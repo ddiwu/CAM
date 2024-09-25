@@ -1,0 +1,97 @@
+mkdir -p ./build_dir.hw.xilinx_u50_gen3x16_xdma_201920_3
+v++ -l --save-temps   -t hw --platform /opt/xilinx/platforms/xilinx_u50_gen3x16_xdma_201920_3/xilinx_u50_gen3x16_xdma_201920_3.xpfm --temp_dir ./_x.hw.xilinx_u50_gen3x16_xdma_201920_3 --config ./cam.cfg -o'./build_dir.hw.xilinx_u50_gen3x16_xdma_201920_3/cam.link.xclbin' _x.hw.xilinx_u50_gen3x16_xdma_201920_3/cam.xo
+Option Map File Used: '/opt/Xilinx/Vitis/2021.2/data/vitis/vpp/optMap.xml'
+mkdir -p ./build_dir.hw.xilinx_u50_gen3x16_xdma_201920_3
+v++ -l --save-temps   -t hw --platform /opt/xilinx/platforms/xilinx_u50_gen3x16_xdma_201920_3/xilinx_u50_gen3x16_xdma_201920_3.xpfm --temp_dir ./_x.hw.xilinx_u50_gen3x16_xdma_201920_3 --config ./cam.cfg -o'./build_dir.hw.xilinx_u50_gen3x16_xdma_201920_3/cam.link.xclbin' _x.hw.xilinx_u50_gen3x16_xdma_201920_3/cam.xo
+Option Map File Used: '/opt/Xilinx/Vitis/2021.2/data/vitis/vpp/optMap.xml'
+
+****** v++ v2021.2 (64-bit)
+  **** SW Build 3363252 on 2021-10-14-04:41:01
+    ** Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
+
+INFO: [v++ 60-1306] Additional information associated with this v++ link can be found at:
+	Reports: /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/reports/link
+	Log files: /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/logs/link
+Running Dispatch Server on port: 44417
+INFO: [v++ 60-1548] Creating build summary session with primary output /home/wddd/Vitis_Accel_Examples/host_xrt/cam/build_dir.hw.xilinx_u50_gen3x16_xdma_201920_3/cam.link.xclbin.link_summary, at Tue Sep 17 18:50:06 2024
+INFO: [v++ 60-1316] Initiating connection to rulecheck server, at Tue Sep 17 18:50:06 2024
+INFO: [v++ 60-1315] Creating rulecheck session with output '/home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/reports/link/v++_link_cam.link_guidance.html', at Tue Sep 17 18:50:09 2024
+INFO: [v++ 60-895]   Target platform: /opt/xilinx/platforms/xilinx_u50_gen3x16_xdma_201920_3/xilinx_u50_gen3x16_xdma_201920_3.xpfm
+INFO: [v++ 60-1578]   This platform contains Xilinx Shell Archive '/opt/xilinx/platforms/xilinx_u50_gen3x16_xdma_201920_3/hw/hw.xsa'
+INFO: [v++ 74-78] Compiler Version string: 2021.2
+INFO: [v++ 60-1302] Platform 'xilinx_u50_gen3x16_xdma_201920_3.xpfm' has been explicitly enabled for this release.
+INFO: [v++ 60-629] Linking for hardware target
+INFO: [v++ 60-423]   Target device: xilinx_u50_gen3x16_xdma_201920_3
+INFO: [v++ 60-1332] Run 'run_link' status: Not started
+INFO: [v++ 60-1443] [18:50:38] Run run_link: Step system_link: Started
+INFO: [v++ 60-1453] Command Line: system_link --xo /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/cam.xo -keep --xpfm /opt/xilinx/platforms/xilinx_u50_gen3x16_xdma_201920_3/xilinx_u50_gen3x16_xdma_201920_3.xpfm --target hw --output_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int --temp_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link
+INFO: [v++ 60-1454] Run Directory: /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/run_link
+INFO: [SYSTEM_LINK 60-1316] Initiating connection to rulecheck server, at Tue Sep 17 18:50:41 2024
+INFO: [SYSTEM_LINK 82-70] Extracting xo v3 file /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/cam.xo
+INFO: [SYSTEM_LINK 82-53] Creating IP database /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/_sysl/.cdb/xd_ip_db.xml
+INFO: [SYSTEM_LINK 82-38] [18:51:26] build_xd_ip_db started: /opt/Xilinx/Vitis/2021.2/bin/build_xd_ip_db -ip_search 0  -sds-pf /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/hw.hpfm -clkid 0 -ip /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/iprepo/xilinx_com_hls_cam_1_0,cam -o /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/_sysl/.cdb/xd_ip_db.xml
+INFO: [SYSTEM_LINK 82-37] [18:51:44] build_xd_ip_db finished successfully
+Time (s): cpu = 00:00:04 ; elapsed = 00:00:17 . Memory (MB): peak = 2166.570 ; gain = 0.000 ; free physical = 424158 ; free virtual = 508378
+INFO: [SYSTEM_LINK 82-51] Create system connectivity graph
+INFO: [SYSTEM_LINK 82-102] Applying explicit connections to the system connectivity graph: /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/cfgraph/cfgen_cfgraph.xml
+INFO: [SYSTEM_LINK 82-38] [18:51:44] cfgen started: /opt/Xilinx/Vitis/2021.2/bin/cfgen -dmclkid 0 -r /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/_sysl/.cdb/xd_ip_db.xml -o /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/cfgraph/cfgen_cfgraph.xml
+INFO: [CFGEN 83-0] Kernel Specs: 
+INFO: [CFGEN 83-0]   kernel: cam, num: 1  {cam_1}
+INFO: [CFGEN 83-2226] Inferring mapping for argument cam_1.key to HBM[0]
+INFO: [CFGEN 83-2226] Inferring mapping for argument cam_1.val to HBM[0]
+INFO: [CFGEN 83-2226] Inferring mapping for argument cam_1.out to HBM[0]
+INFO: [SYSTEM_LINK 82-37] [18:51:47] cfgen finished successfully
+Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 2166.570 ; gain = 0.000 ; free physical = 424157 ; free virtual = 508376
+INFO: [SYSTEM_LINK 82-52] Create top-level block diagram
+INFO: [SYSTEM_LINK 82-38] [18:51:47] cf2bd started: /opt/Xilinx/Vitis/2021.2/bin/cf2bd  --linux --trace_buffer 1024 --input_file /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/cfgraph/cfgen_cfgraph.xml --ip_db /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/_sysl/.cdb/xd_ip_db.xml --cf_name dr --working_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/_sysl/.xsd --temp_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link --output_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int --target_bd ulp.bd
+INFO: [CF2BD 82-31] Launching cf2xd: cf2xd -linux -trace-buffer 1024 -i /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/cfgraph/cfgen_cfgraph.xml -r /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/_sysl/.cdb/xd_ip_db.xml -o dr.xml
+INFO: [CF2BD 82-28] cf2xd finished successfully
+INFO: [CF2BD 82-31] Launching cf_xsd: cf_xsd -disable-address-gen -bd ulp.bd -dn dr -dp /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/sys_link/_sysl/.xsd
+INFO: [CF2BD 82-28] cf_xsd finished successfully
+INFO: [SYSTEM_LINK 82-37] [18:51:52] cf2bd finished successfully
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:05 . Memory (MB): peak = 2166.570 ; gain = 0.000 ; free physical = 424152 ; free virtual = 508377
+INFO: [v++ 60-1441] [18:51:52] Run run_link: Step system_link: Completed
+Time (s): cpu = 00:00:12 ; elapsed = 00:01:14 . Memory (MB): peak = 2040.035 ; gain = 0.000 ; free physical = 424196 ; free virtual = 508420
+INFO: [v++ 60-1443] [18:51:52] Run run_link: Step cf2sw: Started
+INFO: [v++ 60-1453] Command Line: cf2sw -sdsl /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/sdsl.dat -rtd /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/cf2sw.rtd -nofilter /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/cf2sw_full.rtd -xclbin /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/xclbin_orig.xml -o /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/xclbin_orig.1.xml
+INFO: [v++ 60-1454] Run Directory: /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/run_link
+INFO: [v++ 60-1441] [18:51:57] Run run_link: Step cf2sw: Completed
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:05 . Memory (MB): peak = 2040.035 ; gain = 0.000 ; free physical = 424195 ; free virtual = 508420
+INFO: [v++ 60-1443] [18:51:57] Run run_link: Step rtd2_system_diagram: Started
+INFO: [v++ 60-1453] Command Line: rtd2SystemDiagram
+INFO: [v++ 60-1454] Run Directory: /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/run_link
+INFO: [v++ 60-1441] [18:51:58] Run run_link: Step rtd2_system_diagram: Completed
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.87 . Memory (MB): peak = 2040.035 ; gain = 0.000 ; free physical = 424190 ; free virtual = 508415
+INFO: [v++ 60-1443] [18:51:58] Run run_link: Step vpl: Started
+INFO: [v++ 60-1453] Command Line: vpl -t hw -f /opt/xilinx/platforms/xilinx_u50_gen3x16_xdma_201920_3/xilinx_u50_gen3x16_xdma_201920_3.xpfm --remote_ip_cache /home/wddd/Vitis_Accel_Examples/host_xrt/cam/.ipcache -s --output_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int --log_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/logs/link --report_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/reports/link --config /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/vplConfig.ini -k /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/kernel_info.dat --webtalk_flag Vitis --temp_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link --no-info --iprepo /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/xo/ip_repo/xilinx_com_hls_cam_1_0 --messageDb /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/run_link/vpl.pb /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/dr.bd.tcl
+INFO: [v++ 60-1454] Run Directory: /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/run_link
+
+****** vpl v2021.2 (64-bit)
+  **** SW Build 3363252 on 2021-10-14-04:41:01
+    ** Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
+
+INFO: [VPL 60-839] Read in kernel information from file '/home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/kernel_info.dat'.
+INFO: [VPL 74-78] Compiler Version string: 2021.2
+INFO: [VPL 60-423]   Target device: xilinx_u50_gen3x16_xdma_201920_3
+INFO: [VPL 60-1032] Extracting hardware platform to /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/vivado/vpl/.local/hw_platform
+[19:13:49] Run vpl: Step create_project: RUNNING...
+[19:15:05] Run vpl: Step create_project: RUNNING...
+[19:16:20] Run vpl: Step create_project: RUNNING...
+[19:17:35] Run vpl: Step create_project: RUNNING...
+[19:18:50] Run vpl: Step create_project: RUNNING...
+/opt/Xilinx/Vitis/2021.2/bin/rdiArgs.sh: line 311: 2158023 Segmentation fault      (core dumped) "$RDI_PROG" "$@"
+segfault in /opt/Xilinx/Vitis/2021.2/bin/unwrapped/lnx64.o/vpl -exec vpl -t hw -f /opt/xilinx/platforms/xilinx_u50_gen3x16_xdma_201920_3/xilinx_u50_gen3x16_xdma_201920_3.xpfm --remote_ip_cache /home/wddd/Vitis_Accel_Examples/host_xrt/cam/.ipcache -s --output_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int --log_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/logs/link --report_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/reports/link --config /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/vplConfig.ini -k /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/kernel_info.dat --webtalk_flag Vitis --temp_dir /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link --no-info --iprepo /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/xo/ip_repo/xilinx_com_hls_cam_1_0 --messageDb /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/run_link/vpl.pb /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/int/dr.bd.tcl, exiting...
+INFO: [v++ 60-1442] [19:19:44] Run run_link: Step vpl: Failed
+Time (s): cpu = 00:00:10 ; elapsed = 00:27:46 . Memory (MB): peak = 2040.035 ; gain = 0.000 ; free physical = 422624 ; free virtual = 507228
+INFO: [v++ 60-586] Created ./build_dir.hw.xilinx_u50_gen3x16_xdma_201920_3/cam.link.xclbin
+INFO: [v++ 60-1307] Run completed. Additional information can be found in:
+	Guidance: /home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/reports/link/v++_link_cam.link_guidance.html
+
+INFO: [v++ 60-2343] Use the vitis_analyzer tool to visualize and navigate the relevant reports. Run the following command. 
+    vitis_analyzer /home/wddd/Vitis_Accel_Examples/host_xrt/cam/build_dir.hw.xilinx_u50_gen3x16_xdma_201920_3/cam.link.xclbin.link_summary 
+INFO: [v++ 60-791] Total elapsed time: 0h 38m 8s
+terminate called after throwing an instance of 'HXMLException'
+  what():  ERROR: [v++ 60-131] Error writing the XML file '/home/wddd/Vitis_Accel_Examples/host_xrt/cam/_x.hw.xilinx_u50_gen3x16_xdma_201920_3/link/link.spr'
+
+/opt/Xilinx/Vitis/2021.2/bin/rdiArgs.sh: line 311: 2157621 Aborted                 (core dumped) "$RDI_PROG" "$@"
+make: *** [makefile_us_alveo.mk:101: build_dir.hw.xilinx_u50_gen3x16_xdma_201920_3/cam.xclbin] Error 134
