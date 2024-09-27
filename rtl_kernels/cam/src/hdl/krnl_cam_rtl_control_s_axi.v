@@ -51,6 +51,8 @@ module krnl_cam_rtl_control_s_axi
     output wire [63:0]                   b,
     output wire [63:0]                   c,
     output wire [31:0]                   length_r
+    // output wire [31:0]                   ctrl_1_done,
+    // input wire                           ctrl_1_done_in
 );
 //------------------------Address Info-------------------
 // 0x00 : Control signals
@@ -113,6 +115,7 @@ localparam
     WRRESP               = 2'd2,
     RDIDLE               = 2'd0,
     RDDATA               = 2'd1,
+    ADDR_CTRL_1_DONE     = 6'h3c,
     ADDR_BITS         = 6;
 
 //------------------------Local signal-------------------
@@ -140,6 +143,9 @@ localparam
     reg  [63:0]                   int_b = 64'b0;
     reg  [63:0]                   int_c = 64'b0;
     reg  [31:0]                   int_length_r = 32'b0;
+    reg  [31:0]                   int_ctrl_1_done = 32'b0;
+    wire                          ctrl_1_done_in;
+    wire [31:0]                   ctrl_1_done;
 
 //------------------------Instantiation------------------
 
@@ -268,6 +274,9 @@ always @(posedge ACLK) begin
                 ADDR_LENGTH_R_DATA_0: begin
                     rdata <= int_length_r[31:0];
                 end
+                ADDR_CTRL_1_DONE: begin
+                    rdata <= int_ctrl_1_done;
+                end
             endcase
         end
     end
@@ -283,6 +292,7 @@ assign a            = int_a;
 assign b            = int_b;
 assign c            = int_c;
 assign length_r     = int_length_r;
+assign ctrl_1_done  = int_ctrl_1_done;
 // int_ap_start
 always @(posedge ACLK) begin
     if (ARESET)
@@ -431,6 +441,17 @@ always @(posedge ACLK) begin
     end
 end
 
+// int_ctrl_1_done[31:0]
+always @(posedge ACLK) begin
+    if (ARESET)
+        int_ctrl_1_done[31:0] <= 0;
+    else if (ctrl_1_done_in)
+        int_ctrl_1_done[31:0] <= 1;
+    else if (ACLK_EN) begin
+        if (w_hs && waddr == ADDR_CTRL_1_DONE)
+            int_ctrl_1_done[31:0] <= (WDATA[31:0] & wmask) | (int_ctrl_1_done[31:0] & ~wmask);
+    end
+end
 
 //------------------------Memory logic-------------------
 

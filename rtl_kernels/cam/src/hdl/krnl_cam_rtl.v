@@ -27,7 +27,7 @@ module krnl_cam_rtl #(
   parameter integer  C_S_AXI_CONTROL_ADDR_WIDTH = 6,
   parameter integer  C_M_AXI_GMEM_ID_WIDTH = 1,
   parameter integer  C_M_AXI_GMEM_ADDR_WIDTH = 64,
-  parameter integer  C_M_AXI_GMEM_DATA_WIDTH = 32
+  parameter integer  C_M_AXI_GMEM_DATA_WIDTH = 64
 )
 (
   // System signals

@@ -143,6 +143,9 @@ logic                               wr_fifo_tvalid_n;
 logic                               wr_fifo_tready; 
 logic [C_M_AXI_GMEM_DATA_WIDTH-1:0] wr_fifo_tdata;
 
+logic [31:0] ctrl_1_done;
+logic ctrl_1_done_in;
+
 ///////////////////////////////////////////////////////////////////////////////
 // RTL Logic 
 ///////////////////////////////////////////////////////////////////////////////
@@ -225,6 +228,8 @@ inst_krnl_cam_control_s_axi (
   .b         ( b[0+:C_M_AXI_GMEM_ADDR_WIDTH] ) ,
   .c         ( c[0+:C_M_AXI_GMEM_ADDR_WIDTH] ) ,
   .length_r  ( length_r[0+:LP_LENGTH_WIDTH]  ) 
+  // .ctrl_1_done( ctrl_1_done                  ) ,
+  // .ctrl_1_done_in( ctrl_1_done_in            )
 );
 
 // AXI4 Read Master
@@ -325,6 +330,7 @@ inst_adder (
   .m_tvalid ( adder_tvalid      ) ,
   .m_tready ( ~adder_tready_n   ) ,
   .m_tdata  ( adder_tdata       ) 
+  // .ctrl_1_done( ctrl_1_done_in     )
 );
 
 // xpm_fifo_sync: Synchronous FIFO

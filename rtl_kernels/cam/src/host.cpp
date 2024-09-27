@@ -15,133 +15,132 @@
 */
 #include "xcl2.hpp"
 #include <vector>
+#include <ap_int.h>
+#include <iostream>
+#include "experimental/xrt-next.h"
+#include "experimental/xrt_bo.h"
+#include "experimental/xrt_device.h"
+#include "experimental/xrt_kernel.h"
+#include "cmdlineparser.h"
+#include <cstring>
 
 #define DATA_SIZE 256
 
+// 定义 AXI-Lite 寄存器地址偏移量
+#define CTRL_REG_ADDR 0x000
+#define GIER_REG_ADDR 0x004
+#define IP_IER_REG_ADDR 0x008
+#define IP_ISR_REG_ADDR 0x00C
+#define A_REG_ADDR 0x010
+#define B_REG_ADDR 0x01C
+#define C_REG_ADDR 0x028
+#define LENGTH_R_REG_ADDR 0x034
+#define CTRL_1_DONE_REG_ADDR 0x03C
+
 int main(int argc, char** argv) {
-    if (argc != 2) {
-        std::cout << "Usage: " << argv[0] << " <XCLBIN File>" << std::endl;
-        return EXIT_FAILURE;
-    }
+    // Command Line Parser
+    sda::utils::CmdLineParser parser;
 
-    std::string binaryFile = argv[1];
+    // Switches
+    //**************//"<Full Arg>",  "<Short Arg>", "<Description>", "<Default>"
+    parser.addSwitch("--xclbin_file", "-x", "input binary file string", "");
+    parser.addSwitch("--device_id", "-d", "device index", "0");
+    parser.parse(argc, argv);
 
-    cl_int err;
-    cl::CommandQueue q;
-    cl::Context context;
-    cl::Kernel rtl_cam, cl_cam;
+    std::string binaryFile = parser.value("xclbin_file");
+    int device_index = stoi(parser.value("device_id"));
+
+    std::cout << "Open the device" << device_index << std::endl;
+    auto device = xrt::device(device_index);
+    std::cout << "Load the xclbin " << binaryFile << std::endl;
+    auto uuid = device.load_xclbin(binaryFile); 
+
+    // xclDeviceHandle handle = xclOpen(0, nullptr, XCL_QUIET); 
+
     auto size = DATA_SIZE;
     // Allocate Memory in Host Memory
-    auto vector_size_bytes = sizeof(int) * size;
-    std::vector<int, aligned_allocator<int> > source_input1(size);
-    std::vector<int, aligned_allocator<int> > source_input2(size);
-    std::vector<int, aligned_allocator<int> > source_input3(size);
-    std::vector<int, aligned_allocator<int> > source_input4(size);
-    std::vector<int, aligned_allocator<int> > source_krnl0_output(size);
-    std::vector<int, aligned_allocator<int> > source_hw_results(size);
-    std::vector<int, aligned_allocator<int> > source_sw_results(size);
+    long int source_sw_results[size];
+
+    auto rtl_kernel = xrt::kernel(device, uuid, "krnl_cam_rtl", xrt::kernel::cu_access_mode::exclusive);
+    auto cl_kernel = xrt::kernel(device, uuid, "krnl_cam");
+
+    xrt::bo buffer_r1 = xrt::bo(device, size * sizeof(long int), rtl_kernel.group_id(0));
+    xrt::bo buffer_r2 = xrt::bo(device, size * sizeof(long int), rtl_kernel.group_id(1));
+    xrt::bo buffer_rw_0 = xrt::bo(device, size * sizeof(long int), rtl_kernel.group_id(2));
+    xrt::bo buffer_rw_1 = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(0));
+    xrt::bo buffer_r3 = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(1));
+    xrt::bo buffer_w = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(2));
+
+    auto buffer_r1_map = buffer_r1.map<ap_uint<48>*>();
+    auto buffer_r2_map = buffer_r2.map<ap_uint<48>*>();
+    auto buffer_rw_0_map = buffer_rw_0.map<ap_uint<48>*>();
+    auto buffer_rw_1_map = buffer_rw_1.map<ap_uint<48>*>();
+    auto buffer_r3_map = buffer_r3.map<ap_uint<48>*>();
+    auto buffer_w_map = buffer_w.map<ap_uint<48>*>();
 
     // Create the test data and Software Result
     for (int i = 0; i < size; i++) {
-        source_input1[i] = i;
-        source_input2[i] = i;
-        source_input3[i] = i;
-        source_input4[i] = i;
-        source_sw_results[i] = source_input1[i] + source_input2[i] + source_input4[i];
-        source_krnl0_output[i] = 0;
-        source_hw_results[i] = 0;
+        buffer_r1_map[i] = i;
+        buffer_r2_map[i] = i;
+        buffer_r3_map[i] = i;
+        source_sw_results[i] = i ^ i + 0;
+        buffer_rw_0_map[i] = 0;
+        buffer_rw_1_map[i] = 0;
+        buffer_w_map[i] = 0;
     }
 
-    // OPENCL HOST CODE AREA START
-    // Create Program and Kernel
-    auto devices = xcl::get_xil_devices();
+    std::cout << "Copying input data to device global memory" << std::endl;
+    buffer_r1.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+    buffer_r2.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+    buffer_rw_0.sync(XCL_BO_SYNC_BO_TO_DEVICE);
 
-    // read_binary_file() is a utility API which will load the binaryFile
-    // and will return the pointer to file buffer.
-    auto fileBuf = xcl::read_binary_file(binaryFile);
-    cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
-    bool valid_device = false;
-    for (unsigned int i = 0; i < devices.size(); i++) {
-        auto device = devices[i];
-        // Creating Context and Command Queue for selected Device
-        OCL_CHECK(err, context = cl::Context(device, nullptr, nullptr, nullptr, &err));
-        OCL_CHECK(err, q = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE, &err));
+    std::cout << "Launching RTL kernel" << std::endl;
+    xrt::run rtl_run = rtl_kernel(buffer_r1, buffer_r2, buffer_rw_0, size );
 
-        std::cout << "Trying to program device[" << i << "]: " << device.getInfo<CL_DEVICE_NAME>() << std::endl;
-        cl::Program program(context, {device}, bins, nullptr, &err);
-        if (err != CL_SUCCESS) {
-            std::cout << "Failed to program device[" << i << "] with xclbin file!\n";
-        } else {
-            std::cout << "Device[" << i << "]: program successful!\n";
-            OCL_CHECK(err, rtl_cam = cl::Kernel(program, "krnl_cam_rtl", &err));
-            OCL_CHECK(err, cl_cam = cl::Kernel(program, "krnl_cam", &err));
-            valid_device = true;
-            break; // we break because we found a valid device
-        }
-    }
-    if (!valid_device) {
-        std::cout << "Failed to program any device found, exit!\n";
-        exit(EXIT_FAILURE);
-    }
+    rtl_run.wait();
 
-    // Allocate Buffer in Global Memory
-    OCL_CHECK(err, cl::Buffer buffer_r1(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, vector_size_bytes,
-                                        source_input1.data(), &err));
-    OCL_CHECK(err, cl::Buffer buffer_r2(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, vector_size_bytes,
-                                        source_input2.data(), &err));
-    OCL_CHECK(err, cl::Buffer buffer_rw_0(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, vector_size_bytes,
-                                          source_krnl0_output.data(), &err));
-    OCL_CHECK(err, cl::Buffer buffer_rw_1(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, vector_size_bytes,
-                                          source_input3.data(), &err));
-    OCL_CHECK(err, cl::Buffer buffer_r3(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, vector_size_bytes,
-                                        source_input4.data(), &err));
-    OCL_CHECK(err, cl::Buffer buffer_w(context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, vector_size_bytes,
-                                       source_hw_results.data(), &err));
+    std::cout << "Reading LENGTH_R_REG_ADDR" << std::endl;
+    // uint32_t cu_index = rtl_kernel.cu_index();
+    uint32_t si;
+    // xclRegRead(handle, cu_index, LENGTH_R_REG_ADDR, &si);
+    si = rtl_kernel.read_register(LENGTH_R_REG_ADDR);
+    std::cout << "si = " << si << std::endl;
 
-    // Set the "RTL kernel" Arguments
-    OCL_CHECK(err, err = rtl_cam.setArg(0, buffer_r1));
-    OCL_CHECK(err, err = rtl_cam.setArg(1, buffer_r2));
-    OCL_CHECK(err, err = rtl_cam.setArg(2, buffer_rw_0));
-    OCL_CHECK(err, err = rtl_cam.setArg(3, size));
+    // uint32_t ctrl_1_done = 0;
+    // while (!ctrl_1_done) {
+    //     // xclRegRead(handle, cu_index, CTRL_1_DONE_REG_ADDR, &ctrl_1_done);
+    //     ctrl_1_done = rtl_kernel.read_register(CTRL_1_DONE_REG_ADDR);
+    // }
+    // std::cout << "1 stage done" << std::endl;
 
-    // Set the "CL kernel" Arguments
-    OCL_CHECK(err, err = cl_cam.setArg(0, buffer_rw_1));
-    OCL_CHECK(err, err = cl_cam.setArg(1, buffer_r3));
-    OCL_CHECK(err, err = cl_cam.setArg(2, buffer_w));
-    OCL_CHECK(err, err = cl_cam.setArg(3, size));
+    std::cout << "Copying output data to device global memory" << std::endl;
+    buffer_rw_0.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
+    buffer_rw_0.copy(buffer_rw_1);
+    buffer_rw_1.sync(XCL_BO_SYNC_BO_TO_DEVICE);
 
-    // Copy input data to device global memory
-    OCL_CHECK(err, err = q.enqueueMigrateMemObjects({buffer_r1, buffer_r2, buffer_r3}, 0 /* 0 means from host*/));
+    std::cout << "Launching CL kernel" << std::endl;
+    xrt::run cl_run = cl_kernel(buffer_rw_1, buffer_r3, buffer_w, size );
+ 
+    cl_run.wait();
 
-    // Launch the "RTL kernel"
-    OCL_CHECK(err, err = q.enqueueTask(rtl_cam));
+    std::cout << "Copying output data to host local memory" << std::endl;
+    buffer_w.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
 
-    // This enqueueCopyBuffer() command will copy buffer from buffer_rw_0 to buffer_rw_1
-    OCL_CHECK(err, err = q.enqueueCopyBuffer(buffer_rw_0, buffer_rw_1, 0, 0, vector_size_bytes));
 
-    // Launch the "CL kernel"
-    OCL_CHECK(err, err = q.enqueueTask(cl_cam));
-
-    // Copy Result from Device Global Memory to Host Local Memory
-    OCL_CHECK(err, err = q.enqueueMigrateMemObjects({buffer_w}, CL_MIGRATE_MEM_OBJECT_HOST));
-    OCL_CHECK(err, err = q.finish());
-
-    // OPENCL HOST CODE AREA END
-
-    // Compare the results of the Device to the simulation
+    std::cout << "Comparing results" << std::endl;
     int match = 0;
     for (int i = 0; i < size; i++) {
-        if (source_hw_results[i] != source_sw_results[i]) {
+        if (buffer_w_map[i] != source_sw_results[i]) {
             std::cout << "Error: Result mismatch" << std::endl;
             std::cout << "i = " << i << " Software result = " << source_sw_results[i]
-                      << " Device result = " << source_hw_results[i] << std::endl;
+                      << " Device result = " << buffer_w_map[i] << std::endl;
             match = 1;
             break;
         }
         std::cout << "i = " << i << " Software result = " << source_sw_results[i]
-                  << " Device result = " << source_hw_results[i] << " input1 = " << source_input1[i]
-                  << " input2 = " << source_input2[i] << " krnl0_output = " << source_krnl0_output[i]
-                  << " input3 = " << source_input4[i] << std::endl;
+                  << " Device result = " << buffer_w_map[i] << " input1 = " << buffer_r1_map[i]
+                  << " input2 = " << buffer_r2_map[i] << " krnl0_output = " << buffer_rw_0_map[i]
+                  << " input3 = " << buffer_r3_map[i] << std::endl;
     }
 
     std::cout << "TEST " << (match ? "FAILED" : "PASSED") << std::endl;
