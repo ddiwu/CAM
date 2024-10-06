@@ -20,6 +20,7 @@ set path_to_tmp_project "./tmp_kernel_pack_${suffix}"
 
 create_project -force kernel_pack $path_to_tmp_project 
 add_files -norecurse [glob $path_to_hdl/*.v $path_to_hdl/*.sv]
+add_files -fileset constrs_1 -norecurse [glob $path_to_hdl/*.xdc]
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
 ipx::package_project -root_dir $path_to_packaged -vendor xilinx.com -library RTLKernel -taxonomy /KernelIP -import_files -set_current false
@@ -122,9 +123,9 @@ set reg      [::ipx::add_register -quiet "length_r" $addr_block]
   set_property address_offset 0x034 $reg
   set_property size           [expr {4*8}]   $reg
 
-# set reg      [::ipx::add_register -quiet "ctrl_1_done" $addr_block]
-#   set_property address_offset 0x03C $reg
-#   set_property size           32    $reg
+set reg      [::ipx::add_register -quiet "ctrl_1_done" $addr_block]
+  set_property address_offset 0x03C $reg
+  set_property size           32    $reg
 
 
 set_property slave_memory_map_ref "s_axi_control" [::ipx::get_bus_interfaces -of $core "s_axi_control"]

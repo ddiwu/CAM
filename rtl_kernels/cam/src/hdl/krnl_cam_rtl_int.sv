@@ -227,9 +227,9 @@ inst_krnl_cam_control_s_axi (
   .a         ( a[0+:C_M_AXI_GMEM_ADDR_WIDTH] ) ,
   .b         ( b[0+:C_M_AXI_GMEM_ADDR_WIDTH] ) ,
   .c         ( c[0+:C_M_AXI_GMEM_ADDR_WIDTH] ) ,
-  .length_r  ( length_r[0+:LP_LENGTH_WIDTH]  ) 
-  // .ctrl_1_done( ctrl_1_done                  ) ,
-  // .ctrl_1_done_in( ctrl_1_done_in            )
+  .length_r  ( length_r[0+:LP_LENGTH_WIDTH]  ) ,
+  .ctrl_1_done( ctrl_1_done                  ) ,
+  .ctrl_1_done_in( ctrl_1_done_in            )
 );
 
 // AXI4 Read Master
@@ -329,8 +329,10 @@ inst_adder (
 
   .m_tvalid ( adder_tvalid      ) ,
   .m_tready ( ~adder_tready_n   ) ,
-  .m_tdata  ( adder_tdata       ) 
-  // .ctrl_1_done( ctrl_1_done_in     )
+  .m_tdata  ( adder_tdata       ) ,
+  .read_done( read_done         ) ,
+  .ctrl_edge( ctrl_1_done_in    ) , //upedge of ctrl_1_done
+  .ctrl_1_done_in( ctrl_1_done  ) //axilite to make ctrl_1_done_in low
 );
 
 // xpm_fifo_sync: Synchronous FIFO
@@ -391,7 +393,7 @@ inst_axi_write_master (
 
   .ctrl_start  ( ap_start_pulse     ) ,
   .ctrl_offset ( c                  ) ,
-  .ctrl_length ( length_r           ) ,
+  .ctrl_length ( length_r*16       ) , // decide when to stop
   .ctrl_done   ( ap_done            ) ,
 
   .awvalid     ( m_axi_gmem_AWVALID ) ,

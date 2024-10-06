@@ -17,28 +17,57 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Description: Basic Adder using DSP48E2, no overflow. Unsigned. Combinatorial.
 ////////////////////////////////////////////////////////////////////////////////
+// (* DONT_TOUCH = "FALSE" *)
+// (* use_dsp = "logic" *)
+// module dspxor #(
+//   parameter integer DW = 48
+// )
+// (
+//   input  logic          aclk,
+//   input  logic          areset,
+//   input  logic [DW-1:0] a,
+//   input  logic [DW-1:0] b,
+//   output logic [DW-1:0] c_out
+// );
+// logic [DW-1:0] a_in;
+// logic [DW-1:0] b_in;
 
-`default_nettype none
+// always_ff @(posedge aclk) begin
+//   if (areset) begin
+//     c_out <= 0;
+//   end
+//   else begin
+//     a_in <= a;
+//     b_in <= b;
+//     c_out <= a_in ^ b_in;
+//   end
+// end
+// endmodule
 
-(* use_dsp = "logic" *)
+// `default_nettype none
+`define DATA_WIDTH 48
+
 module krnl_cam_rtl_adder #(
   parameter integer C_DATA_WIDTH   = 32, // Data width of both input and output data
   parameter integer C_NUM_CHANNELS = 2   // Number of input channels.  Only a value of 2 implemented.
 )
 (
-  input wire                                         aclk,
-  input wire                                         areset,
+  input logic                                        aclk,
+  input logic                                        areset,
 
-  input wire  [C_NUM_CHANNELS-1:0]                   s_tvalid,
-  input wire  [C_NUM_CHANNELS-1:0][C_DATA_WIDTH-1:0] s_tdata,
-  output wire [C_NUM_CHANNELS-1:0]                   s_tready,
+  input logic  [C_NUM_CHANNELS-1:0]                   s_tvalid,
+  input logic  [C_NUM_CHANNELS-1:0][C_DATA_WIDTH-1:0] s_tdata,
+  output logic [C_NUM_CHANNELS-1:0]                   s_tready,
 
   output logic                                       m_tvalid,
-  output wire [C_DATA_WIDTH-1:0]                     m_tdata,
-  input  wire                                        m_tready
+  output logic [C_DATA_WIDTH-1:0]                    m_tdata,
+  input  logic                                       m_tready,
+
+  input  logic                                       read_done,
 
   // AXI-Lite Slave Interface
-  //output logic                                       ctrl_1_done  //update done signal
+  input  logic [31:0]                                ctrl_1_done_in,
+  output logic                                       ctrl_edge  //update done signal
 
 );
 
@@ -48,83 +77,245 @@ timeprecision 1ps;
 /////////////////////////////////////////////////////////////////////////////
 // Variables
 /////////////////////////////////////////////////////////////////////////////
-logic [C_DATA_WIDTH-1:0] acc;
-logic [15:0] dummy;
-logic [5:0] num;
-
-logic [5:0][2:0][47:0] data_in;
+logic [C_DATA_WIDTH-1:0] m_tdata1, m_tdata2;
+logic [47:0] s_data1;
+logic m_tvalid1;
+logic [C_NUM_CHANNELS-1:0] s_tready1, s_tready2;
+logic [47:0] acc [256];
+logic [7:0] write_index; 
+logic [47:0] data_in [256];
+logic [47:0] data_in1 [256];
+logic [7:0] compare_index, compare_index1, compare_index2;
+// logic m_tready1, m_tready_edge;
+logic s_tvalid1, s_tvalid2;
+// logic s_tready_first;
+logic ctrl1, ctrl_1_done;
 /////////////////////////////////////////////////////////////////////////////
 // Logic
 /////////////////////////////////////////////////////////////////////////////
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     data_in <= 0;
-//     num <= 0;
-//     ctrl_1_done <= 0;
-//   end
-//   else if (ctrl_1_done) begin
-//     data_in <= data_in;
-//     num <= num;
-//   end
-//   else if (num == 6'b111111 && &s_tvalid) begin
-//     for (int i = 0; i < 8; i++) begin
-//       data_in[num][i] <= s_tdata[0][i*64+:48];
-//     end
-//     num <= 0;
-//     ctrl_1_done <= 1;
-//   end
-//   else if (&s_tvalid) begin
-//     for (int i = 0; i < 8; i++) begin
-//       data_in[num][i] <= s_tdata[0][i*64+:48];
-//     end
-//     num <= num + 1;
-//   end
-// end
+always_ff @(posedge aclk) begin
+  if (areset) begin
+    ctrl1 <= 0;
+  end
+  else begin
+    ctrl1 <= ctrl_1_done;
+  end
+end
+assign ctrl_edge = !ctrl1 && ctrl_1_done;
 
-// after clock cycles, update ctrl_1_done
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     ctrl_1_done <= 0;
-//     num <= 0;
-//   end
-//   else if (num == 6'b111111) begin
-//     ctrl_1_done <= 1;
-//     num <= 0;
-//   end
-//   else if (&s_tvalid) begin 
-//     ctrl_1_done <= 0;
-//     num <= num + 1;
-//   end
-// end
-
-
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     dummy <= 0;
-//     acc <= 0;
-//     m_tvalid <= 0;
-//   end
-//   else if (&s_tvalid) begin
-//     {dummy, acc} <= {16'b0, s_tdata[0]} ^ {16'b0, s_tdata[1]};
-//     m_tvalid <= 1;
-//   end
-//   else begin
-//     dummy <= 0;
-//     acc <= 0;
-//     m_tvalid <= 0;
-//   end
-// end
-
-always_comb begin 
-    acc = s_tdata[0] ^ s_tdata[1];
+always_ff @(posedge aclk) begin
+  if (areset) begin
+    for (int i = 0; i < 256; i++) begin
+      data_in[i] <= 0;
+    end
+    write_index <= 0;
+    ctrl_1_done <= 0;
+  end
+  else if (!ctrl_1_done && &s_tvalid) begin
+    for (int i = 0; i < 8; i++) begin
+      data_in[write_index + i][47:0] <= s_tdata[0][i*64+:48];
+    end
+    if (write_index == 8'd248) begin 
+      write_index <= 0;
+      ctrl_1_done <= 1;
+    end
+    else begin
+      write_index <= write_index + 8'd8;
+    end
+  end
+  else if (ctrl1 && !ctrl_1_done_in[0]) begin //if we set ctrl_1_done_in low when starting
+    ctrl_1_done <= 0;
+  end
 end
 
-assign m_tvalid = &s_tvalid;
-assign m_tdata = acc;
+//DSP48E2 block
+// always_comb begin 
+//     for (int i = 0; i < 256; i++) begin
+//       acc[i][47:0] = s_tdata[0][0+:48] ^ data_in[i][47:0];
+//     end
+// end
 
-// Only assert s_tready when transfer has been accepted.  tready asserted on all channels simultaneously
-assign s_tready = m_tready & m_tvalid ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+generate begin
+  genvar i;
+  // for (i = 0; i < 256; i++) begin
+  //   (* use_dsp = "logic" *)
+  //   dspxor #(
+  //     .DW(48)
+  //   ) dspxor_inst (
+  //     .aclk(aclk),
+  //     .areset(areset),
+  //     .a(s_tdata[0][47:0]),
+  //     .b(data_in[i][47:0]),
+  //     .c_out(acc[i][47:0])
+  //   );
+  // end
+  for (i = 0; i < 256; i++) begin
+  DSP48E2 #(
+    // Feature Control Attributes: Data Path Selection
+    .AMULTSEL("A"),                    // Selects A input to multiplier (A, AD)
+    .A_INPUT("DIRECT"),                // Selects A input source, "DIRECT" (A port) or "CASCADE" (ACIN port)
+    .BMULTSEL("B"),                    // Selects B input to multiplier (AD, B)
+    .B_INPUT("DIRECT"),                // Selects B input source, "DIRECT" (B port) or "CASCADE" (BCIN port)
+    .PREADDINSEL("A"),                 // Selects input to pre-adder (A, B)
+    .RND(48'h000000000000),            // Rounding Constant
+    .USE_MULT("NONE"),                 // Disable the multiplier, as multiplication is not needed
+    .USE_SIMD("ONE48"),                // SIMD selection (FOUR12, ONE48, TWO24)
+    .USE_WIDEXOR("TRUE"),              // Enable the Wide XOR function for 48-bit operation
+    .XORSIMD("XOR24_48_96"),           // Enable full 48-bit XOR function
+    // Pattern Detector Attributes: Pattern Detection Configuration
+    .AUTORESET_PATDET("NO_RESET"),     // No reset for pattern detection
+    .AUTORESET_PRIORITY("RESET"),      // Priority of AUTORESET vs. CEP (CEP, RESET)
+    .MASK(48'h3fffffffffff),           // 48-bit mask value for pattern detect (1=ignore)
+    .PATTERN(48'h000000000000),        // 48-bit pattern match for pattern detect
+    .SEL_MASK("MASK"),                 // Select MASK value for pattern detection
+    .SEL_PATTERN("PATTERN"),           // Select pattern value for pattern detection
+    .USE_PATTERN_DETECT("NO_PATDET"),  // Disable pattern detection
+    // Programmable Inversion Attributes: Specifies built-in programmable inversion on specific pins
+    .IS_ALUMODE_INVERTED(4'b0000),     // No inversion for ALUMODE
+    .IS_CARRYIN_INVERTED(1'b0),        // No inversion for CARRYIN
+    .IS_CLK_INVERTED(1'b0),            // No inversion for CLK
+    .IS_INMODE_INVERTED(5'b00000),     // No inversion for INMODE
+    .IS_OPMODE_INVERTED(9'b000000000), // No inversion for OPMODE
+    .IS_RSTALLCARRYIN_INVERTED(1'b0),  // No inversion for RSTALLCARRYIN
+    .IS_RSTALUMODE_INVERTED(1'b0),     // No inversion for RSTALUMODE
+    .IS_RSTA_INVERTED(1'b0),           // No inversion for RSTA
+    .IS_RSTB_INVERTED(1'b0),           // No inversion for RSTB
+    .IS_RSTCTRL_INVERTED(1'b0),        // No inversion for RSTCTRL
+    .IS_RSTC_INVERTED(1'b0),           // No inversion for RSTC
+    .IS_RSTD_INVERTED(1'b0),           // No inversion for RSTD
+    .IS_RSTINMODE_INVERTED(5'b00000),  // No inversion for RSTINMODE
+    .IS_RSTM_INVERTED(1'b0),           // No inversion for RSTM
+    .IS_RSTP_INVERTED(1'b0),           // No inversion for RSTP
+    // Register Control Attributes: Pipeline Register Configuration
+    .ACASCREG(1),                      // Number of pipeline stages between A/ACIN and ACOUT (0-2)
+    .ADREG(1),                         // Pipeline stages for pre-adder (0-1)
+    .ALUMODEREG(0),                    // Pipeline stages for ALUMODE (0-1)
+    .AREG(1),                          // Pipeline stages for A (0-2)
+    .BCASCREG(1),                      // Number of pipeline stages between B/BCIN and BCOUT (0-2)
+    .BREG(1),                          // Pipeline stages for B (0-2)
+    .CARRYINREG(0),                    // Disable carry-in register
+    .CARRYINSELREG(0),                 // Disable carry-in select register
+    .CREG(1),                          // Pipeline stages for C (0-1)
+    .DREG(1),                          // Disable D input register
+    .INMODEREG(0),                     // Disable INMODE register
+    .MREG(0),                          // Disable multiplier register
+    .OPMODEREG(0),                     // Enable OPMODE register for better control
+    .PREG(0)                           // Disable P register for direct output
+  )
+  DSP48E2_inst (
+    // Control outputs: Control Inputs/Status Bits
+    .OVERFLOW(),             // Overflow status output (not used)
+    .UNDERFLOW(),            // Underflow status output (not used)
+    .PATTERNBDETECT(),       // Pattern B detect output (not used)
+    .PATTERNDETECT(),        // Pattern detect output (not used)
+    // Data outputs: Data Ports
+    .P(acc[i][47:0]),                   // 48-bit output: Result of A:B XOR C
+    // Data inputs: Data Ports
+    .A(s_tdata[0][47:18]),                   // 30-bit input: A data
+    .B(s_tdata[0][17:0]),                   // 18-bit input: B data
+    //.C(s_tdata[0][(i%8)*64+:48]),                   // 48-bit input: C data
+    .C(data_in[i][47:0]),                   // 48-bit input: C data
+    // Control inputs: Control Inputs/Status Bits
+    .ALUMODE(4'b0100),       // Set ALUMODE to perform XOR operation
+    .OPMODE(9'b000110011),   // Set OPMODE to enable A:B XOR C operation
+    .CLK(aclk),               // Clock signal
+    .CEA1(1'b0),             // Clock enable for A input register
+    .CEA2(1'b1),             // Clock enable for A input register
+    .CEB1(1'b0),             // Clock enable for B input register
+    .CEB2(1'b1),             // Clock enable for B input register
+    //.CEC(!ctrl_1_done && &s_tvalid && write_index <= i && write_index+8 > i),
+    .CEC(1'b1),             // Clock enable for C input register
+    .CEALUMODE(1'b1),         // Clock enable for ALUMODE register
+    .CECTRL(1'b1),           // Clock enable for control register 
+    .CED(1'b0),             // Clock enable for D input register (not used)
+    .CEAD(1'b0),            // Clock enable for AD input register (not used)
+    .RSTA(1'b0),             // Reset for A input register
+    .RSTB(1'b0),             // Reset for B input register
+    .RSTC(1'b0),             // Reset for C input register
+    .RSTD(1'b0),             // Reset for D input register (not used)
+    .RSTALLCARRYIN(1'b0),    // Reset for carry-in register (not used)
+    .RSTALUMODE(1'b0),       // Reset for ALUMODE register
+    .RSTCTRL(1'b0),          // Reset for control register
+    .RSTP(1'b0)              // Reset for output register
+  );
+end
+end
+endgenerate
+
+// assign m_tvalid = m_tready && ctrl_1_done;
+always_ff @(posedge aclk) begin
+  if (areset) begin
+    m_tvalid1 <= 0;
+    m_tvalid <= 0;
+  end
+  else if (ctrl_1_done) begin
+    m_tvalid1 <= &s_tvalid | read_done;
+    m_tvalid <= m_tvalid1;
+  end
+end
+
+always_ff @(posedge aclk) begin
+  if (areset) begin
+    s_tvalid1 <= 0;
+    s_tvalid2 <= 0;
+  end
+  else if (ctrl_1_done) begin
+    s_tvalid1 <= &s_tvalid;
+    s_tvalid2 <= s_tvalid1;
+  end
+end
+
+always_ff @(posedge aclk) begin
+  if (areset) begin
+    compare_index <= 0;
+  end
+  else if (ctrl_1_done && s_tvalid2 && m_tready) begin
+    compare_index <= compare_index + 8'd8;
+  end
+end
+
+// always_ff @(posedge aclk) begin
+//   if (areset) begin
+//     compare_index1 <= 0;
+//     compare_index2 <= 0;
+//   end
+//   else begin
+//     compare_index1 <= compare_index;
+//     compare_index2 <= compare_index1;
+//   end
+// end
+
+always_comb begin
+  if (!ctrl_1_done) begin
+    m_tdata = 0;
+  end
+  else begin
+    m_tdata = {16'b0,acc[compare_index+7],16'b0,acc[compare_index+6],16'b0,acc[compare_index+5],16'b0,acc[compare_index+4],16'b0,acc[compare_index+3],16'b0,acc[compare_index+2],16'b0,acc[compare_index+1],16'b0,acc[compare_index]};
+  end
+end
+
+//once stready is ok, then read s_tdata
+// always_ff @(posedge aclk) begin
+//   if (areset) begin
+//     s_tready1 <= 0;
+//     s_tready2 <= 0;
+//   end
+//   else if (ctrl_1_done) begin
+//     s_tready1 <= compare_index == 8'd0 && &s_tvalid && m_tready ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+//     s_tready2 <= s_tready1;
+//   end
+// end
+
+always_comb begin
+  if (!ctrl_1_done) begin
+    s_tready = /*m_tready &&*/ &s_tvalid && write_index != 8'd248 ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+  end
+  else begin
+    s_tready = (ctrl_edge || (compare_index == 8'd240 && &s_tvalid && m_tready)) ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+  end
+end
+
 
 endmodule : krnl_cam_rtl_adder
 
-`default_nettype wire
+// `default_nettype wire

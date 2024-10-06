@@ -50,9 +50,9 @@ module krnl_cam_rtl_control_s_axi
     output wire [63:0]                   a,
     output wire [63:0]                   b,
     output wire [63:0]                   c,
-    output wire [31:0]                   length_r
-    // output wire [31:0]                   ctrl_1_done,
-    // input wire                           ctrl_1_done_in
+    output wire [31:0]                   length_r,
+    output wire [31:0]                   ctrl_1_done,
+    input wire                           ctrl_1_done_in
 );
 //------------------------Address Info-------------------
 // 0x00 : Control signals
@@ -144,8 +144,8 @@ localparam
     reg  [63:0]                   int_c = 64'b0;
     reg  [31:0]                   int_length_r = 32'b0;
     reg  [31:0]                   int_ctrl_1_done = 32'b0;
-    wire                          ctrl_1_done_in;
-    wire [31:0]                   ctrl_1_done;
+    // wire                          ctrl_1_done_in;
+    // wire [31:0]                   ctrl_1_done;
 
 //------------------------Instantiation------------------
 

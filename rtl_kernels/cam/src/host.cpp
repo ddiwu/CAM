@@ -17,16 +17,18 @@
 #include <vector>
 #include <ap_int.h>
 #include <iostream>
+#include <cstring>
+#include <thread>
+#include <chrono>
 #include "experimental/xrt-next.h"
 #include "experimental/xrt_bo.h"
 #include "experimental/xrt_device.h"
 #include "experimental/xrt_kernel.h"
 #include "cmdlineparser.h"
-#include <cstring>
 
-#define DATA_SIZE 256
+#define DATA_SIZE 512
 
-// 定义 AXI-Lite 寄存器地址偏移量
+// AXI-Lite address 
 #define CTRL_REG_ADDR 0x000
 #define GIER_REG_ADDR 0x004
 #define IP_IER_REG_ADDR 0x008
@@ -55,38 +57,45 @@ int main(int argc, char** argv) {
     std::cout << "Load the xclbin " << binaryFile << std::endl;
     auto uuid = device.load_xclbin(binaryFile); 
 
-    // xclDeviceHandle handle = xclOpen(0, nullptr, XCL_QUIET); 
-
     auto size = DATA_SIZE;
     // Allocate Memory in Host Memory
-    long int source_sw_results[size];
+    long int source_sw_results[256 * 32];
 
     auto rtl_kernel = xrt::kernel(device, uuid, "krnl_cam_rtl", xrt::kernel::cu_access_mode::exclusive);
-    auto cl_kernel = xrt::kernel(device, uuid, "krnl_cam");
+    // auto cl_kernel = xrt::kernel(device, uuid, "krnl_cam");
 
     xrt::bo buffer_r1 = xrt::bo(device, size * sizeof(long int), rtl_kernel.group_id(0));
     xrt::bo buffer_r2 = xrt::bo(device, size * sizeof(long int), rtl_kernel.group_id(1));
-    xrt::bo buffer_rw_0 = xrt::bo(device, size * sizeof(long int), rtl_kernel.group_id(2));
-    xrt::bo buffer_rw_1 = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(0));
-    xrt::bo buffer_r3 = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(1));
-    xrt::bo buffer_w = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(2));
+    xrt::bo buffer_rw_0 = xrt::bo(device, 256 * 32 * sizeof(long int), rtl_kernel.group_id(2));
+    // xrt::bo buffer_rw_1 = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(0));
+    // xrt::bo buffer_r3 = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(1));
+    // xrt::bo buffer_w = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(2));
 
-    auto buffer_r1_map = buffer_r1.map<ap_uint<48>*>();
-    auto buffer_r2_map = buffer_r2.map<ap_uint<48>*>();
-    auto buffer_rw_0_map = buffer_rw_0.map<ap_uint<48>*>();
-    auto buffer_rw_1_map = buffer_rw_1.map<ap_uint<48>*>();
-    auto buffer_r3_map = buffer_r3.map<ap_uint<48>*>();
-    auto buffer_w_map = buffer_w.map<ap_uint<48>*>();
+    auto buffer_r1_map = buffer_r1.map<long int*>();
+    auto buffer_r2_map = buffer_r2.map<long int*>();
+    auto buffer_rw_0_map = buffer_rw_0.map<long int*>();
+    // auto buffer_rw_1_map = buffer_rw_1.map<long int*>();
+    // auto buffer_r3_map = buffer_r3.map<long int*>();
+    // auto buffer_w_map = buffer_w.map<long int*>();
 
     // Create the test data and Software Result
-    for (int i = 0; i < size; i++) {
-        buffer_r1_map[i] = i;
-        buffer_r2_map[i] = i;
-        buffer_r3_map[i] = i;
-        source_sw_results[i] = i ^ i + 0;
+    for (int i = 0; i < 256; i++) {
+        buffer_r1_map[i] = i*i;
+        buffer_r2_map[i] = 0;
+    }
+
+    for (int i = 256; i < 512; i += 8) {
+        buffer_r1_map[i] = (i-256)/8;
+    }
+
+    for (int i = 0; i < 32; i++) {
+        for (int j = 0; j < 256; j++) {
+            source_sw_results[i*256+j] = (j*j) ^ i;
+        }
+    }
+
+    for (int i = 0; i < 32 * 256; i++) {
         buffer_rw_0_map[i] = 0;
-        buffer_rw_1_map[i] = 0;
-        buffer_w_map[i] = 0;
     }
 
     std::cout << "Copying input data to device global memory" << std::endl;
@@ -95,54 +104,54 @@ int main(int argc, char** argv) {
     buffer_rw_0.sync(XCL_BO_SYNC_BO_TO_DEVICE);
 
     std::cout << "Launching RTL kernel" << std::endl;
-    xrt::run rtl_run = rtl_kernel(buffer_r1, buffer_r2, buffer_rw_0, size );
 
-    rtl_run.wait();
+    xrt::run rtl_run = rtl_kernel(buffer_r1, buffer_r2, buffer_rw_0, size/8, 0);
+    uint32_t ctrl_1_done = rtl_kernel.read_register(CTRL_1_DONE_REG_ADDR);
+    std::cout << "ctrl_1_done = " << ctrl_1_done << std::endl;
 
     std::cout << "Reading LENGTH_R_REG_ADDR" << std::endl;
-    // uint32_t cu_index = rtl_kernel.cu_index();
     uint32_t si;
-    // xclRegRead(handle, cu_index, LENGTH_R_REG_ADDR, &si);
     si = rtl_kernel.read_register(LENGTH_R_REG_ADDR);
     std::cout << "si = " << si << std::endl;
 
-    // uint32_t ctrl_1_done = 0;
-    // while (!ctrl_1_done) {
-    //     // xclRegRead(handle, cu_index, CTRL_1_DONE_REG_ADDR, &ctrl_1_done);
-    //     ctrl_1_done = rtl_kernel.read_register(CTRL_1_DONE_REG_ADDR);
-    // }
-    // std::cout << "1 stage done" << std::endl;
+    while (!ctrl_1_done) {
+        std::cout << "suspend 1 s" << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        ctrl_1_done = rtl_kernel.read_register(CTRL_1_DONE_REG_ADDR);
+    }
+    std::cout << "1 stage done" << std::endl;
+    // sleep(5);
+    rtl_run.wait();
 
     std::cout << "Copying output data to device global memory" << std::endl;
     buffer_rw_0.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
-    buffer_rw_0.copy(buffer_rw_1);
-    buffer_rw_1.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+    // buffer_rw_0.copy(buffer_rw_1);
+    // buffer_rw_1.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+    // buffer_r3.sync(XCL_BO_SYNC_BO_TO_DEVICE);
 
-    std::cout << "Launching CL kernel" << std::endl;
-    xrt::run cl_run = cl_kernel(buffer_rw_1, buffer_r3, buffer_w, size );
+    // std::cout << "Launching CL kernel" << std::endl;
+    // xrt::run cl_run = cl_kernel(buffer_rw_1, buffer_r3, buffer_w, size);
  
-    cl_run.wait();
+    // cl_run.wait();
 
-    std::cout << "Copying output data to host local memory" << std::endl;
-    buffer_w.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
+    // std::cout << "Copying output data to host local memory" << std::endl;
+    // buffer_w.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
 
 
     std::cout << "Comparing results" << std::endl;
     int match = 0;
-    for (int i = 0; i < size; i++) {
-        if (buffer_w_map[i] != source_sw_results[i]) {
+    for (int i = 0; i < 256 * 32; i++) {
+        if (buffer_rw_0_map[i] != source_sw_results[i]) {
             std::cout << "Error: Result mismatch" << std::endl;
             std::cout << "i = " << i << " Software result = " << source_sw_results[i]
-                      << " Device result = " << buffer_w_map[i] << std::endl;
+                      << " Device result = " << buffer_rw_0_map[i] << std::endl;
             match = 1;
-            break;
         }
-        std::cout << "i = " << i << " Software result = " << source_sw_results[i]
-                  << " Device result = " << buffer_w_map[i] << " input1 = " << buffer_r1_map[i]
-                  << " input2 = " << buffer_r2_map[i] << " krnl0_output = " << buffer_rw_0_map[i]
-                  << " input3 = " << buffer_r3_map[i] << std::endl;
+        else std::cout << "i = " << i << " Software result = " << source_sw_results[i]
+                      << " Device result = " << buffer_rw_0_map[i] << std::endl;
     }
 
     std::cout << "TEST " << (match ? "FAILED" : "PASSED") << std::endl;
+
     return (match ? EXIT_FAILURE : EXIT_SUCCESS); 
 }
