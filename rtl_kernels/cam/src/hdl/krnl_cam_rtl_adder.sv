@@ -45,10 +45,11 @@
 // endmodule
 
 // `default_nettype none
-`define DATA_WIDTH 48
+`define T_DATA_WIDTH 64
+`define CAM_SIZE 256
 
 module krnl_cam_rtl_adder #(
-  parameter integer C_DATA_WIDTH   = 32, // Data width of both input and output data
+  parameter integer C_DATA_WIDTH   = 512, // Data width of both input and output data
   parameter integer C_NUM_CHANNELS = 2   // Number of input channels.  Only a value of 2 implemented.
 )
 (
@@ -81,10 +82,10 @@ logic [C_DATA_WIDTH-1:0] m_tdata1, m_tdata2;
 logic [47:0] s_data1;
 logic m_tvalid1;
 logic [C_NUM_CHANNELS-1:0] s_tready1, s_tready2;
-logic [47:0] acc [256];
+logic [47:0] acc [CAM_SIZE];
 logic [7:0] write_index; 
-logic [47:0] data_in [256];
-logic [47:0] data_in1 [256];
+logic [47:0] data_in [CAM_SIZE];
+logic [47:0] data_in1 [CAM_SIZE];
 logic [7:0] compare_index, compare_index1, compare_index2;
 // logic m_tready1, m_tready_edge;
 logic s_tvalid1, s_tvalid2;
@@ -105,17 +106,17 @@ assign ctrl_edge = !ctrl1 && ctrl_1_done;
 
 always_ff @(posedge aclk) begin
   if (areset) begin
-    for (int i = 0; i < 256; i++) begin
+    for (int i = 0; i < CAM_SIZE; i++) begin
       data_in[i] <= 0;
     end
     write_index <= 0;
     ctrl_1_done <= 0;
   end
   else if (!ctrl_1_done && &s_tvalid) begin
-    for (int i = 0; i < 8; i++) begin
+    for (int i = 0; i < CAM_SIZE/T_DATA_WIDTH; i++) begin
       data_in[write_index + i][47:0] <= s_tdata[0][i*64+:48];
     end
-    if (write_index == 8'd248) begin 
+    if (write_index == (CAM_SIZE - 8'd8)) begin 
       write_index <= 0;
       ctrl_1_done <= 1;
     end
@@ -149,7 +150,7 @@ generate begin
   //     .c_out(acc[i][47:0])
   //   );
   // end
-  for (i = 0; i < 256; i++) begin
+  for (i = 0; i < CAM_SIZE; i++) begin
   DSP48E2 #(
     // Feature Control Attributes: Data Path Selection
     .AMULTSEL("A"),                    // Selects A input to multiplier (A, AD)
@@ -274,17 +275,6 @@ always_ff @(posedge aclk) begin
   end
 end
 
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     compare_index1 <= 0;
-//     compare_index2 <= 0;
-//   end
-//   else begin
-//     compare_index1 <= compare_index;
-//     compare_index2 <= compare_index1;
-//   end
-// end
-
 always_comb begin
   if (!ctrl_1_done) begin
     m_tdata = 0;
@@ -294,24 +284,12 @@ always_comb begin
   end
 end
 
-//once stready is ok, then read s_tdata
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     s_tready1 <= 0;
-//     s_tready2 <= 0;
-//   end
-//   else if (ctrl_1_done) begin
-//     s_tready1 <= compare_index == 8'd0 && &s_tvalid && m_tready ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
-//     s_tready2 <= s_tready1;
-//   end
-// end
-
 always_comb begin
   if (!ctrl_1_done) begin
-    s_tready = /*m_tready &&*/ &s_tvalid && write_index != 8'd248 ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+    s_tready = /*m_tready &&*/ &s_tvalid && write_index != (CAM_SIZE - 8'd8) ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
   end
   else begin
-    s_tready = (ctrl_edge || (compare_index == 8'd240 && &s_tvalid && m_tready)) ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+    s_tready = (ctrl_edge || (compare_index == (CAM_SIZE - 8'd16) && &s_tvalid && m_tready)) ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
   end
 end
 
