@@ -40,7 +40,7 @@ void krnl_cam(long int* a, long int* b, long int* c, const int n_elements) {
 #pragma HLS INTERFACE s_axilite port = n_elements
 #pragma HLS INTERFACE s_axilite port = return
 
-    for (int i = 0; i < n_elements * 8; i++) {
+    for (int i = 0; i < n_elements; i++) {
         c[i] = a[i] + b[i];
     }
 }
