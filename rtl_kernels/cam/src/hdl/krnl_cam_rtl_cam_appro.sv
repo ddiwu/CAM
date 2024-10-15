@@ -25,6 +25,7 @@
 // (
 //   input  logic          aclk,
 //   input  logic          areset,
+//   input  logic          m_tready,
 //   input  logic [DW-1:0] a,
 //   input  logic [DW-1:0] b,
 //   output logic [DW-1:0] c_out
@@ -36,7 +37,7 @@
 //   if (areset) begin
 //     c_out <= 0;
 //   end
-//   else begin
+//   else if (m_tready) begin
 //     a_in <= a;
 //     b_in <= b;
 //     c_out <= a_in ^ b_in;
@@ -45,12 +46,11 @@
 // endmodule
 
 // `default_nettype none
-`define T_DATA_WIDTH 64
-`define CAM_SIZE 256
 
 module krnl_cam_rtl_adder #(
   parameter integer C_DATA_WIDTH   = 512, // Data width of both input and output data
-  parameter integer C_NUM_CHANNELS = 2   // Number of input channels.  Only a value of 2 implemented.
+  parameter integer C_NUM_CHANNELS = 2,   // Number of input channels.  Only a value of 2 implemented.
+  parameter integer CAM_SIZE = 256
 )
 (
   input logic                                        aclk,
@@ -78,17 +78,20 @@ timeprecision 1ps;
 /////////////////////////////////////////////////////////////////////////////
 // Variables
 /////////////////////////////////////////////////////////////////////////////
-logic [C_DATA_WIDTH-1:0] m_tdata1, m_tdata2;
 logic [47:0] s_data1;
-logic m_tvalid1;
+logic m_tvalid1, m_tvalid2, m_tvalid3, m_tvalid4, m_tvalid5, m_tvalid6, m_tvalid7, m_tvalid8, m_tvalid9, m_tvalid10, m_tvalid11;
 logic [C_NUM_CHANNELS-1:0] s_tready1, s_tready2;
 logic [47:0] acc [CAM_SIZE];
+logic [29:0] A_in;
+logic [17:0] B_in;
+logic [7:0] num_index_1 [CAM_SIZE], num_index_2 [CAM_SIZE/2], num_index_3 [CAM_SIZE/4], num_index_4 [CAM_SIZE/8], num_index_5 [CAM_SIZE/16], num_index_6 [CAM_SIZE/32], num_index_7 [CAM_SIZE/64], num_index_8 [CAM_SIZE/128], num_index_9;
+logic [5:0] one_num_1 [CAM_SIZE], one_num_2 [CAM_SIZE/2], one_num_3 [CAM_SIZE/4], one_num_4 [CAM_SIZE/8], one_num_5 [CAM_SIZE/16], one_num_6 [CAM_SIZE/32], one_num_7 [CAM_SIZE/64], one_num_8 [CAM_SIZE/128], one_num_9;
 logic [7:0] write_index; 
 logic [47:0] data_in [CAM_SIZE];
 logic [47:0] data_in1 [CAM_SIZE];
 logic [7:0] compare_index, compare_index1, compare_index2;
 // logic m_tready1, m_tready_edge;
-logic s_tvalid1, s_tvalid2;
+logic s_tvalid1, s_tvalid2, s_tvalid3, s_tvalid4, s_tvalid5, s_tvalid6, s_tvalid7, s_tvalid8, s_tvalid9, s_tvalid10, s_tvalid11;
 // logic s_tready_first;
 logic ctrl1, ctrl_1_done;
 /////////////////////////////////////////////////////////////////////////////
@@ -97,9 +100,13 @@ logic ctrl1, ctrl_1_done;
 always_ff @(posedge aclk) begin
   if (areset) begin
     ctrl1 <= 0;
+    A_in <= 0;
+    B_in <= 0;
   end
   else begin
     ctrl1 <= ctrl_1_done;
+    A_in <= s_tdata[0][47:18];
+    B_in <= s_tdata[0][17:0];
   end
 end
 assign ctrl_edge = !ctrl1 && ctrl_1_done;
@@ -113,10 +120,10 @@ always_ff @(posedge aclk) begin
     ctrl_1_done <= 0;
   end
   else if (!ctrl_1_done && &s_tvalid) begin
-    for (int i = 0; i < CAM_SIZE/T_DATA_WIDTH; i++) begin
+    for (int i = 0; i < 8; i++) begin
       data_in[write_index + i][47:0] <= s_tdata[0][i*64+:48];
     end
-    if (write_index == (CAM_SIZE - 8'd8)) begin 
+    if (write_index == 8'd248) begin 
       write_index <= 0;
       ctrl_1_done <= 1;
     end
@@ -129,13 +136,6 @@ always_ff @(posedge aclk) begin
   end
 end
 
-//DSP48E2 block
-// always_comb begin 
-//     for (int i = 0; i < 256; i++) begin
-//       acc[i][47:0] = s_tdata[0][0+:48] ^ data_in[i][47:0];
-//     end
-// end
-
 generate begin
   genvar i;
   // for (i = 0; i < 256; i++) begin
@@ -145,6 +145,7 @@ generate begin
   //   ) dspxor_inst (
   //     .aclk(aclk),
   //     .areset(areset),
+  //     .m_tready(m_tready),
   //     .a(s_tdata[0][47:0]),
   //     .b(data_in[i][47:0]),
   //     .c_out(acc[i][47:0])
@@ -161,7 +162,7 @@ generate begin
     .RND(48'h000000000000),            // Rounding Constant
     .USE_MULT("NONE"),                 // Disable the multiplier, as multiplication is not needed
     .USE_SIMD("ONE48"),                // SIMD selection (FOUR12, ONE48, TWO24)
-    .USE_WIDEXOR("TRUE"),              // Enable the Wide XOR function for 48-bit operation
+    .USE_WIDEXOR("FALSE"),              // Enable the Wide XOR function for 48-bit operation
     .XORSIMD("XOR24_48_96"),           // Enable full 48-bit XOR function
     // Pattern Detector Attributes: Pattern Detection Configuration
     .AUTORESET_PATDET("NO_RESET"),     // No reset for pattern detection
@@ -201,7 +202,7 @@ generate begin
     .INMODEREG(0),                     // Disable INMODE register
     .MREG(0),                          // Disable multiplier register
     .OPMODEREG(0),                     // Enable OPMODE register for better control
-    .PREG(0)                           // Disable P register for direct output
+    .PREG(1)                           // Disable P register for direct output
   )
   DSP48E2_inst (
     // Control outputs: Control Inputs/Status Bits
@@ -221,11 +222,12 @@ generate begin
     .OPMODE(9'b000110011),   // Set OPMODE to enable A:B XOR C operation
     .CLK(aclk),               // Clock signal
     .CEA1(1'b0),             // Clock enable for A input register
-    .CEA2(1'b1),             // Clock enable for A input register
+    .CEA2(m_tready),             // Clock enable for A input register
     .CEB1(1'b0),             // Clock enable for B input register
-    .CEB2(1'b1),             // Clock enable for B input register
+    .CEB2(m_tready),             // Clock enable for B input register
     //.CEC(!ctrl_1_done && &s_tvalid && write_index <= i && write_index+8 > i),
     .CEC(1'b1),             // Clock enable for C input register
+    .CEP(m_tready),             // pipeline stall
     .CEALUMODE(1'b1),         // Clock enable for ALUMODE register
     .CECTRL(1'b1),           // Clock enable for control register 
     .CED(1'b0),             // Clock enable for D input register (not used)
@@ -243,53 +245,228 @@ end
 end
 endgenerate
 
+// approximate logic
+always_ff @(posedge aclk) begin
+  if (areset) begin
+    for (int i = 0; i < CAM_SIZE; i++) begin
+      one_num_1[i] <= 0;
+      num_index_1[i] <= 0;
+    end
+    for (int i = 0; i < CAM_SIZE/2; i++) begin
+      one_num_2[i] <= 0;
+      num_index_2[i] <= 0;
+    end
+    for (int i = 0; i < CAM_SIZE/4; i++) begin
+      one_num_3[i] <= 0;
+      num_index_3[i] <= 0;
+    end
+    for (int i = 0; i < CAM_SIZE/8; i++) begin
+      one_num_4[i] <= 0;
+      num_index_4[i] <= 0;
+    end
+    for (int i = 0; i < CAM_SIZE/16; i++) begin
+      one_num_5[i] <= 0;
+      num_index_5[i] <= 0;
+    end
+    for (int i = 0; i < CAM_SIZE/32; i++) begin
+      one_num_6[i] <= 0;
+      num_index_6[i] <= 0;
+    end
+    for (int i = 0; i < CAM_SIZE/64; i++) begin
+      one_num_7[i] <= 0;
+      num_index_7[i] <= 0;
+    end
+    for (int i = 0; i < CAM_SIZE/128; i++) begin
+      one_num_8[i] <= 0;
+      num_index_8[i] <= 0;
+    end
+    one_num_9 <= 0;
+    num_index_9 <= 0;
+  end
+  else if (ctrl_1_done && m_tready) begin
+    for (int i = 0; i < CAM_SIZE; i++) begin
+      one_num_1[i] <= acc[i][0] + acc[i][1] + acc[i][2] + acc[i][3] + acc[i][4] + acc[i][5] + acc[i][6] + acc[i][7] + acc[i][8] + acc[i][9] + acc[i][10] + acc[i][11] + acc[i][12] + acc[i][13] + acc[i][14] + acc[i][15] + acc[i][16] + acc[i][17] + acc[i][18] + acc[i][19] + acc[i][20] + acc[i][21] + acc[i][22] + acc[i][23] + acc[i][24] + acc[i][25] + acc[i][26] + acc[i][27] + acc[i][28] + acc[i][29] + acc[i][30] + acc[i][31] + acc[i][32] + acc[i][33] + acc[i][34] + acc[i][35] + acc[i][36] + acc[i][37] + acc[i][38] + acc[i][39] + acc[i][40] + acc[i][41] + acc[i][42] + acc[i][43] + acc[i][44] + acc[i][45] + acc[i][46] + acc[i][47];
+      num_index_1[i] <= i;
+    end
+    for (int i = 0; i < CAM_SIZE/2; i++) begin
+      if (one_num_1[i*2] <= one_num_1[i*2+1]) begin
+        one_num_2[i] <= one_num_1[i*2];
+        num_index_2[i] <= num_index_1[i*2];
+      end
+      else begin
+        one_num_2[i] <= one_num_1[i*2+1];
+        num_index_2[i] <= num_index_1[i*2+1];
+      end
+    end
+    for (int i = 0; i < CAM_SIZE/4; i++) begin
+      if (one_num_2[i*2] <= one_num_2[i*2+1]) begin
+        one_num_3[i] <= one_num_2[i*2];
+        num_index_3[i] <= num_index_2[i*2];
+      end
+      else begin
+        one_num_3[i] <= one_num_2[i*2+1];
+        num_index_3[i] <= num_index_2[i*2+1];
+      end
+    end
+    for (int i = 0; i < CAM_SIZE/8; i++) begin
+      if (one_num_3[i*2] <= one_num_3[i*2+1]) begin
+        one_num_4[i] <= one_num_3[i*2];
+        num_index_4[i] <= num_index_3[i*2];
+      end
+      else begin
+        one_num_4[i] <= one_num_3[i*2+1];
+        num_index_4[i] <= num_index_3[i*2+1];
+      end
+    end
+    for (int i = 0; i < CAM_SIZE/16; i++) begin
+      if (one_num_4[i*2] <= one_num_4[i*2+1]) begin
+        one_num_5[i] <= one_num_4[i*2];
+        num_index_5[i] <= num_index_4[i*2];
+      end
+      else begin
+        one_num_5[i] <= one_num_4[i*2+1];
+        num_index_5[i] <= num_index_4[i*2+1];
+      end
+    end
+    for (int i = 0; i < CAM_SIZE/32; i++) begin
+      if (one_num_5[i*2] <= one_num_5[i*2+1]) begin
+        one_num_6[i] <= one_num_5[i*2];
+        num_index_6[i] <= num_index_5[i*2];
+      end
+      else begin
+        one_num_6[i] <= one_num_5[i*2+1];
+        num_index_6[i] <= num_index_5[i*2+1];
+      end
+    end
+    for (int i = 0; i < CAM_SIZE/64; i++) begin
+      if (one_num_6[i*2] <= one_num_6[i*2+1]) begin
+        one_num_7[i] <= one_num_6[i*2];
+        num_index_7[i] <= num_index_6[i*2];
+      end
+      else begin
+        one_num_7[i] <= one_num_6[i*2+1];
+        num_index_7[i] <= num_index_6[i*2+1];
+      end
+    end
+    for (int i = 0; i < CAM_SIZE/128; i++) begin
+      if (one_num_7[i*2] <= one_num_7[i*2+1]) begin
+        one_num_8[i] <= one_num_7[i*2];
+        num_index_8[i] <= num_index_7[i*2];
+      end
+      else begin
+        one_num_8[i] <= one_num_7[i*2+1];
+        num_index_8[i] <= num_index_7[i*2+1];
+      end
+    end
+    for (int i = 0; i < CAM_SIZE/256; i++) begin
+      if (one_num_8[i*2] <= one_num_8[i*2+1]) begin
+        one_num_9 <= one_num_8[i*2];
+        num_index_9 <= num_index_8[i*2];
+      end
+      else begin
+        one_num_9 <= one_num_8[i*2+1];
+        num_index_9 <= num_index_8[i*2+1];
+      end
+    end
+  end
+end
+
 // assign m_tvalid = m_tready && ctrl_1_done;
 always_ff @(posedge aclk) begin
   if (areset) begin
     m_tvalid1 <= 0;
+    m_tvalid2 <= 0;
+    m_tvalid3 <= 0;
+    m_tvalid4 <= 0;
+    m_tvalid5 <= 0;
+    m_tvalid6 <= 0;
+    m_tvalid7 <= 0;
+    m_tvalid8 <= 0;
+    m_tvalid9 <= 0;
+    m_tvalid10 <= 0;
+    m_tvalid11 <= 0;
     m_tvalid <= 0;
   end
-  else if (ctrl_1_done) begin
-    m_tvalid1 <= &s_tvalid | read_done;
-    m_tvalid <= m_tvalid1;
+  else if (ctrl_1_done && m_tready) begin
+    m_tvalid1 <= &s_tvalid /*| read_done*/;
+    m_tvalid2 <= m_tvalid1;
+    m_tvalid3 <= m_tvalid2;
+    m_tvalid4 <= m_tvalid3;
+    m_tvalid5 <= m_tvalid4;
+    m_tvalid6 <= m_tvalid5;
+    m_tvalid7 <= m_tvalid6;
+    m_tvalid8 <= m_tvalid7;
+    m_tvalid9 <= m_tvalid8;
+    m_tvalid10 <= m_tvalid9;
+    m_tvalid <= m_tvalid10;
+    // m_tvalid <= m_tvalid11;
   end
 end
+// always_comb begin
+//   if (!ctrl_1_done) begin
+//     m_tvalid = 0;
+//   end
+//   else begin
+//     m_tvalid = &s_tvalid;
+//   end
+// end
 
-always_ff @(posedge aclk) begin
-  if (areset) begin
-    s_tvalid1 <= 0;
-    s_tvalid2 <= 0;
-  end
-  else if (ctrl_1_done) begin
-    s_tvalid1 <= &s_tvalid;
-    s_tvalid2 <= s_tvalid1;
-  end
-end
+// always_ff @(posedge aclk) begin
+//   if (areset) begin
+//     s_tvalid1 <= 0;
+//     s_tvalid2 <= 0;
+//     s_tvalid3 <= 0;
+//     s_tvalid4 <= 0;
+//     s_tvalid5 <= 0;
+//     s_tvalid6 <= 0;
+//     s_tvalid7 <= 0;
+//     s_tvalid8 <= 0;
+//     s_tvalid9 <= 0;
+//     s_tvalid10 <= 0;
+//     s_tvalid11 <= 0;
+//   end
+//   else if (ctrl_1_done) begin
+//     s_tvalid1 <= &s_tvalid;
+//     s_tvalid2 <= s_tvalid1;
+//     s_tvalid3 <= s_tvalid2;
+//     s_tvalid4 <= s_tvalid3;
+//     s_tvalid5 <= s_tvalid4;
+//     s_tvalid6 <= s_tvalid5;
+//     s_tvalid7 <= s_tvalid6;
+//     s_tvalid8 <= s_tvalid7;
+//     s_tvalid9 <= s_tvalid8;
+//     s_tvalid10 <= s_tvalid9;
+//     s_tvalid11 <= s_tvalid10;
+//   end
+// end
 
-always_ff @(posedge aclk) begin
-  if (areset) begin
-    compare_index <= 0;
-  end
-  else if (ctrl_1_done && s_tvalid2 && m_tready) begin
-    compare_index <= compare_index + 8'd8;
-  end
-end
+// always_ff @(posedge aclk) begin
+//   if (areset) begin
+//     compare_index <= 0;
+//   end
+//   else if (ctrl_1_done && s_tvalid2 && m_tready) begin
+//     compare_index <= compare_index + 8'd8;
+//   end
+// end
 
 always_comb begin
   if (!ctrl_1_done) begin
     m_tdata = 0;
   end
   else begin
-    m_tdata = {16'b0,acc[compare_index+7],16'b0,acc[compare_index+6],16'b0,acc[compare_index+5],16'b0,acc[compare_index+4],16'b0,acc[compare_index+3],16'b0,acc[compare_index+2],16'b0,acc[compare_index+1],16'b0,acc[compare_index]};
+    // m_tdata = {16'b0,acc[compare_index+7],16'b0,acc[compare_index+6],16'b0,acc[compare_index+5],16'b0,acc[compare_index+4],16'b0,acc[compare_index+3],16'b0,acc[compare_index+2],16'b0,acc[compare_index+1],16'b0,acc[compare_index]};
+    m_tdata = {442'b0, one_num_9[5:0], 56'b0, num_index_9[7:0]};
+    // m_tdata = {464'b0, s_tdata[0][47:0]};
   end
 end
 
 always_comb begin
   if (!ctrl_1_done) begin
-    s_tready = /*m_tready &&*/ &s_tvalid && write_index != (CAM_SIZE - 8'd8) ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+    s_tready = &s_tvalid /*&& write_index != 8'd248*/ ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
   end
   else begin
-    s_tready = (ctrl_edge || (compare_index == (CAM_SIZE - 8'd16) && &s_tvalid && m_tready)) ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+    // s_tready = (ctrl_edge || (compare_index == (CAM_SIZE - 8'd16) && &s_tvalid && m_tready)) ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+    s_tready = &s_tvalid && m_tready ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
   end
 end
 

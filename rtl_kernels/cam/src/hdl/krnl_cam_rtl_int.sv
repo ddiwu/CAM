@@ -393,7 +393,7 @@ inst_axi_write_master (
 
   .ctrl_start  ( ap_start_pulse     ) ,
   .ctrl_offset ( c                  ) ,
-  .ctrl_length ( length_r*16       ) , // decide when to stop
+  .ctrl_length ( length_r/2         ) , // decide when to stop
   .ctrl_done   ( ap_done            ) ,
 
   .awvalid     ( m_axi_gmem_AWVALID ) ,

@@ -39,6 +39,36 @@
 #define LENGTH_R_REG_ADDR 0x034
 #define CTRL_1_DONE_REG_ADDR 0x03C
 
+long int val[256];
+
+int cam_appro(long int key){
+    long int xor_value[256];
+    int num_1[256];
+    for (int i = 0; i < 256; i++) {
+        xor_value[i] = val[i] ^ key;
+        // for (int j = 0; j < 48; j++){
+        //     num_1[i] += xor_value[i].range(j,j);
+        // }   
+        num_1[i] = __builtin_popcount(xor_value[i]);
+    }
+    int index = 0;
+    for (int i = 0; i < 256; i++){
+        if (num_1[index] > num_1[i]){
+            index = i;
+        }
+    }
+    return index;
+}
+
+int cam_precise(long int key){
+    for (int i = 0; i < 256; i++){
+        if (val[i] == key){
+            return i;
+        }
+    }
+    return 511;
+}
+
 int main(int argc, char** argv) {
     // Command Line Parser
     sda::utils::CmdLineParser parser;
@@ -66,7 +96,7 @@ int main(int argc, char** argv) {
 
     xrt::bo buffer_r1 = xrt::bo(device, size * sizeof(long int), rtl_kernel.group_id(0));
     xrt::bo buffer_r2 = xrt::bo(device, size * sizeof(long int), rtl_kernel.group_id(1));
-    xrt::bo buffer_rw_0 = xrt::bo(device, 256 * 32 * sizeof(long int), rtl_kernel.group_id(2));
+    xrt::bo buffer_rw_0 = xrt::bo(device, 256 * sizeof(long int), rtl_kernel.group_id(2));
     // xrt::bo buffer_rw_1 = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(0));
     // xrt::bo buffer_r3 = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(1));
     // xrt::bo buffer_w = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(2));
@@ -81,6 +111,7 @@ int main(int argc, char** argv) {
     // Create the test data and Software Result
     for (int i = 0; i < 256; i++) {
         buffer_r1_map[i] = i*i;
+        val[i] = i*i;
         buffer_r2_map[i] = 0;
     }
 
@@ -88,13 +119,18 @@ int main(int argc, char** argv) {
         buffer_r1_map[i] = (i-256)/8;
     }
 
+    // for (int i = 0; i < 32; i++) {
+    //     for (int j = 0; j < 256; j++) {
+    //         source_sw_results[i*256+j] = (j) ^ i;
+    //     }
+    // }
+
     for (int i = 0; i < 32; i++) {
-        for (int j = 0; j < 256; j++) {
-            source_sw_results[i*256+j] = (j*j) ^ i;
-        }
+        // source_sw_results[i] = cam_appro(i);
+        source_sw_results[i] = cam_precise(i);
     }
 
-    for (int i = 0; i < 32 * 256; i++) {
+    for (int i = 0; i < 256; i++) {
         buffer_rw_0_map[i] = 0;
     }
 
@@ -140,15 +176,18 @@ int main(int argc, char** argv) {
 
     std::cout << "Comparing results" << std::endl;
     int match = 0;
-    for (int i = 0; i < 256 * 32; i++) {
-        if (buffer_rw_0_map[i] != source_sw_results[i]) {
+    for (int i = 0; i < 32; i++) {
+        if (buffer_rw_0_map[8*i] != source_sw_results[i]) {
             std::cout << "Error: Result mismatch" << std::endl;
             std::cout << "i = " << i << " Software result = " << source_sw_results[i]
-                      << " Device result = " << buffer_rw_0_map[i] << std::endl;
+                      << " Device result = " << buffer_rw_0_map[8*i] << std::endl;
+            std::cout << "1 num = " << buffer_rw_0_map[8*i+1] << std::endl;
             match = 1;
         }
-        else std::cout << "i = " << i << " Software result = " << source_sw_results[i]
-                      << " Device result = " << buffer_rw_0_map[i] << std::endl;
+        else 
+        {std::cout << "i = " << i << " Software result = " << source_sw_results[i]
+                      << " Device result = " << buffer_rw_0_map[8*i] << std::endl;
+        std::cout << "1 num = " << buffer_rw_0_map[8*i+1] << std::endl;}
     }
 
     std::cout << "TEST " << (match ? "FAILED" : "PASSED") << std::endl;

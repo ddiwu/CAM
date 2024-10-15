@@ -79,7 +79,7 @@ EMCONFIG_DIR = $(TEMP_DIR)
 
 ############################## Setting Targets ##############################
 .PHONY: all clean cleanall docs emconfig
-all: check-platform check-device check-vitis $(EXECUTABLE) $(BUILD_DIR)/cam.xclbin emconfig
+all: update_trigger check-platform check-device check-vitis $(EXECUTABLE) $(BUILD_DIR)/cam.xclbin emconfig
 
 .PHONY: host
 host: $(EXECUTABLE)
