@@ -73,7 +73,7 @@ LDFLAGS += -luuid -lxrt_coreutil
 # Kernel compiler global settings
 VPP_FLAGS += --save-temps 
 
-
+VPP_FLAGS_krnl_cam_rtl += --config ./krnl_cam_rtl.cfg
 EXECUTABLE = ./rtl_cam_mixed_c_cam
 EMCONFIG_DIR = $(TEMP_DIR)
 
@@ -93,7 +93,7 @@ xclbin: build
 # Building kernel
 $(BUILD_DIR)/cam.xclbin: $(TEMP_DIR)/rtl_cam.xo $(TEMP_DIR)/krnl_cam.xo
 	mkdir -p $(BUILD_DIR)
-	v++ -l $(VPP_FLAGS) -t $(TARGET) --platform $(PLATFORM) $(VPP_LDFLAGS) --temp_dir $(TEMP_DIR) -o'$(LINK_OUTPUT)' $(+)
+	v++ -l $(VPP_FLAGS) -t $(TARGET) --platform $(PLATFORM) $(VPP_LDFLAGS) --temp_dir $(TEMP_DIR) $(VPP_FLAGS_krnl_cam_rtl) -o'$(LINK_OUTPUT)' $(+)
 	v++ -p $(LINK_OUTPUT) -t $(TARGET) --platform $(PLATFORM) --package.out_dir $(PACKAGE_OUT) -o $(BUILD_DIR)/cam.xclbin
 ############################## Setting Rules for Host (Building Host Executable) ##############################
 $(EXECUTABLE): $(HOST_SRCS) | check-xrt

@@ -17,7 +17,7 @@
 `timescale 1ns/1ps
 module krnl_cam_rtl_control_s_axi
 #(parameter
-    C_S_AXI_ADDR_WIDTH = 6,
+    C_S_AXI_ADDR_WIDTH = 7,
     C_S_AXI_DATA_WIDTH = 32
 )(
     // axi4 lite slave signals
@@ -116,6 +116,7 @@ localparam
     RDIDLE               = 2'd0,
     RDDATA               = 2'd1,
     ADDR_CTRL_1_DONE     = 6'h3c,
+    LATENCY              = 7'h40,
     ADDR_BITS         = 6;
 
 //------------------------Local signal-------------------
@@ -144,6 +145,7 @@ localparam
     reg  [63:0]                   int_c = 64'b0;
     reg  [31:0]                   int_length_r = 32'b0;
     reg  [31:0]                   int_ctrl_1_done = 32'b0;
+    reg  [31:0]                   int_latency = 32'b0;
     // wire                          ctrl_1_done_in;
     // wire [31:0]                   ctrl_1_done;
 
@@ -276,6 +278,12 @@ always @(posedge ACLK) begin
                 end
                 ADDR_CTRL_1_DONE: begin
                     rdata <= int_ctrl_1_done;
+                end
+                LATENCY: begin
+                    rdata <= int_latency;
+                end
+                ADDR_A_CTRL: begin
+                    rdata <= int_latency;
                 end
             endcase
         end
@@ -451,6 +459,38 @@ always @(posedge ACLK) begin
         if (w_hs && waddr == ADDR_CTRL_1_DONE)
             int_ctrl_1_done[31:0] <= (WDATA[31:0] & wmask) | (int_ctrl_1_done[31:0] & ~wmask);
     end
+end
+
+// int_latency[31:0]
+reg ap_start_r;
+wire ap_start_pulse;
+always @(posedge ACLK) begin 
+  begin 
+    ap_start_r <= ap_start;
+  end
+end
+
+assign ap_start_pulse = ap_start & ~ap_start_r;
+
+// reg count_start;
+// always @(posedge ACLK) begin
+//     if (ARESET)
+//         count_start <= 1'b0;
+//     // else if (ctrl_1_done_in)
+//     else if (ap_done)
+//         count_start <= 1'b0;
+//     else if (ap_start_pulse)
+//         count_start <= 1'b1;
+// end
+
+always @(posedge ACLK) begin
+    if (ARESET)
+        int_latency <= 0;
+    // else if (count_start)
+    else if (ap_start_pulse)
+        int_latency <= 0;
+    else if (!ap_idle)
+        int_latency <= int_latency + 1;
 end
 
 //------------------------Memory logic-------------------

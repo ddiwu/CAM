@@ -26,7 +26,7 @@
 #include "experimental/xrt_kernel.h"
 #include "cmdlineparser.h"
 
-#define DATA_SIZE 512
+#define DATA_SIZE 16
 
 // AXI-Lite address 
 #define CTRL_REG_ADDR 0x000
@@ -34,17 +34,19 @@
 #define IP_IER_REG_ADDR 0x008
 #define IP_ISR_REG_ADDR 0x00C
 #define A_REG_ADDR 0x010
+#define A_REG_ADDR_CTRL 0x018
 #define B_REG_ADDR 0x01C
 #define C_REG_ADDR 0x028
 #define LENGTH_R_REG_ADDR 0x034
 #define CTRL_1_DONE_REG_ADDR 0x03C
+#define LATENCY 0x040
 
-long int val[256];
+long int val[1024];
 
 int cam_appro(long int key){
-    long int xor_value[256];
-    int num_1[256];
-    for (int i = 0; i < 256; i++) {
+    long int xor_value[DATA_SIZE/2];
+    int num_1[DATA_SIZE/2];
+    for (int i = 0; i < DATA_SIZE/2; i++) {
         xor_value[i] = val[i] ^ key;
         // for (int j = 0; j < 48; j++){
         //     num_1[i] += xor_value[i].range(j,j);
@@ -52,7 +54,7 @@ int cam_appro(long int key){
         num_1[i] = __builtin_popcount(xor_value[i]);
     }
     int index = 0;
-    for (int i = 0; i < 256; i++){
+    for (int i = 0; i < DATA_SIZE/2; i++){
         if (num_1[index] > num_1[i]){
             index = i;
         }
@@ -61,12 +63,12 @@ int cam_appro(long int key){
 }
 
 int cam_precise(long int key){
-    for (int i = 0; i < 256; i++){
+    for (int i = 0; i < DATA_SIZE/2; i++){
         if (val[i] == key){
             return i;
         }
     }
-    return 511;
+    return DATA_SIZE-1;
 }
 
 int main(int argc, char** argv) {
@@ -94,9 +96,14 @@ int main(int argc, char** argv) {
     auto rtl_kernel = xrt::kernel(device, uuid, "krnl_cam_rtl", xrt::kernel::cu_access_mode::exclusive);
     // auto cl_kernel = xrt::kernel(device, uuid, "krnl_cam");
 
-    xrt::bo buffer_r1 = xrt::bo(device, size * sizeof(long int), rtl_kernel.group_id(0));
-    xrt::bo buffer_r2 = xrt::bo(device, size * sizeof(long int), rtl_kernel.group_id(1));
-    xrt::bo buffer_rw_0 = xrt::bo(device, 256 * sizeof(long int), rtl_kernel.group_id(2));
+    int bank_assign[3] = {0, 0, 1};
+    // for (int i = 0; i < 3; i++) {
+    //     bank_assign[i] = i;
+    // }
+
+    xrt::bo buffer_r1 = xrt::bo(device, size * 32 * sizeof(long int), bank_assign[0]);
+    xrt::bo buffer_r2 = xrt::bo(device, size * sizeof(long int), bank_assign[1]);
+    xrt::bo buffer_rw_0 = xrt::bo(device, (size * 16) * sizeof(long int), bank_assign[2]);
     // xrt::bo buffer_rw_1 = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(0));
     // xrt::bo buffer_r3 = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(1));
     // xrt::bo buffer_w = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(2));
@@ -109,14 +116,14 @@ int main(int argc, char** argv) {
     // auto buffer_w_map = buffer_w.map<long int*>();
 
     // Create the test data and Software Result
-    for (int i = 0; i < 256; i++) {
-        buffer_r1_map[i] = i*i;
-        val[i] = i*i;
+    for (int i = 0; i < DATA_SIZE/2; i++) {
+        buffer_r1_map[i] = i;
+        val[i] = i;
         buffer_r2_map[i] = 0;
     }
 
-    for (int i = 256; i < 512; i += 8) {
-        buffer_r1_map[i] = (i-256)/8;
+    for (int i = DATA_SIZE/2; i < (DATA_SIZE/2+256); i += 8) {
+        buffer_r1_map[i] = (i)/8;
     }
 
     // for (int i = 0; i < 32; i++) {
@@ -127,7 +134,7 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < 32; i++) {
         // source_sw_results[i] = cam_appro(i);
-        source_sw_results[i] = cam_precise(i);
+        source_sw_results[i] = cam_precise(i+1);
     }
 
     for (int i = 0; i < 256; i++) {
@@ -141,7 +148,7 @@ int main(int argc, char** argv) {
 
     std::cout << "Launching RTL kernel" << std::endl;
 
-    xrt::run rtl_run = rtl_kernel(buffer_r1, buffer_r2, buffer_rw_0, size/8, 0);
+    xrt::run rtl_run = rtl_kernel(buffer_r1, buffer_r2, buffer_rw_0, 1, 1); // can not be 1 without update
     uint32_t ctrl_1_done = rtl_kernel.read_register(CTRL_1_DONE_REG_ADDR);
     std::cout << "ctrl_1_done = " << ctrl_1_done << std::endl;
 
@@ -156,8 +163,12 @@ int main(int argc, char** argv) {
         ctrl_1_done = rtl_kernel.read_register(CTRL_1_DONE_REG_ADDR);
     }
     std::cout << "1 stage done" << std::endl;
+    uint32_t latency_cycle = rtl_kernel.read_register(A_REG_ADDR_CTRL);
+    std::cout << "latency_cycle = " << latency_cycle << std::endl;
     // sleep(5);
     rtl_run.wait();
+    // uint32_t latency_cycle = rtl_kernel.read_register(LATENCY);
+    // std::cout << "latency_cycle = " << latency_cycle << std::endl;
 
     std::cout << "Copying output data to device global memory" << std::endl;
     buffer_rw_0.sync(XCL_BO_SYNC_BO_FROM_DEVICE);

@@ -132,6 +132,10 @@ set reg      [::ipx::add_register -quiet "ctrl_1_done" $addr_block]
   set_property address_offset 0x03C $reg
   set_property size           32    $reg
 
+# set reg      [::ipx::add_register -quiet "latency" $addr_block]
+#   set_property address_offset 0x040 $reg
+#   set_property size           32    $reg
+
 
 set_property slave_memory_map_ref "s_axi_control" [::ipx::get_bus_interfaces -of $core "s_axi_control"]
 

@@ -1,0 +1,846 @@
+/*
+
+Xilinx Vivado v2022.1 (64-bit) [Major: 2022, Minor: 1]
+SW Build: 3526262 on Mon Apr 18 15:47:01 MDT 2022
+IP Build: 3524634 on Mon Apr 18 20:55:01 MDT 2022
+
+Process ID (PID): 1618225
+License: Customer
+Mode: GUI Mode
+
+Current time: 	Tue Oct 29 04:36:02 UTC 2024
+Time zone: 	Coordinated Universal Time (Etc/UTC)
+
+OS: Ubuntu
+OS Version: 5.4.0-196-generic
+OS Architecture: amd64
+Available processors (cores): 64
+
+Display: localhost:48.0
+Screen size: 1512x863
+Screen resolution (DPI): 100
+Available screens: 1
+Default font: family=Dialog,name=Dialog,style=plain,size=12
+Scale size: 12
+
+Java version: 	11.0.11 64-bit
+Java home: 	/tools/Xilinx/Vivado/2022.1/tps/lnx64/jre11.0.11_9
+Java executable: 	/tools/Xilinx/Vivado/2022.1/tps/lnx64/jre11.0.11_9/bin/java
+Java arguments: 	[-Dsun.java2d.pmoffscreen=false, -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2, -Dsun.java2d.xrender=false, -Djdk.gtk.version=2, -Dsun.java2d.uiScale.enabled=false, -Xverify:none, -Dswing.aatext=true, -XX:-UsePerfData, -Djdk.map.althashing.threshold=512, -XX:StringTableSize=4072, --add-opens=java.desktop/com.sun.awt=ALL-UNNAMED, --add-opens=java.desktop/javax.swing.plaf.synth=ALL-UNNAMED, --add-opens=java.base/java.nio=ALL-UNNAMED, --add-opens=java.desktop/sun.swing=ALL-UNNAMED, --add-opens=java.desktop/javax.swing=ALL-UNNAMED, --add-opens=java.desktop/javax.swing.tree=ALL-UNNAMED, --add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED, --add-opens=java.desktop/javax.swing.plaf.synth=ALL-UNNAMED, --add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED, --add-opens=java.desktop/javax.swing=ALL-UNNAMED, --add-opens=java.desktop/javax.swing.tree=ALL-UNNAMED, --add-opens=java.desktop/java.awt.event=ALL-UNNAMED, --add-exports=java.desktop/javax.swing.plaf.synth=ALL-UNNAMED, --add-exports=java.base/java.nio=ALL-UNNAMED, --add-exports=java.desktop/sun.swing=ALL-UNNAMED, --add-exports=java.desktop/javax.swing=ALL-UNNAMED, --add-exports=java.desktop/javax.swing.tree=ALL-UNNAMED, --add-exports=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED, --add-exports=java.desktop/sun.swing=ALL-UNNAMED, --add-exports=java.desktop/sun.swing.table=ALL-UNNAMED, --add-exports=java.desktop/sun.swing.plaf.synth=ALL-UNNAMED, --add-exports=java.desktop/sun.awt.shell=ALL-UNNAMED, --add-exports=java.base/sun.security.action=ALL-UNNAMED, --add-exports=java.desktop/sun.font=ALL-UNNAMED, --add-opens=java.desktop/sun.awt.X11=ALL-UNNAMED, -XX:NewSize=60m, -XX:MaxNewSize=60m, -Xms256m, -Xmx3072m, -Xss5m, -Xrs]
+Java initial memory (-Xms): 	256 MB
+Java maximum memory (-Xmx):	 3 GB
+
+
+User name: 	wddd
+User home directory: /home/wddd
+User working directory: /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam
+User country: 	US
+User language: 	en
+User locale: 	en_US
+
+RDI_BASEROOT: /tools/Xilinx/Vivado
+HDI_APPROOT: /tools/Xilinx/Vivado/2022.1
+RDI_DATADIR: /tools/Xilinx/Vivado/2022.1/data
+RDI_BINDIR: /tools/Xilinx/Vivado/2022.1/bin
+
+Vivado preferences file: /home/wddd/.Xilinx/Vivado/2022.1/vivado.xml
+Vivado preferences directory: /home/wddd/.Xilinx/Vivado/2022.1/
+Vivado layouts directory: /home/wddd/.Xilinx/Vivado/2022.1/data/layouts
+PlanAhead jar file: 	/tools/Xilinx/Vivado/2022.1/lib/classes/planAhead.jar
+Vivado log file: 	/home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/vivado.log
+Vivado journal file: 	/home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/vivado.jou
+Engine tmp dir: 	./.Xil/Vivado-1618225-hacc-gpu1
+
+Xilinx Environment Variables
+----------------------------
+XILINX_DSP: 
+XILINX_HLS: /tools/Xilinx/Vitis_HLS/2022.1
+XILINX_PLANAHEAD: /tools/Xilinx/Vivado/2022.1
+XILINX_SDK: /tools/Xilinx/Vitis/2022.1
+XILINX_VITIS: /tools/Xilinx/Vitis/2022.1
+XILINX_VIVADO: /tools/Xilinx/Vivado/2022.1
+XILINX_VIVADO_HLS: /tools/Xilinx/Vivado/2022.1
+XILINX_XRT: /opt/xilinx/xrt
+
+
+GUI allocated memory:	256 MB
+GUI max memory:		3,072 MB
+Engine allocated memory: 1,920 MB
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+*/
+
+// TclEventType: START_GUI
+// Tcl Message: start_gui 
+// Tcl Message: _IceTransSocketUNIXConnect: Cannot connect to non-local host hacchead _IceTransSocketUNIXConnect: Cannot connect to non-local host hacchead Warning: Tried to connect to session manager, Could not open network socket 
+// HMemoryUtils.trashcanNow. Engine heap size: 1,921 MB. GUI used memory: 54 MB. Current time: 10/29/24, 4:36:03 AM UTC
+selectList(PAResourceQtoS.SyntheticaGettingStartedView_RECENT_PROJECTS, "/home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/prj/prj.xpr", 0); // r
+// [GUI Memory]: 60 MB (+60629kb) [00:00:12]
+// [Engine Memory]: 1,922 MB (+1863858kb) [00:00:12]
+// Opening Vivado Project: /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/prj/prj.xpr. Version: Vivado v2022.1 
+// TclEventType: DEBUG_PROBE_SET_CHANGE
+// TclEventType: FLOW_ADDED
+// TclEventType: MSGMGR_MOVEMSG
+// TclEventType: DESIGN_MODE_CHANGE
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: FILE_SET_NEW
+// TclEventType: RUN_COMPLETED
+// TclEventType: RUN_STATUS_CHANGE
+// TclEventType: RUN_COMPLETED
+// TclEventType: RUN_STATUS_CHANGE
+// TclEventType: RUN_COMPLETED
+// TclEventType: RUN_STATUS_CHANGE
+// TclEventType: RUN_CURRENT
+// TclEventType: PR_PARTITION_RM_NEW
+// TclEventType: PROJECT_DASHBOARD_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: PROJECT_NEW
+// [GUI Memory]: 140 MB (+80504kb) [00:00:25]
+// WARNING: HEventQueue.dispatchEvent() is taking  1888 ms.
+// Tcl Message: open_project /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/prj/prj.xpr 
+// Tcl Message: INFO: [filemgmt 56-3] Default IP Output Path : Could not find the directory '/home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/prj/prj.gen/sources_1'. 
+// Tcl Message: Scanning sources... Finished scanning sources 
+// HMemoryUtils.trashcanNow. Engine heap size: 2,021 MB. GUI used memory: 82 MB. Current time: 10/29/24, 4:36:19 AM UTC
+// Tcl Message: open_project: Time (s): cpu = 00:00:18 ; elapsed = 00:00:13 . Memory (MB): peak = 7694.152 ; gain = 70.172 ; free physical = 131434 ; free virtual = 379062 
+// [Engine Memory]: 2,021 MB (+2708kb) [00:00:27]
+// Project name: prj; location: /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/prj; part: xcu55c-fsvh2892-2L-e
+// Elapsed time: 15 seconds
+dismissDialog("Open Project"); // bA
+// TclEventType: FILE_SET_CHANGE
+// Elapsed time: 349 seconds
+selectTreeTableHeader(PAResourceEtoH.ExpRunTreePanel_EXP_RUN_TREE_TABLE, "TNS", 5); // az
+selectTreeTableHeader(PAResourceEtoH.ExpRunTreePanel_EXP_RUN_TREE_TABLE, "WHS", 6); // az
+selectTreeTableHeader(PAResourceEtoH.ExpRunTreePanel_EXP_RUN_TREE_TABLE, "TNS", 5); // az
+// Elapsed time: 80 seconds
+selectTreeTable(PAResourceEtoH.ExpRunTreePanel_EXP_RUN_TREE_TABLE, "impl_1 ; config_1 ; constrs_1 ; write_bitstream Complete! ; -0.31049829721450806 ; -1202.2767333984375 ; 0.009040102362632751 ; 0.0 ;  ; 0.0 ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ; Mon Oct 28 13:32:27 UTC 2024 ; 01:51:26 ; Vivado Implementation Defaults* (Vivado Implementation 2022) ; Vivado Implementation Default Reports (Vivado Implementation 2022) ; xcu55c-fsvh2892-2L-e ; hacc-gpu1 ; Default settings for Implementation.", 0, "100", 4, false); // az
+// PAPropertyPanels.initPanels (impl_1) elapsed time: 0.3s
+selectTreeTable(PAResourceEtoH.ExpRunTreePanel_EXP_RUN_TREE_TABLE, "impl_1 ; config_1 ; constrs_1 ; write_bitstream Complete! ; -0.31049829721450806 ; -1202.2767333984375 ; 0.009040102362632751 ; 0.0 ;  ; 0.0 ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ; Mon Oct 28 13:32:27 UTC 2024 ; 01:51:26 ; Vivado Implementation Defaults* (Vivado Implementation 2022) ; Vivado Implementation Default Reports (Vivado Implementation 2022) ; xcu55c-fsvh2892-2L-e ; hacc-gpu1 ; Default settings for Implementation.", 0, "100", 4, false, false, false, false, false, true); // az - Double Click
+// [GUI Memory]: 152 MB (+5465kb) [00:07:43]
+// Tcl Message: open_run impl_1 
+// HMemoryUtils.trashcanNow. Engine heap size: 2,378 MB. GUI used memory: 90 MB. Current time: 10/29/24, 4:43:38 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 4,243 MB. GUI used memory: 90 MB. Current time: 10/29/24, 4:43:58 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 4,453 MB. GUI used memory: 90 MB. Current time: 10/29/24, 4:44:05 AM UTC
+// [Engine Memory]: 5,108 MB (+3131252kb) [00:08:22]
+// HMemoryUtils.trashcanNow. Engine heap size: 6,353 MB. GUI used memory: 90 MB. Current time: 10/29/24, 4:44:28 AM UTC
+// TclEventType: PHY_BLOCK_NEW
+// TclEventType: SDC_CONSTRAINT_ADD
+// HMemoryUtils.trashcanNow. Engine heap size: 6,441 MB. GUI used memory: 90 MB. Current time: 10/29/24, 4:44:35 AM UTC
+// TclEventType: POWER_CNS_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: PHY_BLOCK_ADD_INST
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// HMemoryUtils.trashcanNow. Engine heap size: 7,004 MB. GUI used memory: 90 MB. Current time: 10/29/24, 4:44:53 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 7,720 MB. GUI used memory: 90 MB. Current time: 10/29/24, 4:45:05 AM UTC
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_CNS_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: PHY_BLOCK_ADD_INST
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_REPORT_STALE
+// TclEventType: SDC_CONSTRAINT_ADD
+// TclEventType: POWER_CNS_STALE
+// [Engine Memory]: 7,832 MB (+2588377kb) [00:09:31]
+// TclEventType: SDC_CONSTRAINT_ADD
+// HMemoryUtils.trashcanNow. Engine heap size: 7,979 MB. GUI used memory: 90 MB. Current time: 10/29/24, 4:45:33 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 7,979 MB. GUI used memory: 90 MB. Current time: 10/29/24, 4:45:35 AM UTC
+// TclEventType: PHY_BLOCK_MODIFY
+// HMemoryUtils.trashcanNow. Engine heap size: 8,471 MB. GUI used memory: 90 MB. Current time: 10/29/24, 4:45:53 AM UTC
+// TclEventType: TIMING_RESULTS_STALE
+// HMemoryUtils.trashcanNow. Engine heap size: 8,744 MB. GUI used memory: 90 MB. Current time: 10/29/24, 4:46:05 AM UTC
+// TclEventType: FLOORPLAN_MODIFY
+// TclEventType: DESIGN_NEW
+// [Engine Memory]: 8,744 MB (+546108kb) [00:10:18]
+// HMemoryUtils.trashcanNow. Engine heap size: 8,744 MB. GUI used memory: 90 MB. Current time: 10/29/24, 4:46:11 AM UTC
+// [GUI Memory]: 160 MB (+469kb) [00:10:19]
+// [GUI Memory]: 181 MB (+13495kb) [00:10:20]
+// TclEventType: DESIGN_NEW
+// [GUI Memory]: 198 MB (+8532kb) [00:10:20]
+// Xgd.load filename: /tools/Xilinx/Vivado/2022.1/data/parts/xilinx/virtexuplusHBM/devint/virtexuplusHBM/xcu55c/xcu55c.xgd; ZipEntry: xcu55c_detail.xgd elapsed time: 1.6s
+// DeviceModel: Load Xgds SwingWorker Join Forever elapsed time: 1.9s
+// [GUI Memory]: 236 MB (+29037kb) [00:10:21]
+// [GUI Memory]: 248 MB (+292kb) [00:10:22]
+// [Engine Memory]: 9,221 MB (+41943kb) [00:10:23]
+// [GUI Memory]: 263 MB (+2456kb) [00:10:23]
+// DeviceView Instantiated
+// WARNING: HEventQueue.dispatchEvent() is taking  3092 ms.
+// TclEventType: CURR_DESIGN_SET
+// Tcl Message: INFO: [Device 21-403] Loading part xcu55c-fsvh2892-2L-e 
+// Tcl Message: Netlist sorting complete. Time (s): cpu = 00:00:04 ; elapsed = 00:00:03 . Memory (MB): peak = 9923.234 ; gain = 25.000 ; free physical = 129134 ; free virtual = 376798 
+// Tcl Message: INFO: [Netlist 29-17] Analyzing 7047 Unisim elements for replacement INFO: [Netlist 29-28] Unisim Transformation completed in 6 CPU seconds INFO: [Project 1-479] Netlist was created with Vivado 2022.1 INFO: [Project 1-570] Preparing netlist for logic optimization 
+// Tcl Message: INFO: [Timing 38-478] Restoring timing data from binary archive. INFO: [Timing 38-479] Binary timing data restore complete. INFO: [Project 1-856] Restoring constraints from binary archive. INFO: [Constraints 18-4422] SNAPPING_MODE is set so implementation will use the DERIVED_RANGES which may be different then the GRID_RANGES. INFO: [Constraints 18-4421] A LAGUNA range, without usable sites, was added to DERIVED_RANGES for purposes of keeping the Programmable Unit together within the reconfigurable pblock. INFO: [Power 33-23] Power model is not available for STARTUP_8SERIES_GEN.STARTUP3_8SERIES_inst 
+// Tcl Message: INFO: [Project 1-853] Binary constraint restore complete. 
+// Tcl Message: Reading XDEF placement. Reading placer database... Reading XDEF routing. 
+// Tcl Message: Read XDEF Files: Time (s): cpu = 00:00:15 ; elapsed = 00:00:15 . Memory (MB): peak = 14424.047 ; gain = 697.605 ; free physical = 125019 ; free virtual = 372684 
+// Tcl Message: Restored from archive | CPU: 15.760000 secs | Memory: 478.996307 MB | 
+// Tcl Message: Finished XDEF File Restore: Time (s): cpu = 00:00:15 ; elapsed = 00:00:15 . Memory (MB): peak = 14424.047 ; gain = 697.605 ; free physical = 125019 ; free virtual = 372684 
+// Tcl Message: Netlist sorting complete. Time (s): cpu = 00:00:00.03 ; elapsed = 00:00:00.03 . Memory (MB): peak = 14424.047 ; gain = 0.000 ; free physical = 125090 ; free virtual = 372757 
+// Tcl Message: open_run: Time (s): cpu = 00:04:17 ; elapsed = 00:02:40 . Memory (MB): peak = 14617.895 ; gain = 6383.301 ; free physical = 124606 ; free virtual = 372273 
+// Device view-level: 0.0
+// [GUI Memory]: 276 MB (+7kb) [00:10:24]
+// [GUI Memory]: 290 MB (+175kb) [00:10:24]
+// ExpRunCommands.openImplResults elapsed time: 161.5s
+// RouteApi: Init Delay Mediator Swing Worker Finished
+// TclEventType: TIMING_SUMMARY_UPDATED
+// [GUI Memory]: 352 MB (+49572kb) [00:10:29]
+// [Engine Memory]: 9,785 MB (+107260kb) [00:10:29]
+// WARNING: HEventQueue.dispatchEvent() is taking  3713 ms.
+// Elapsed time: 166 seconds
+dismissDialog("Open Implemented Design"); // bA
+// HMemoryUtils.trashcanNow. Engine heap size: 10,201 MB. GUI used memory: 278 MB. Current time: 10/29/24, 4:46:33 AM UTC
+// TclEventType: HFED_INIT_ROUTE_STORAGE_COMPLETED
+// RouteApi::loadEngineXgdAndInitRouteStorage elapsed time: 34.8s
+// Device view-level: 0.1
+// [Engine Memory]: 13,000 MB (+2858664kb) [00:10:56]
+// Elapsed time: 48 seconds
+selectList(PAResourceAtoD.CmdMsgDialog_MESSAGES, "[Timing 38-282] The design failed to meet the timing requirements. Please see the timing summary report for details on the timing violations.", 0); // b
+selectButton(PAResourceAtoD.CmdMsgDialog_OK, "OK"); // f
+dismissDialog("Critical Messages"); // X
+// Device view-level: 0.6
+// Device view-level: 1.5
+// HMemoryUtils.trashcanNow. Engine heap size: 13,005 MB. GUI used memory: 285 MB. Current time: 10/29/24, 4:54:49 AM UTC
+// Elapsed time: 457 seconds
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 3672633, 4904448); // E
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 3672633, 4904448); // E
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 3672633, 4904448); // E
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 3672633, 4904448); // E
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 3672633, 4904448); // E
+// Device view-level: 1.2
+// Device view-level: 0.9
+// Device view-level: 0.6
+// [GUI Memory]: 375 MB (+5867kb) [00:19:04]
+// HMemoryUtils.trashcanNow. Engine heap size: 13,005 MB. GUI used memory: 294 MB. Current time: 10/29/24, 4:54:57 AM UTC
+// Device view-level: 0.9
+// Device view-level: 1.2
+// Elapsed time: 11 seconds
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 3913578, 2130013); // E
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 3913578, 2130013); // E
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 3913578, 2130013); // E
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 3913578, 2130013); // E
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 3913578, 2130013); // E
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 3913578, 2130013); // E
+// HMemoryUtils.trashcanNow. Engine heap size: 13,007 MB. GUI used memory: 289 MB. Current time: 10/29/24, 4:55:03 AM UTC
+// Device view-level: 1.5
+// Device view-level: 2.7
+// HMemoryUtils.trashcanNow. Engine heap size: 13,008 MB. GUI used memory: 284 MB. Current time: 10/29/24, 4:55:07 AM UTC
+// Device view-level: 3.0
+// Device view-level: 3.6
+// Device view-level: 4.7
+// Device view-level: 4.4
+// Device view-level: 4.2
+// HMemoryUtils.trashcanNow. Engine heap size: 13,012 MB. GUI used memory: 286 MB. Current time: 10/29/24, 4:55:19 AM UTC
+// Device view-level: 3.9
+// Device view-level: 3.6
+// HMemoryUtils.trashcanNow. Engine heap size: 13,012 MB. GUI used memory: 294 MB. Current time: 10/29/24, 4:55:23 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,053 MB. GUI used memory: 287 MB. Current time: 10/29/24, 4:55:29 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,015 MB. GUI used memory: 281 MB. Current time: 10/29/24, 4:55:30 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,022 MB. GUI used memory: 280 MB. Current time: 10/29/24, 4:55:33 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,012 MB. GUI used memory: 280 MB. Current time: 10/29/24, 4:55:35 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,009 MB. GUI used memory: 280 MB. Current time: 10/29/24, 4:55:41 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,009 MB. GUI used memory: 280 MB. Current time: 10/29/24, 4:55:42 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,043 MB. GUI used memory: 284 MB. Current time: 10/29/24, 4:55:44 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,020 MB. GUI used memory: 280 MB. Current time: 10/29/24, 4:55:47 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,015 MB. GUI used memory: 280 MB. Current time: 10/29/24, 4:55:48 AM UTC
+// Device view-level: 3.9
+// Device view-level: 4.2
+// HMemoryUtils.trashcanNow. Engine heap size: 13,082 MB. GUI used memory: 290 MB. Current time: 10/29/24, 4:55:51 AM UTC
+// Device view-level: 4.4
+// Device view-level: 4.7
+// Device view-level: 5.0
+// Device view-level: 4.7
+// Device view-level: 4.4
+// HMemoryUtils.trashcanNow. Engine heap size: 13,044 MB. GUI used memory: 283 MB. Current time: 10/29/24, 4:56:04 AM UTC
+// Device view-level: 4.2
+// Device view-level: 3.9
+// Device view-level: 3.6
+// Device view-level: 3.3
+// HMemoryUtils.trashcanNow. Engine heap size: 13,044 MB. GUI used memory: 288 MB. Current time: 10/29/24, 4:56:06 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,041 MB. GUI used memory: 280 MB. Current time: 10/29/24, 4:56:06 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,041 MB. GUI used memory: 280 MB. Current time: 10/29/24, 4:56:08 AM UTC
+// Device view-level: 3.6
+// Device view-level: 3.9
+// Device view-level: 3.6
+// Device view-level: 3.3
+// Device view-level: 3.0
+// HMemoryUtils.trashcanNow. Engine heap size: 13,041 MB. GUI used memory: 283 MB. Current time: 10/29/24, 4:56:16 AM UTC
+// Device view-level: 2.4
+// HMemoryUtils.trashcanNow. Engine heap size: 13,037 MB. GUI used memory: 281 MB. Current time: 10/29/24, 4:56:17 AM UTC
+// Elapsed time: 77 seconds
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 4192224, 3955661); // E
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 4192224, 3955661); // E
+// HMemoryUtils.trashcanNow. Engine heap size: 13,037 MB. GUI used memory: 282 MB. Current time: 10/29/24, 4:56:20 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,037 MB. GUI used memory: 283 MB. Current time: 10/29/24, 4:56:22 AM UTC
+// Device view-level: 2.7
+// Device view-level: 3.0
+// HMemoryUtils.trashcanNow. Engine heap size: 13,024 MB. GUI used memory: 281 MB. Current time: 10/29/24, 4:56:33 AM UTC
+// Device view-level: 3.3
+// Device view-level: 3.6
+// Device view-level: 3.9
+// Device view-level: 4.2
+// Device view-level: 4.4
+// HMemoryUtils.trashcanNow. Engine heap size: 13,024 MB. GUI used memory: 284 MB. Current time: 10/29/24, 4:56:35 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,024 MB. GUI used memory: 281 MB. Current time: 10/29/24, 4:56:41 AM UTC
+// Elapsed time: 26 seconds
+selectTab((HResource) null, (HResource) null, "Reports", 3); // aL
+// Elapsed time: 30 seconds
+selectTreeTable(PAResourceEtoH.ExpReportTreePanel_EXP_REPORT_TREE_TABLE, "synthesis_report ;  ;  ; Mon Oct 28 13:32:11 UTC 2024 ; 139996", 3, "synthesis_report", 0, false); // O
+expandTreeTable(PAResourceEtoH.ExpReportTreePanel_EXP_REPORT_TREE_TABLE, "synthesis_report ;  ;  ; Mon Oct 28 13:32:11 UTC 2024 ; 139996", 3); // O
+selectTreeTable(PAResourceEtoH.ExpReportTreePanel_EXP_REPORT_TREE_TABLE, "synthesis_report ;  ;  ; Mon Oct 28 13:32:11 UTC 2024 ; 139996", 3, "synthesis_report", 0, false, false, false, false, false, true); // O - Double Click
+selectTreeTable(PAResourceEtoH.ExpReportTreePanel_EXP_REPORT_TREE_TABLE, "Utilization - Synth Design ; report_utilization ;  ; Mon Oct 28 13:30:43 UTC 2024 ; 13815", 5, "Utilization - Synth Design", 0, false); // O
+expandTreeTable(PAResourceEtoH.ExpReportTreePanel_EXP_REPORT_TREE_TABLE, "Utilization - Synth Design ; report_utilization ;  ; Mon Oct 28 13:30:43 UTC 2024 ; 13815", 5); // O
+selectTreeTable(PAResourceEtoH.ExpReportTreePanel_EXP_REPORT_TREE_TABLE, "Utilization - Synth Design ; report_utilization ;  ; Mon Oct 28 13:30:43 UTC 2024 ; 13815", 5, "Utilization - Synth Design", 0, false, false, false, false, false, true); // O - Double Click
+closeView(PAResourceOtoP.PAViews_PAR_REPORT, "PAR Report"); // c
+selectCodeEditor("Utilization - Synth Design - ulp_krnl_cam_rtl_1_0_synth_1", 199, 83); // E
+selectCodeEditor("Utilization - Synth Design - ulp_krnl_cam_rtl_1_0_synth_1", 538, 114); // E
+// Elapsed time: 32 seconds
+selectTab("PlanAheadTabBaseWorkspace_JideTabbedPane", (HResource) null, "Device", 1); // m
+// Device view-level: 4.2
+// Device view-level: 3.9
+// Device view-level: 3.6
+// HMemoryUtils.trashcanNow. Engine heap size: 13,050 MB. GUI used memory: 289 MB. Current time: 10/29/24, 4:58:06 AM UTC
+// Device view-level: 3.3
+// Device view-level: 3.0
+// Device view-level: 2.7
+// Device view-level: 2.4
+// Device view-level: 2.1
+// HMemoryUtils.trashcanNow. Engine heap size: 13,051 MB. GUI used memory: 286 MB. Current time: 10/29/24, 4:58:11 AM UTC
+// Device view-level: 1.5
+// HMemoryUtils.trashcanNow. Engine heap size: 13,051 MB. GUI used memory: 291 MB. Current time: 10/29/24, 4:58:16 AM UTC
+// Device view-level: 1.2
+// Device view-level: 0.9
+// HMemoryUtils.trashcanNow. Engine heap size: 13,051 MB. GUI used memory: 295 MB. Current time: 10/29/24, 4:58:21 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,051 MB. GUI used memory: 294 MB. Current time: 10/29/24, 4:58:23 AM UTC
+// Device view-level: 1.2
+// Device view-level: 1.5
+// Device view-level: 1.2
+// Device view-level: 0.9
+// HMemoryUtils.trashcanNow. Engine heap size: 13,052 MB. GUI used memory: 294 MB. Current time: 10/29/24, 4:58:40 AM UTC
+// Elapsed time: 37 seconds
+selectTab((HResource) null, (HResource) null, "Intelligent Design Runs", 4); // aL
+selectTab((HResource) null, (HResource) null, "Design Runs", 5); // aL
+selectTab((HResource) null, (HResource) null, "Timing", 6); // aL
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Check Timing]", 5, true); // a - Node
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Check Timing, no_input_delay]", 10, false, false, false, false, false, true); // a - Double Click
+selectTable(PAResourceAtoD.CheckTimingSectionPanel_CHECK_TIMING_SELECTION_TABLE, "no_input_delay ; 7 ; High", 0, "no_input_delay", 0); // c
+selectTable(PAResourceAtoD.CheckTimingSectionPanel_CHECK_TIMING_SELECTION_TABLE, "no_input_delay ; 7 ; High", 0, "no_input_delay", 0, false, false, false, false, true); // c - Double Click
+selectTable(PAResourceAtoD.CheckTimingSectionPanel_CHECK_TIMING_SELECTION_TABLE, "no_input_delay ; 7 ; High", 0, "no_input_delay", 0); // c
+selectTable(PAResourceAtoD.CheckTimingSectionPanel_CHECK_TIMING_SELECTION_TABLE, "no_input_delay ; 7 ; High", 0, "High", 2); // c
+selectTable(PAResourceAtoD.CheckTimingSectionPanel_CHECK_TIMING_SELECTION_TABLE, "no_input_delay ; 7 ; High", 0, "High", 2); // c
+selectTable(PAResourceAtoD.CheckTimingSectionPanel_CHECK_TIMING_SELECTION_TABLE, "no_output_delay ; 3 ; High", 1, "no_output_delay", 0); // c
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Check Timing, no_clock]", 6, false); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Check Timing, no_input_delay]", 10, false); // a
+selectTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[0] ; High", 1, "io_data_satellite_ctrl_00[0]", 0, false); // j
+selectTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[0] ; High", 1, "io_data_satellite_ctrl_00[0]", 0, false, false, false, false, false, true); // j - Double Click
+selectTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[1] ; High", 2, "io_data_satellite_ctrl_00[1]", 0, false); // j
+expandTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[1] ; High", 2); // j
+selectTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[1] ; High", 2, "io_data_satellite_ctrl_00[1]", 0, false, false, false, false, false, true); // j - Double Click
+// HMemoryUtils.trashcanNow. Engine heap size: 13,054 MB. GUI used memory: 286 MB. Current time: 10/29/24, 5:04:22 AM UTC
+// Elapsed time: 688 seconds
+expandTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths]", 18); // a
+collapseTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths]", 18); // a
+// HMemoryUtils.trashcanNow. Engine heap size: 13,055 MB. GUI used memory: 289 MB. Current time: 10/29/24, 5:10:39 AM UTC
+// HMemoryUtils.trashcanNow. Engine heap size: 13,055 MB. GUI used memory: 288 MB. Current time: 10/29/24, 5:10:41 AM UTC
+// Elapsed time: 158 seconds
+selectTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[1] ; High", 2, "High", 1, false); // j
+selectTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[1] ; High", 2, "High", 1, false, false, false, false, false, true); // j - Double Click
+selectTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[0] ; High", 1, "High", 1, false); // j
+selectTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[0] ; High", 1, "High", 1, false, false, false, false, false, true); // j - Double Click
+selectTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[0] ; High", 1, "io_data_satellite_ctrl_00[0]", 0, false); // j
+selectTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[0] ; High", 1, "io_data_satellite_ctrl_00[0]", 0, false, false, false, false, false, true); // j - Double Click
+selectTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[0] ; High", 1, "io_data_satellite_ctrl_00[0]", 0, false); // j
+selectTreeTable(PAResourceAtoD.CheckTimingResultTreeTablePanel_CHECK_TIMING_RESULT_TREE_TABLE, "io_data_satellite_ctrl_00[0] ; High", 1, "io_data_satellite_ctrl_00[0]", 0, false, false, false, false, false, true); // j - Double Click
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Check Timing, no_output_delay]", 11, false); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Clock Summary]", 3, false); // a
+selectTreeTable(PAResourceAtoD.ClockSummaryTreeTablePanel_CLOCK_SUMMARY_TREE_TABLE, "level0_i/blp/blp_i/ss_hif/inst/pcie/inst/bd_39ab_pcie_0_gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_intclk/O ; {0.000 500.000} ; 1000.0 ; 1.0", 66, "level0_i/blp/blp_i/ss_hif/inst/pcie/inst/bd_39ab_pcie_0_gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_intclk/O", 0, false); // e
+expandTreeTable(PAResourceAtoD.ClockSummaryTreeTablePanel_CLOCK_SUMMARY_TREE_TABLE, "level0_i/blp/blp_i/ss_hif/inst/pcie/inst/bd_39ab_pcie_0_gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_intclk/O ; {0.000 500.000} ; 1000.0 ; 1.0", 66); // e
+selectTreeTable(PAResourceAtoD.ClockSummaryTreeTablePanel_CLOCK_SUMMARY_TREE_TABLE, "level0_i/blp/blp_i/ss_hif/inst/pcie/inst/bd_39ab_pcie_0_gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_intclk/O ; {0.000 500.000} ; 1000.0 ; 1.0", 66, "level0_i/blp/blp_i/ss_hif/inst/pcie/inst/bd_39ab_pcie_0_gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_intclk/O", 0, false, false, false, false, false, true); // e - Double Click
+selectTreeTable(PAResourceAtoD.ClockSummaryTreeTablePanel_CLOCK_SUMMARY_TREE_TABLE, "level0_i/blp/blp_i/ss_hif/inst/pcie/inst/bd_39ab_pcie_0_gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_intclk/O ; {0.000 500.000} ; 1000.0 ; 1.0", 66, "{0.000 500.000}", 1, false); // e
+selectTreeTable(PAResourceAtoD.ClockSummaryTreeTablePanel_CLOCK_SUMMARY_TREE_TABLE, "level0_i/blp/blp_i/ss_hif/inst/pcie/inst/bd_39ab_pcie_0_gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_intclk/O ; {0.000 500.000} ; 1000.0 ; 1.0", 66, "{0.000 500.000}", 1, false, false, false, false, false, true); // e - Double Click
+selectTreeTable(PAResourceAtoD.ClockSummaryTreeTablePanel_CLOCK_SUMMARY_TREE_TABLE, "level0_i/blp/blp_i/ss_hif/inst/pcie/inst/bd_39ab_pcie_0_gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_intclk/O ; {0.000 500.000} ; 1000.0 ; 1.0", 66, "1000.0", 2, false); // e
+selectTreeTable(PAResourceAtoD.ClockSummaryTreeTablePanel_CLOCK_SUMMARY_TREE_TABLE, "level0_i/blp/blp_i/ss_hif/inst/pcie/inst/bd_39ab_pcie_0_gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_intclk/O ; {0.000 500.000} ; 1000.0 ; 1.0", 66, "1000.0", 2, false, false, false, false, false, true); // e - Double Click
+selectTreeTable(PAResourceAtoD.ClockSummaryTreeTablePanel_CLOCK_SUMMARY_TREE_TABLE, "level0_i/blp/blp_i/ss_hif/inst/pcie/inst/bd_39ab_pcie_0_gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_intclk/O ; {0.000 500.000} ; 1000.0 ; 1.0", 66, "1.0", 3, false); // e
+selectTreeTable(PAResourceAtoD.ClockSummaryTreeTablePanel_CLOCK_SUMMARY_TREE_TABLE, "level0_i/blp/blp_i/ss_hif/inst/pcie/inst/bd_39ab_pcie_0_gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_intclk/O ; {0.000 500.000} ; 1000.0 ; 1.0", 66, "1.0", 3, false, false, false, false, false, true); // e - Double Click
+// Elapsed time: 15 seconds
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Methodology Summary]", 4, false); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Timer Settings]", 1, false); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Timer Settings]", 1, false); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, General Information]", 0, false); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Methodology Summary]", 4, false); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Check Timing]", 5, true); // a - Node
+selectTable(PAResourceAtoD.CheckTimingSectionPanel_CHECK_TIMING_SELECTION_TABLE, "no_input_delay ; 7 ; High", 0, "High", 2); // c
+selectTable(PAResourceAtoD.CheckTimingSectionPanel_CHECK_TIMING_SELECTION_TABLE, "no_input_delay ; 7 ; High", 0, "High", 2, false, false, false, false, true); // c - Double Click
+selectTable(PAResourceAtoD.CheckTimingSectionPanel_CHECK_TIMING_SELECTION_TABLE, "no_input_delay ; 7 ; High", 0, "no_input_delay", 0); // c
+selectTable(PAResourceAtoD.CheckTimingSectionPanel_CHECK_TIMING_SELECTION_TABLE, "no_input_delay ; 7 ; High", 0, "no_input_delay", 0, false, false, false, false, true); // c - Double Click
+selectTable(PAResourceAtoD.CheckTimingSectionPanel_CHECK_TIMING_SELECTION_TABLE, "no_input_delay ; 7 ; High", 0, "no_input_delay", 0); // c
+selectTable(PAResourceAtoD.CheckTimingSectionPanel_CHECK_TIMING_SELECTION_TABLE, "no_input_delay ; 7 ; High", 0, "no_input_delay", 0, false, false, false, false, true); // c - Double Click
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Check Timing, no_clock]", 6, false); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Check Timing, constant_clock]", 7, false); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Check Timing, no_input_delay]", 10, false); // a
+// Elapsed time: 61 seconds
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Check Timing, no_output_delay]", 11, false); // a
+expandTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths]", 18); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, clk_kernel_00_unbuffered_net]", 35, true); // a - Node
+expandTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, clk_kernel_00_unbuffered_net]", 35); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, GTYE4_CHANNEL_TXOUTCLK[3]_7]", 34, true); // a - Node
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, clk_kernel_00_unbuffered_net]", 35, true); // a - Node
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, GTYE4_CHANNEL_TXOUTCLK[3]_7]", 34, true); // a - Node
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, GTYE4_CHANNEL_TXOUTCLK[3]_6]", 33, true); // a - Node
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, clk_kernel_00_unbuffered_net]", 35, true); // a - Node
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, clk_kernel_00_unbuffered_net, Setup -0.310 ns]", 36, false); // a
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 25 ; -0.3084386 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[283].DSP48E2_inst/DSP_A_B_DATA_INST/A[18] ; 3.11536 ; 0.23099999 ; 2.8843603 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 4, "0", 2); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 25 ; -0.3084386 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[283].DSP48E2_inst/DSP_A_B_DATA_INST/A[18] ; 3.11536 ; 0.23099999 ; 2.8843603 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 4, "0", 2); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 25 ; -0.3084386 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[283].DSP48E2_inst/DSP_A_B_DATA_INST/A[18] ; 3.11536 ; 0.23099999 ; 2.8843603 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 4, "0", 2); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 25 ; -0.3084386 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[283].DSP48E2_inst/DSP_A_B_DATA_INST/A[18] ; 3.11536 ; 0.23099999 ; 2.8843603 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 4, "0", 2); // h
+// PAPropertyPanels.initPanels (Path 21) elapsed time: 0.3s
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 21 ; -0.3104983 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[921].DSP48E2_inst/DSP_A_B_DATA_INST/A[6] ; 2.9904091 ; 0.21599999 ; 2.7744095 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 0, "Path 21", 0); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 21 ; -0.3104983 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[921].DSP48E2_inst/DSP_A_B_DATA_INST/A[6] ; 2.9904091 ; 0.21599999 ; 2.7744095 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 0, "Path 21", 0, false, false, false, false, true); // h - Double Click
+// Elapsed time: 21 seconds
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK   (rising edge-triggered cell RAMB36E2 clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK   (rising edge-triggered cell RAMB36E2 clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK   (rising edge-triggered cell RAMB36E2 clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK   (rising edge-triggered cell RAMB36E2 clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1, false, false, false, false, true); // C - Double Click
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[921].DSP48E2_inst/DSP_A_B_DATA_INST/A[6]   (rising edge-triggered cell DSP_A_B_DATA clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[921].DSP48E2_inst/DSP_A_B_DATA_INST/A[6]   (rising edge-triggered cell DSP_A_B_DATA clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[921].DSP48E2_inst/DSP_A_B_DATA_INST/A[6]   (rising edge-triggered cell DSP_A_B_DATA clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[921].DSP48E2_inst/DSP_A_B_DATA_INST/A[6]   (rising edge-triggered cell DSP_A_B_DATA clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1, false, false, false, false, true); // C - Double Click
+selectTab("PlanAheadTabBaseWorkspace_JideTabbedPane", (HResource) null, "Utilization - Synth Design - ulp_krnl_cam_rtl_1_0_synth_1", 2); // m
+closeView(PAResourceOtoP.PAViews_PAR_REPORT, "PAR Report"); // c
+selectTab("PlanAheadTabBaseWorkspace_JideTabbedPane", (HResource) null, "Device", 1); // m
+// Elapsed time: 100 seconds
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 26 ; -0.30778667 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[245].DSP48E2_inst/DSP_A_B_DATA_INST/B[6] ; 3.1987076 ; 0.21800001 ; 2.980708 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 5, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK", 4); // h
+// Elapsed time: 12 seconds
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5); // h
+// HMemoryUtils.trashcanNow. Engine heap size: 13,057 MB. GUI used memory: 295 MB. Current time: 10/29/24, 5:17:51 AM UTC
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5, false, false, false, false, true); // h - Double Click
+// Elapsed time: 17 seconds
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 30 ; -0.3073799 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[183].DSP48E2_inst/DSP_A_B_DATA_INST/B[9] ; 3.0969205 ; 0.21700001 ; 2.8799205 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 9, "3.0969205", 6); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 29 ; -0.3074785 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[588].DSP48E2_inst/DSP_A_B_DATA_INST/B[6] ; 3.2204003 ; 0.21800001 ; 3.0024006 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 8, "3.2204003", 6); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 28 ; -0.30760995 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[773].DSP48E2_inst/DSP_A_B_DATA_INST/A[15] ; 2.9365315 ; 0.221 ; 2.7155313 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 7, "2.9365315", 6); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "3.3569744", 6); // h
+// Elapsed time: 159 seconds
+selectMenu(PAResourceItoN.MainMenuMgr_FILE, "File"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_PROJECT, "Project"); // ao
+dismissMenu(PAResourceItoN.MainMenuMgr_FILE, "File"); // aj
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Path Type ; Setup (Max at Slow Process Corner)", 5, "Setup (Max at Slow Process Corner)", 1); // C
+// Elapsed time: 367 seconds
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Logic Levels ; 10  (LUT2=1 LUT5=1 LUT6=8)", 8, "10  (LUT2=1 LUT5=1 LUT6=8)", 1); // C
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 23 ; -0.3099965 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[827].DSP48E2_inst/DSP_A_B_DATA_INST/A[24] ; 3.3039176 ; 0.226 ; 3.0779173 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[827].DSP48E2_inst/DSP_A_B_DATA_INST/A[24]", 5); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 23 ; -0.3099965 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[827].DSP48E2_inst/DSP_A_B_DATA_INST/A[24] ; 3.3039176 ; 0.226 ; 3.0779173 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[827].DSP48E2_inst/DSP_A_B_DATA_INST/A[24]", 5, false, false, false, false, true); // h - Double Click
+// Elapsed time: 24 seconds
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5, false, false, false, false, true); // h - Double Click
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Clock Path Skew ; -0.253ns", 9, "Clock Path Skew", 0); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Clock Uncertainty ; 0.058ns", 10, "Clock Uncertainty", 0); // C
+// Elapsed time: 33 seconds
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1, false, false, false, true, false); // C - Popup Trigger
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1, false, false, false, true, false); // C - Popup Trigger
+selectMenu(RDIResource.HTable_SET_ELIDING_FOR_TABLE_CELLS, "Elide Setting"); // F
+selectMenu(PAResourceOtoP.PathReportTableView_FLOORPLANNING, "Floorplanning"); // ao
+selectMenu(PAResourceOtoP.PathReportTableView_SELECT, "Select"); // ao
+selectMenu(PAResourceQtoS.SelectMenu_HIGHLIGHT, "Highlight"); // ao
+selectMenu(PAResourceQtoS.SelectMenu_MARK, "Mark"); // ao
+selectMenu(PAResourceQtoS.SelectMenu_MARK, "Mark"); // ao
+selectMenu(PAResourceQtoS.SelectMenu_HIGHLIGHT, "Highlight"); // ao
+selectMenu(PAResourceOtoP.PathReportTableView_SELECT, "Select"); // ao
+selectMenu(PAResourceOtoP.PathReportTableView_FLOORPLANNING, "Floorplanning"); // ao
+selectMenu(RDIResource.HTable_SET_ELIDING_FOR_TABLE_CELLS, "Elide Setting"); // F
+selectMenu(PAResourceQtoS.SelectMenu_HIGHLIGHT, "Highlight"); // ao
+selectMenu(PAResourceOtoP.PathReportTableView_SELECT, "Select"); // ao
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+// Elapsed time: 189 seconds
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Clock Uncertainty ; 0.058ns", 10, "0.058ns", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Clock Uncertainty ; 0.058ns", 10, "0.058ns", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Clock Uncertainty ; 0.058ns", 10, "0.058ns", 1); // C
+// Elapsed time: 17 seconds
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, clk_kernel_00_unbuffered_net, Hold 0.010 ns]", 37, false); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, clk_kernel_00_unbuffered_net, Pulse Width 1.125 ns]", 38, false); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, clk_kernel_00_unbuffered_net, Setup -0.310 ns]", 36, false); // a
+// Elapsed time: 30 seconds
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 21 ; -0.3104983 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[921].DSP48E2_inst/DSP_A_B_DATA_INST/A[6] ; 2.9904091 ; 0.21599999 ; 2.7744095 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 0, "-0.3104983", 1); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 21 ; -0.3104983 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[921].DSP48E2_inst/DSP_A_B_DATA_INST/A[6] ; 2.9904091 ; 0.21599999 ; 2.7744095 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 0, "-0.3104983", 1, false, false, false, false, true); // h - Double Click
+selectButton(PAResourceTtoZ.TimingPathResultSectionPanel_SHOW_ONLY_FAILING_PATHS, "TimingPathsResultPanel_failingonly"); // w: TRUE
+selectButton(PAResourceTtoZ.TimingPathResultSectionPanel_SHOW_ONLY_FAILING_PATHS, "TimingPathsResultPanel_failingonly"); // w: FALSE
+// HMemoryUtils.trashcanNow. Engine heap size: 13,060 MB. GUI used memory: 293 MB. Current time: 10/29/24, 5:47:53 AM UTC
+// Elapsed time: 1866 seconds
+selectTab((HResource) null, (HResource) null, "Sources", 0); // aL
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Constraints, constrs_1, dont_partition.xdc]", 15, false); // D
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Constraints, constrs_1, dont_partition.xdc]", 15, false, false, false, false, false, true); // D - Double Click
+// WARNING: HEventQueue.dispatchEvent() is taking  1190 ms.
+dismissDialog("Opening Editor"); // bA
+closeView(PAResourceOtoP.PAViews_CODE, "Code"); // D
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Constraints, constrs_1, impl.xdc]", 14, false); // D
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Constraints, constrs_1, impl.xdc]", 14, false, false, false, false, false, true); // D - Double Click
+// WARNING: HEventQueue.dispatchEvent() is taking  1736 ms.
+dismissDialog("Opening Editor"); // bA
+// Elapsed time: 10 seconds
+selectMenu(PAResourceItoN.MainMenuMgr_FILE, "File"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_PROJECT, "Project"); // ao
+dismissMenu(PAResourceItoN.MainMenuMgr_FILE, "File"); // aj
+selectCodeEditor("impl.xdc", 383, 178); // be
+// Elapsed time: 10 seconds
+setText(RDIResource.HCodeEditor_SEARCH_TEXT_COMBO_BOX, "TOUCH"); // k
+selectCodeEditor("impl.xdc", 481, 52); // be
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true); // D - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true, false, false, false, false, true); // D - Double Click - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0, XDC]", 14, true); // D - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0, XDC]", 14, true, false, false, false, false, true); // D - Double Click - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0, XDC, constrains.xdc]", 15, false); // D
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0, XDC, constrains.xdc]", 15, false, false, false, false, false, true); // D - Double Click
+// Elapsed time: 12 seconds
+collapseTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0, XDC]", 14); // D
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0, SystemVerilog]", 13); // D
+collapseTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0, SystemVerilog]", 13); // D
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0, Verilog]", 12); // D
+collapseTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0, Verilog]", 12); // D
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true); // D - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true, false, false, false, false, true); // D - Double Click - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true); // D - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true, false, false, false, false, true); // D - Double Click - Node
+closeView(PAResourceOtoP.PAViews_CODE, "Code"); // D
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true); // D - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true, false, false, false, false, true); // D - Double Click - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true, false, false, false, true, false); // D - Popup Trigger - Node
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, my_rm, Block Designs, ulp]", 8); // D
+collapseTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, my_rm, Block Designs, ulp]", 8); // D
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, my_rm, Block Designs, ulp]", 8, true, false, false, false, true, false); // D - Popup Trigger - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, my_rm, XDC, ulp_ooc_copy.xdc]", 6, false); // D
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, my_rm, XDC, ulp_ooc_copy.xdc]", 6, false, false, false, false, false, true); // D - Double Click
+dismissDialog("Opening Editor"); // bA
+closeView(PAResourceOtoP.PAViews_CODE, "Code"); // D
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, my_rm, Block Designs, ulp]", 8); // D
+collapseTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, my_rm, Block Designs, ulp]", 8); // D
+// Elapsed time: 47 seconds
+selectTab("PlanAheadTabBaseWorkspace_JideTabbedPane", (HResource) null, "Path 23 - hw_bb_locked_timing_summary_routed", 4); // m
+selectTab("PlanAheadTabBaseWorkspace_JideTabbedPane", (HResource) null, "Path 21 - hw_bb_locked_timing_summary_routed", 2); // m
+// Elapsed time: 589 seconds
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Clock Path Skew ; -0.323ns", 9, "-0.323ns", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Clock Path Skew ; -0.323ns", 9, "-0.323ns", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Clock Path Skew ; -0.323ns", 9, "-0.323ns", 1); // C
+// HMemoryUtils.trashcanNow. Engine heap size: 13,034 MB. GUI used memory: 270 MB. Current time: 10/29/24, 6:17:53 AM UTC
+// Elapsed time: 117 seconds
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, clk_kernel_00_unbuffered_net, Hold 0.010 ns]", 37, false); // a
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, clk_kernel_00_unbuffered_net, Pulse Width 1.125 ns]", 38, false); // a
+selectTable(PAResourceOtoP.PulseWidthClockChecksTablePanel_PULSE_WIDTH_CLOCK_CHECKS_TABLE, "Low Pulse Width ; Slow ; RAMB36E2/CLKARDCLK ; n/a ; 0.5420000004363601 ; 1.6666663604780751 ; 1.124666360041715 ; RAMB36_X0Y3 ; level0_i/ulp/krnl_cam_1/inst/gmem_m_axi_U/store_unit/buff_wdata/U_fifo_mem/mem_reg/CLKARDCLK", 0, "Low Pulse Width", 0); // e
+selectTable(PAResourceOtoP.PulseWidthClockChecksTablePanel_PULSE_WIDTH_CLOCK_CHECKS_TABLE, "Low Pulse Width ; Slow ; RAMB36E2/CLKARDCLK ; n/a ; 0.5420000004363601 ; 1.6666663604780751 ; 1.124666360041715 ; RAMB36_X0Y3 ; level0_i/ulp/krnl_cam_1/inst/gmem_m_axi_U/store_unit/buff_wdata/U_fifo_mem/mem_reg/CLKARDCLK", 0, "Low Pulse Width", 0, false, false, false, false, true); // e - Double Click
+selectTable(PAResourceOtoP.PulseWidthClockChecksTablePanel_PULSE_WIDTH_CLOCK_CHECKS_TABLE, "Low Pulse Width ; Slow ; RAMB36E2/CLKBWRCLK ; n/a ; 0.5420000004363601 ; 1.6666663604780751 ; 1.124666360041715 ; RAMB36_X0Y3 ; level0_i/ulp/krnl_cam_1/inst/gmem_m_axi_U/store_unit/buff_wdata/U_fifo_mem/mem_reg/CLKBWRCLK", 1, "Low Pulse Width", 0); // e
+selectTable(PAResourceOtoP.PulseWidthClockChecksTablePanel_PULSE_WIDTH_CLOCK_CHECKS_TABLE, "Min Period ; n/a ; RAMB36E2/CLKBWRCLK ; n/a ; 1.5690000410018001 ; 3.333333387089965 ; 1.764333346088165 ; RAMB36_X8Y23 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_2/CLKBWRCLK", 29, "n/a", 1); // e
+selectTree(PAResourceItoN.NavigableTimingReportTab_TIMING_REPORT_NAVIGATION_TREE, "[Root, Intra-Clock Paths, clk_kernel_00_unbuffered_net, Setup -0.310 ns]", 36, false); // a
+// Elapsed time: 889 seconds
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 23 ; -0.3099965 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[827].DSP48E2_inst/DSP_A_B_DATA_INST/A[24] ; 3.3039176 ; 0.226 ; 3.0779173 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK", 4); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 23 ; -0.3099965 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[827].DSP48E2_inst/DSP_A_B_DATA_INST/A[24] ; 3.3039176 ; 0.226 ; 3.0779173 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK", 4, false, false, false, false, true); // h - Double Click
+// Elapsed time: 91 seconds
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 24 ; -0.30975223 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[992].DSP48E2_inst/DSP_A_B_DATA_INST/B[3] ; 3.2066736 ; 0.212 ; 2.9946735 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK", 4); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 24 ; -0.30975223 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[992].DSP48E2_inst/DSP_A_B_DATA_INST/B[3] ; 3.2066736 ; 0.212 ; 2.9946735 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK", 4); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 24 ; -0.30975223 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[992].DSP48E2_inst/DSP_A_B_DATA_INST/B[3] ; 3.2066736 ; 0.212 ; 2.9946735 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK", 4); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 24 ; -0.30975223 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[992].DSP48E2_inst/DSP_A_B_DATA_INST/B[3] ; 3.2066736 ; 0.212 ; 2.9946735 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK", 4); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 24 ; -0.30975223 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[992].DSP48E2_inst/DSP_A_B_DATA_INST/B[3] ; 3.2066736 ; 0.212 ; 2.9946735 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK", 4); // h
+// Elapsed time: 141 seconds
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 26 ; -0.30778667 ; 0 ; 1152 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_rd_xpm_fifo_sync[0]/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0/CLKARDCLK ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/genblk1.genblk1[245].DSP48E2_inst/DSP_A_B_DATA_INST/B[6] ; 3.1987076 ; 0.21800001 ; 2.980708 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 5, "0.21800001", 7); // h
+// Elapsed time: 68 seconds
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5); // h
+// Elapsed time: 25 seconds
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5, false, false, false, false, true); // h - Double Click
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5, false, false, false, false, true); // h - Double Click
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5, false, false, false, false, true); // h - Double Click
+// Elapsed time: 27 seconds
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+// Elapsed time: 17 seconds
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Slack ; -0.310ns", 1, "-0.310ns", 1); // C
+selectButton(RDIResource.HPopupTitle_CLOSE, (String) null); // j
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Clock Path Skew ; -0.253ns", 9, "-0.253ns", 1); // C
+selectButton(RDIResource.HPopupTitle_CLOSE, (String) null); // j
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Clock Uncertainty ; 0.058ns", 10, "0.058ns", 1); // C
+selectButton(RDIResource.HPopupTitle_CLOSE, (String) null); // j
+// WARNING: HSwingWorker (Refresh Filesets Swing Worker) is taking 4183 ms. Increasing delay to 12549 ms.
+// WARNING: HSwingWorker (Refresh Filesets Swing Worker) is taking 94 ms. Decreasing delay to 2094 ms.
+// HMemoryUtils.trashcanNow. Engine heap size: 13,037 MB. GUI used memory: 281 MB. Current time: 10/29/24, 6:47:54 AM UTC
+// Elapsed time: 789 seconds
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+// Elapsed time: 25 seconds
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1, false, false, false, false, true); // C - Double Click
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1, false, false, false, false, true); // C - Double Click
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1, false, false, false, true, false); // C - Popup Trigger
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1, false, false, false, true, false); // C - Popup Trigger
+selectMenu(RDIResource.HTable_SET_ELIDING_FOR_TABLE_CELLS, "Elide Setting"); // F
+selectMenu(PAResourceOtoP.PathReportTableView_FLOORPLANNING, "Floorplanning"); // ao
+selectMenu(PAResourceOtoP.PathReportTableView_SELECT, "Select"); // ao
+selectMenu(PAResourceQtoS.SelectMenu_HIGHLIGHT, "Highlight"); // ao
+selectMenu(PAResourceOtoP.PathReportTableView_SELECT, "Select"); // ao
+selectMenuItem((HResource) null, "Cell num_index[7][10]_i_271_psdsp_4"); // ar
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1, false, false, false, true, false); // C - Popup Trigger
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1, false, false, false, true, false); // C - Popup Trigger
+selectMenu(RDIResource.HTable_SET_ELIDING_FOR_TABLE_CELLS, "Elide Setting"); // F
+selectMenu(PAResourceOtoP.PathReportTableView_SELECT, "Select"); // ao
+selectMenu(PAResourceQtoS.SelectMenu_HIGHLIGHT, "Highlight"); // ao
+selectMenu(PAResourceQtoS.SelectMenu_HIGHLIGHT, "Highlight"); // ao
+selectMenu(PAResourceOtoP.PathReportTableView_SELECT, "Select"); // ao
+selectMenu(PAResourceOtoP.PathReportTableView_SELECT, "Select"); // ao
+selectMenuItem((HResource) null, "Cell num_index[7][10]_i_271_psdsp_4"); // ar
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1, false, false, false, true, false); // C - Popup Trigger
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1, false, false, false, true, false); // C - Popup Trigger
+selectMenu(RDIResource.HTable_SET_ELIDING_FOR_TABLE_CELLS, "Elide Setting"); // F
+selectMenu(PAResourceOtoP.PathReportTableView_SELECT, "Select"); // ao
+selectMenu(PAResourceQtoS.SelectMenu_HIGHLIGHT, "Highlight"); // ao
+selectMenu(PAResourceQtoS.SelectMenu_HIGHLIGHT, "Highlight"); // ao
+selectMenu(PAResourceOtoP.PathReportTableView_SELECT, "Select"); // ao
+selectMenu(PAResourceQtoS.SelectMenu_HIGHLIGHT, "Highlight"); // ao
+selectMenu(PAResourceQtoS.SelectMenu_MARK, "Mark"); // ao
+selectMenuItem(PAResourceCommand.PACommandNames_SCHEMATIC, "Schematic"); // ar
+// Run Command: PAResourceCommand.PACommandNames_SCHEMATIC
+// Elapsed time: 67 seconds
+selectTab("PlanAheadTabBaseWorkspace_JideTabbedPane", (HResource) null, "Path 23 - hw_bb_locked_timing_summary_routed", 4); // m
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5, false, false, false, false, true); // h - Double Click
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5); // h
+selectTable(PAResourceTtoZ.TimingItemFlatTablePanel_TABLE, "Path 22 ; -0.3100391 ; 10 ; 3 ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D ; 3.3569744 ; 1.0250001 ; 2.3319764 ; 3.3333335 ; clk_kernel_00_unbuffered_net ; clk_kernel_00_unbuffered_net ;  ; 0.058390986", 1, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D", 5); // h
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Path Type ; Setup (Max at Slow Process Corner)", 5, "Setup (Max at Slow Process Corner)", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Path Group ; clk_kernel_00_unbuffered_net", 4, "clk_kernel_00_unbuffered_net", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Path Group ; clk_kernel_00_unbuffered_net", 4, "clk_kernel_00_unbuffered_net", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Path Group ; clk_kernel_00_unbuffered_net", 4, "clk_kernel_00_unbuffered_net", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Path Group ; clk_kernel_00_unbuffered_net", 4, "clk_kernel_00_unbuffered_net", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Destination ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 3, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index_reg[7][1]/D   (rising edge-triggered cell FDSE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+selectTable(PAResourceOtoP.PathReportTableView_DESCRIPTION, "Source ; level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 2, "level0_i/ulp/krnl_cam_rtl_1/inst/inst_krnl_cam_rtl_int/inst_adder/num_index[7][10]_i_271_psdsp_4/C   (rising edge-triggered cell FDRE clocked by clk_kernel_00_unbuffered_net  {rise@0.000ns fall@1.667ns period=3.333ns})", 1); // C
+// TclEventType: RUN_STATUS_CHANGE
+// TclEventType: FILE_SET_CHANGE
+// WARNING: HSwingWorker (Refresh Filesets Swing Worker) is taking 1119 ms. Increasing delay to 3357 ms.
+// Elapsed time: 1196 seconds
+selectTree(PAResourceEtoH.FlowNavigatorTreePanel_FLOW_NAVIGATOR_TREE, "[, Project Manager, Settings]", 1, false); // n
+// Run Command: RDIResourceCommand.RDICommands_SETTINGS
+// Tcl Command: 'rdi::info_commands {device::*}'
+// Tcl Command: 'rdi::info_commands {debug::*}'
+// Tcl Command: 'rdi::info_commands {*}'
+// WARNING: HEventQueue.dispatchEvent() is taking  2483 ms.
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, IP Defaults]", 1, false); // B
+expandTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Vivado Store]", 2); // B
+collapseTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Vivado Store]", 2); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Project]", 0, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_PROJECT_TREE, "[projectRoot, Bitstream]", 3, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_PROJECT_TREE, "[projectRoot, Implementation]", 2, false); // B
+// Elapsed time: 22 seconds
+selectTree(PAResourceQtoS.SettingsDialog_PROJECT_TREE, "[projectRoot, Implementation]", 2, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_PROJECT_TREE, "[projectRoot, Simulation]", 1, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_PROJECT_TREE, "[projectRoot, General]", 0, false); // B
+// Elapsed time: 13 seconds
+expandTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Vivado Store]", 2); // B
+collapseTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Vivado Store]", 2); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Source File]", 3, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Display]", 4, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Help]", 5, false); // B
+expandTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Text Editor]", 6); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Text Editor, Code Completion]", 7, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Text Editor, Syntax Checking]", 8, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Text Editor, Tabs]", 9, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Text Editor, Fonts and Colors]", 10, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Text Editor, VHDL]", 12, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Text Editor, Tcl]", 13, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Text Editor, Xdc]", 14, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Text Editor]", 6, true); // B - Node
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Text Editor, Code Completion]", 7, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Text Editor]", 6, true); // B - Node
+collapseTree(PAResourceQtoS.SettingsDialog_OPTIONS_TREE, "[optionsRoot, Text Editor]", 6); // B
+selectTree(PAResourceQtoS.SettingsDialog_PROJECT_TREE, "[projectRoot, Simulation]", 1, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_PROJECT_TREE, "[projectRoot, Implementation]", 2, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_PROJECT_TREE, "[projectRoot, Bitstream]", 3, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_PROJECT_TREE, "[projectRoot, Bitstream]", 3, false); // B
+selectTree(PAResourceQtoS.SettingsDialog_PROJECT_TREE, "[projectRoot, Implementation]", 2, false); // B
+// Elapsed time: 13 seconds
+dismissDialog("Settings"); // d
+selectMenu(RDIResource.MainWinMenuMgr_LAYOUT, "Layout"); // aj
+dismissMenu(RDIResource.MainWinMenuMgr_LAYOUT, "Layout"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_VIEW, "View"); // aj
+dismissMenu(PAResourceItoN.MainMenuMgr_VIEW, "View"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_HELP, "Help"); // aj
+dismissMenu(PAResourceItoN.MainMenuMgr_HELP, "Help"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_VIEW, "View"); // aj
+dismissMenu(PAResourceItoN.MainMenuMgr_VIEW, "View"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_HELP, "Help"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_DESIGN_HUBS, "Design Hubs"); // ao
+selectMenu(PAResourceItoN.MainMenuMgr_DESIGN_HUBS, "Design Hubs"); // ao
+selectMenu(PAResourceItoN.MainMenuMgr_DESIGN_HUBS, "Design Hubs"); // ao
+selectMenu(PAResourceItoN.MainMenuMgr_DESIGN_HUBS, "Design Hubs"); // ao
+selectMenu(PAResourceItoN.MainMenuMgr_DESIGN_HUBS, "Design Hubs"); // ao
+dismissMenu(PAResourceItoN.MainMenuMgr_HELP, "Help"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_VIEW, "View"); // aj
+dismissMenu(PAResourceItoN.MainMenuMgr_VIEW, "View"); // aj
+selectMenu(RDIResource.MainWinMenuMgr_LAYOUT, "Layout"); // aj
+dismissMenu(RDIResource.MainWinMenuMgr_LAYOUT, "Layout"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_WINDOW, "Window"); // aj
+dismissMenu(PAResourceItoN.MainMenuMgr_WINDOW, "Window"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_REPORTS, "Reports"); // aj
+dismissMenu(PAResourceItoN.MainMenuMgr_REPORTS, "Reports"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_TOOLS, "Tools"); // aj
+dismissMenu(PAResourceItoN.MainMenuMgr_TOOLS, "Tools"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_FLOW, "Flow"); // aj
+dismissMenu(PAResourceItoN.MainMenuMgr_FLOW, "Flow"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_EDIT, "Edit"); // aj
+dismissMenu(PAResourceItoN.MainMenuMgr_EDIT, "Edit"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_FLOW, "Flow"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_SETTINGS, "Settings"); // ao
+dismissMenu(PAResourceItoN.MainMenuMgr_FLOW, "Flow"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_FLOW, "Flow"); // aj
+selectMenu(PAResourceItoN.MainMenuMgr_SETTINGS, "Settings"); // ao
+selectMenu(PAResourceCommand.PACommandNames_SIMULATION_RUN, "Run Simulation"); // aj
+selectMenu(PAResourceCommand.PACommandNames_SIMULATION_RUN, "Run Simulation"); // aj
+dismissMenu(PAResourceItoN.MainMenuMgr_FLOW, "Flow"); // aj
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true); // D - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true, false, false, false, true, false); // D - Popup Trigger - Node
+selectMenuItem(RDIResourceCommand.RDICommands_PROPERTIES, "Source File Properties..."); // ar
+// Run Command: RDIResourceCommand.RDICommands_PROPERTIES
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true, false, false, false, true, false); // D - Popup Trigger - Node
+selectMenuItem(PAResourceCommand.PACommandNames_EDIT_IN_IP_PACKAGER, "Edit in IP Packager"); // ar
+// Run Command: PAResourceCommand.PACommandNames_EDIT_IN_IP_PACKAGER
+selectButton(RDIResource.BaseDialog_OK, "OK"); // a
+// Tcl Message: ipx::edit_ip_in_project -upgrade true -name krnl_cam_rtl_v1_0_project -directory /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/prj.tmp/krnl_cam_rtl_v1_0_project /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/int/xo/ip_repo/xilinx_com_RTLKernel_krnl_cam_rtl_1_0/component.xml 
+// TclEventType: LOAD_FEATURE
+// TclEventType: FILE_SET_NEW
+// TclEventType: RUN_ADD
+// TclEventType: RUN_CURRENT
+// TclEventType: PROJECT_DASHBOARD_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_NEW
+// WARNING: HEventQueue.dispatchEvent() is taking  1487 ms.
+// Tcl Message: INFO: [IP_Flow 19-234] Refreshing IP repositories INFO: [IP_Flow 19-1704] No user IP repositories specified INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/tools/Xilinx/Vivado/2022.1/data/ip'. 
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// Tcl Message: ERROR: [Board 49-71] The board_part definition was not found for xilinx.com:au55c:1.0. The project's board_part property was not set, but the project's part property was set to xcu55c-fsvh2892-2L-e. Valid board_part values can be retrieved with the 'get_board_parts' Tcl command. Check if board.repoPaths parameter is set and the board_part is installed from the tcl app store. 
+// CommandFailedException: ERROR: [Common 17-69] Command failed: ERROR: [Board 49-71] The board_part definition was not found for xilinx.com:au55c:1.0. The project's board_part property was not set, but the project's part property was set to xcu55c-fsvh2892-2L-e. Valid board_part values can be retrieved with the 'get_board_parts' Tcl command. Check if board.repoPaths parameter is set and the board_part is installed from the tcl app store.  
+// 'i' command handler elapsed time: 8 seconds
+dismissDialog("Edit in IP Packager"); // bA
+// HMemoryUtils.trashcanNow. Engine heap size: 13,098 MB. GUI used memory: 300 MB. Current time: 10/29/24, 7:17:54 AM UTC
+// Elapsed time: 12 seconds
+selectTab("PlanAheadTabBaseWorkspace_JideTabbedPane", (HResource) null, "Project Summary", 0); // m
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true, false, false, false, true, false); // D - Popup Trigger - Node
+selectMenuItem(PAResourceCommand.PACommandNames_EDIT_IN_IP_PACKAGER, "Edit in IP Packager"); // ar
+// Run Command: PAResourceCommand.PACommandNames_EDIT_IN_IP_PACKAGER
+selectButton(PAResourceEtoH.EditIPProjectNameChooser_CHOOSE_PROJECT_LOCATION, (String) null); // s
+dismissFolderChooser();
+selectButton(RDIResource.BaseDialog_OK, "OK"); // a
+// Tcl Message: ipx::edit_ip_in_project -upgrade true -name krnl_cam_rtl_v1_0_project -directory /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/prj.tmp/krnl_cam_rtl_v1_0_project/krnl_cam_rtl_v1_0_project.tmp/krnl_cam_rtl_v1_0_project /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/int/xo/ip_repo/xilinx_com_RTLKernel_krnl_cam_rtl_1_0/component.xml 
+// Tcl Message: ERROR: [Ipptcl 7-561] A project named 'krnl_cam_rtl_v1_0_project' is already opened. 
+// Tcl Message: ERROR: [Common 17-39] 'ipx::edit_ip_in_project' failed due to earlier errors. 
+// CommandFailedException: ERROR: [Common 17-69] Command failed: ERROR: [Common 17-39] 'ipx::edit_ip_in_project' failed due to earlier errors.  
+// 'i' command handler elapsed time: 9 seconds
+dismissDialog("Edit in IP Packager"); // bA
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11); // D
+// Elapsed time: 21 seconds
+selectButton(PAResourceQtoS.SrcFilePropPanels_TYPE, (String) null); // s
+selectButton((HResource) null, "Properties_settings"); // w: TRUE
+selectButton((HResource) null, "Properties_settings"); // w: FALSE
+selectTab(RDIResource.PropertiesView_TABBED_PANE, (HResource) null, "IP", 2); // i
+selectTab(RDIResource.PropertiesView_TABBED_PANE, (HResource) null, "Properties", 1); // i
+// Elapsed time: 48 seconds
+selectTreeTable(PAResourceTtoZ.TclObjectTreeTable_TREETABLE, "IMPORTED_FROM ; /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/.local/hw_platform/bd/202210_1_dev.srcs/sources_1/bd/ulp/ip/ulp_krnl_cam_rtl_1_0/ulp_krnl_cam_rtl_1_0.xci", 4, "/home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/.local/hw_platform/bd/202210_1_dev.srcs/sources_1/bd/ulp/ip/ulp_krnl_cam_rtl_1_0/ulp_krnl_cam_rtl_1_0.xci", 1, false); // l
+selectTreeTable(PAResourceTtoZ.TclObjectTreeTable_TREETABLE, "IMPORTED_FROM ; /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/.local/hw_platform/bd/202210_1_dev.srcs/sources_1/bd/ulp/ip/ulp_krnl_cam_rtl_1_0/ulp_krnl_cam_rtl_1_0.xci", 4, "/home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/.local/hw_platform/bd/202210_1_dev.srcs/sources_1/bd/ulp/ip/ulp_krnl_cam_rtl_1_0/ulp_krnl_cam_rtl_1_0.xci", 1, false); // l
+// Elapsed time: 10 seconds
+selectTreeTable(PAResourceTtoZ.TclObjectTreeTable_TREETABLE, "USED_IN ; <unknown>", 16, "USED_IN", 0, false); // l
+selectTreeTable(PAResourceTtoZ.TclObjectTreeTable_TREETABLE, "SUPPORTS_MODREF ; true", 15, "SUPPORTS_MODREF", 0, false); // l
+// Elapsed time: 14 seconds
+selectButton(PAResourceTtoZ.TclObjectView_SHOW_OR_FLATTEN_ALL_PROPERTY_HIERARCHIES, "Tcl Object View_groupbytype"); // w: FALSE
+selectButton(PAResourceTtoZ.TclObjectView_SHOW_OR_FLATTEN_ALL_PROPERTY_HIERARCHIES, "Tcl Object View_groupbytype"); // w: TRUE
+// WARNING: HEventQueue.dispatchEvent() is taking  1026 ms.
+selectButton((HResource) null, "Properties_settings"); // w: TRUE
+// WARNING: HEventQueue.dispatchEvent() is taking  1226 ms.
+selectButton((HResource) null, "Properties_settings"); // w: FALSE
+selectTab(RDIResource.PropertiesView_TABBED_PANE, (HResource) null, "General", 0); // i
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Block Sources, ulp_krnl_cam_rtl_1_0, IP, ulp_krnl_cam_rtl_1_0]", 11, true, false, false, false, true, false); // D - Popup Trigger - Node
+selectMenuItem(PAResourceCommand.PACommandNames_EDIT_CONSTRAINT_SETS, "Edit Constraints Sets..."); // ar
+// Run Command: PAResourceCommand.PACommandNames_EDIT_CONSTRAINT_SETS
+selectTable(PAResourceAtoD.ConstraintsChooserPanel_FILE_TABLE, "impl.xdc ; /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/.local/hw_platform/tcl_hooks", 0, "/home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/.local/hw_platform/tcl_hooks", 1); // t
+selectTable(PAResourceAtoD.ConstraintsChooserPanel_FILE_TABLE, "dont_partition.xdc ; /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/output", 1, "/home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/output", 1); // t
+selectTable(PAResourceAtoD.ConstraintsChooserPanel_FILE_TABLE, "dont_partition.xdc ; /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/output", 1, "/home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/output", 1); // t
+selectTable(PAResourceAtoD.ConstraintsChooserPanel_FILE_TABLE, "dont_partition.xdc ; /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/output", 1, "/home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/output", 1, false, false, false, false, true); // t - Double Click
+selectTable(PAResourceAtoD.ConstraintsChooserPanel_FILE_TABLE, "dont_partition.xdc ; /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/output", 1, "/home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/output", 1); // t
+selectTable(PAResourceAtoD.ConstraintsChooserPanel_FILE_TABLE, "dont_partition.xdc ; /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/output", 1, "/home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/output", 1, false, false, false, false, true); // t - Double Click
+selectButton(RDIResource.BaseDialog_OK, "OK"); // a
+// Tcl Command: 'file mkdir /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/.local/hw_platform/tcl_hooks'
+// 'aB' command handler elapsed time: 12 seconds
+dismissDialog("Edit Constraints Sets"); // aC
+// Tcl Command: 'file mkdir /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/output'
+// Tcl Message: file mkdir /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/.local/hw_platform/tcl_hooks 
+// Tcl Message: file mkdir /home/wddd/Vitis_Accel_Examples/rtl_kernels/cam/_x.hw.xilinx_u55c_gen3x16_xdma_3_202210_1/link/vivado/vpl/output 
+dismissDialog("Add Constraint"); // bA
+selectTab((HResource) null, (HResource) null, "Netlist", 1); // aL
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[level0_wrapper, level0_i (level0), ulp (ulp), krnl_cam_rtl_1 (ulp_krnl_cam_rtl_1_0), inst (ulp_krnl_cam_rtl_1_0_krnl_cam_rtl), inst_krnl_cam_rtl_int (ulp_krnl_cam_rtl_1_0_krnl_cam_rtl_int), inst_adder (ulp_krnl_cam_rtl_1_0_krnl_cam_rtl_adder), Leaf Cells (25186), num_index[7][10]_i_262_psdsp (FDRE)]", 25050, false); // bD
+// Tcl Message: current_project prj 
+// Run Command: PAResourceCommand.PACommandNames_GOTO_PROJECT_MANAGER
+// Elapsed time: 23 seconds
+selectButton(PAResourceOtoP.PlanAheadTab_REFRESH_IP_CATALOG, "Refresh IP Catalog"); // g
+// TclEventType: CREATE_IP_CATALOG
+// TclEventType: IP_LOCK_CHANGE
+// Tcl Message: update_ip_catalog -rebuild -scan_changes 
+// Tcl Message: INFO: [IP_Flow 19-234] Refreshing IP repositories 
+// HMemoryUtils.trashcanNow. Engine heap size: 13,231 MB. GUI used memory: 305 MB. Current time: 10/29/24, 7:21:18 AM UTC

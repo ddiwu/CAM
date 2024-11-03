@@ -25,13 +25,15 @@
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
 `timescale 1 ns / 1 ps 
+(* DONT_TOUCH = "FALSE" *)
 
 module krnl_cam_rtl_int #( 
   parameter integer  C_S_AXI_CONTROL_DATA_WIDTH = 32,
   parameter integer  C_S_AXI_CONTROL_ADDR_WIDTH = 6,
   parameter integer  C_M_AXI_GMEM_ID_WIDTH = 1,
   parameter integer  C_M_AXI_GMEM_ADDR_WIDTH = 64,
-  parameter integer  C_M_AXI_GMEM_DATA_WIDTH = 32
+  parameter integer  C_M_AXI_GMEM_DATA_WIDTH = 32,
+  parameter integer  CAM_SIZE = 8
 )
 (
   // System signals
@@ -79,6 +81,48 @@ module krnl_cam_rtl_int #(
   input  wire [1:0]                           m_axi_gmem_BRESP,
   input  wire [C_M_AXI_GMEM_ID_WIDTH - 1:0]   m_axi_gmem_BID,
 
+  // // AXI4-Lite master interface
+  // output wire                                 m_axi_gmem1_AWVALID, 
+  // input  wire                                 m_axi_gmem1_AWREADY,
+  // output wire [C_M_AXI_GMEM_ADDR_WIDTH-1:0]   m_axi_gmem1_AWADDR,
+  // output wire [C_M_AXI_GMEM_ID_WIDTH-1:0]     m_axi_gmem1_AWID,
+  // output wire [7:0]                           m_axi_gmem1_AWLEN,
+  // output wire [2:0]                           m_axi_gmem1_AWSIZE,
+  // // Tie-off AXI4 transaction options that are not being used.
+  // output wire [1:0]                           m_axi_gmem1_AWBURST,
+  // output wire [1:0]                           m_axi_gmem1_AWLOCK,
+  // output wire [3:0]                           m_axi_gmem1_AWCACHE,
+  // output wire [2:0]                           m_axi_gmem1_AWPROT,
+  // output wire [3:0]                           m_axi_gmem1_AWQOS,
+  // output wire [3:0]                           m_axi_gmem1_AWREGION,
+  // output wire                                 m_axi_gmem1_WVALID,
+  // input  wire                                 m_axi_gmem1_WREADY,
+  // output wire [C_M_AXI_GMEM_DATA_WIDTH-1:0]   m_axi_gmem1_WDATA,
+  // output wire [C_M_AXI_GMEM_DATA_WIDTH/8-1:0] m_axi_gmem1_WSTRB,
+  // output wire                                 m_axi_gmem1_WLAST,
+  // output wire                                 m_axi_gmem1_ARVALID,
+  // input  wire                                 m_axi_gmem1_ARREADY,
+  // output wire [C_M_AXI_GMEM_ADDR_WIDTH-1:0]   m_axi_gmem1_ARADDR,
+  // output wire [C_M_AXI_GMEM_ID_WIDTH-1:0]     m_axi_gmem1_ARID,
+  // output wire [7:0]                           m_axi_gmem1_ARLEN,
+  // output wire [2:0]                           m_axi_gmem1_ARSIZE,
+  // output wire [1:0]                           m_axi_gmem1_ARBURST,
+  // output wire [1:0]                           m_axi_gmem1_ARLOCK,
+  // output wire [3:0]                           m_axi_gmem1_ARCACHE,
+  // output wire [2:0]                           m_axi_gmem1_ARPROT,
+  // output wire [3:0]                           m_axi_gmem1_ARQOS,
+  // output wire [3:0]                           m_axi_gmem1_ARREGION,
+  // input  wire                                 m_axi_gmem1_RVALID,
+  // output wire                                 m_axi_gmem1_RREADY,
+  // input  wire [C_M_AXI_GMEM_DATA_WIDTH - 1:0] m_axi_gmem1_RDATA,
+  // input  wire                                 m_axi_gmem1_RLAST,
+  // input  wire [C_M_AXI_GMEM_ID_WIDTH - 1:0]   m_axi_gmem1_RID,
+  // input  wire [1:0]                           m_axi_gmem1_RRESP,
+  // input  wire                                 m_axi_gmem1_BVALID,
+  // output wire                                 m_axi_gmem1_BREADY,
+  // input  wire [1:0]                           m_axi_gmem1_BRESP,
+  // input  wire [C_M_AXI_GMEM_ID_WIDTH - 1:0]   m_axi_gmem1_BID,
+
   // AXI4-Lite slave interface
   input  wire                                    s_axi_control_AWVALID,
   output wire                                    s_axi_control_AWREADY,
@@ -102,7 +146,7 @@ module krnl_cam_rtl_int #(
 ///////////////////////////////////////////////////////////////////////////////
 // Local Parameters (constants)
 ///////////////////////////////////////////////////////////////////////////////
-localparam integer LP_NUM_READ_CHANNELS  = 2;
+localparam integer LP_NUM_READ_CHANNELS  = 1;
 localparam integer LP_LENGTH_WIDTH       = 32;
 localparam integer LP_DW_BYTES           = C_M_AXI_GMEM_DATA_WIDTH/8;
 localparam integer LP_AXI_BURST_LEN      = 4096/LP_DW_BYTES < 256 ? 4096/LP_DW_BYTES : 256;
@@ -249,8 +293,8 @@ inst_axi_read_master (
 
   .ctrl_start     ( ap_start_pulse         ) ,
   .ctrl_done      ( read_done              ) ,
-  .ctrl_offset    ( {b,a}                  ) ,
-  .ctrl_length    ( length_r               ) ,
+  .ctrl_offset    ( a                      ) ,
+  .ctrl_length    ( length_r+CAM_SIZE/8    ) ,
   .ctrl_prog_full ( ctrl_rd_fifo_prog_full ) ,
 
   .arvalid        ( m_axi_gmem_ARVALID     ) ,
@@ -317,7 +361,8 @@ xpm_fifo_sync # (
 // Combinatorial Adder
 krnl_cam_rtl_adder #( 
   .C_DATA_WIDTH   ( C_M_AXI_GMEM_DATA_WIDTH ) ,
-  .C_NUM_CHANNELS ( LP_NUM_READ_CHANNELS    ) 
+  .C_NUM_CHANNELS ( LP_NUM_READ_CHANNELS    ) ,
+  .CAM_SIZE       ( CAM_SIZE                )
 )
 inst_adder ( 
   .aclk     ( ap_clk            ) ,
@@ -393,7 +438,7 @@ inst_axi_write_master (
 
   .ctrl_start  ( ap_start_pulse     ) ,
   .ctrl_offset ( c                  ) ,
-  .ctrl_length ( length_r/2         ) , // decide when to stop
+  .ctrl_length ( length_r           ) , // decide when to stop
   .ctrl_done   ( ap_done            ) ,
 
   .awvalid     ( m_axi_gmem_AWVALID ) ,

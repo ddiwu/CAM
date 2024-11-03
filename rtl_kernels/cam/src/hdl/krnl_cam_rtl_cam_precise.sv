@@ -50,7 +50,8 @@
 module krnl_cam_rtl_adder #(
   parameter integer C_DATA_WIDTH   = 512, // Data width of both input and output data
   parameter integer C_NUM_CHANNELS = 2,   // Number of input channels.  Only a value of 2 implemented.
-  parameter integer CAM_SIZE = 256
+  parameter integer CAM_SIZE = 8,
+  parameter integer INDEX_WIDTH = 3
 )
 (
   input logic                                        aclk,
@@ -79,21 +80,18 @@ timeprecision 1ps;
 // Variables
 /////////////////////////////////////////////////////////////////////////////
 logic [47:0] s_data1;
-logic m_tvalid1, m_tvalid2;
-logic [C_NUM_CHANNELS-1:0] s_tready1, s_tready2;
+logic m_tvalid1, m_tvalid2, m_tvalid3;
 logic [47:0] acc [CAM_SIZE];
 logic [29:0] A_in;
 logic [17:0] B_in;
 // logic [7:0] num_index_1 [CAM_SIZE], num_index_2 [CAM_SIZE/2], num_index_3 [CAM_SIZE/4], num_index_4 [CAM_SIZE/8], num_index_5 [CAM_SIZE/16], num_index_6 [CAM_SIZE/32], num_index_7 [CAM_SIZE/64], num_index_8 [CAM_SIZE/128], num_index_9;
 // logic [5:0] one_num_1 [CAM_SIZE], one_num_2 [CAM_SIZE/2], one_num_3 [CAM_SIZE/4], one_num_4 [CAM_SIZE/8], one_num_5 [CAM_SIZE/16], one_num_6 [CAM_SIZE/32], one_num_7 [CAM_SIZE/64], one_num_8 [CAM_SIZE/128], one_num_9;
-logic [8:0] num_index, num_index_final;
-logic [7:0] write_index; 
+logic [INDEX_WIDTH:0] num_index [2], num_index_final;
+logic [INDEX_WIDTH-1:0] write_index; 
 logic [47:0] data_in [CAM_SIZE];
 logic [47:0] data_in1 [CAM_SIZE];
 logic [7:0] compare_index, compare_index1, compare_index2;
-// logic m_tready1, m_tready_edge;
-// logic s_tvalid1, s_tvalid2, s_tvalid3, s_tvalid4, s_tvalid5, s_tvalid6, s_tvalid7, s_tvalid8, s_tvalid9, s_tvalid10, s_tvalid11;
-// logic s_tready_first;
+
 logic ctrl1, ctrl_1_done;
 /////////////////////////////////////////////////////////////////////////////
 // Logic
@@ -101,30 +99,30 @@ logic ctrl1, ctrl_1_done;
 always_ff @(posedge aclk) begin
   if (areset) begin
     ctrl1 <= 0;
-    A_in <= 0;
-    B_in <= 0;
+    // A_in <= 0;
+    // B_in <= 0;
   end
   else begin
     ctrl1 <= ctrl_1_done;
-    A_in <= s_tdata[0][47:18];
-    B_in <= s_tdata[0][17:0];
+    // A_in <= s_tdata[0][47:18];
+    // B_in <= s_tdata[0][17:0];
   end
 end
 assign ctrl_edge = !ctrl1 && ctrl_1_done;
 
 always_ff @(posedge aclk) begin
   if (areset) begin
-    for (int i = 0; i < CAM_SIZE; i++) begin
-      data_in[i] <= 0;
-    end
+    // for (int i = 0; i < CAM_SIZE; i++) begin
+    //   data_in[i] <= 0;
+    // end
     write_index <= 0;
     ctrl_1_done <= 0;
   end
   else if (!ctrl_1_done && &s_tvalid) begin
-    for (int i = 0; i < 8; i++) begin
-      data_in[write_index + i][47:0] <= s_tdata[0][i*64+:48];
-    end
-    if (write_index == 8'd248) begin 
+    // for (int i = 0; i < 8; i++) begin
+    //   data_in[write_index + i][47:0] <= s_tdata[0][i*64+:48];
+    // end
+    if (write_index == /*(CAM_SIZE-8)*/0) begin 
       write_index <= 0;
       ctrl_1_done <= 1;
     end
@@ -216,8 +214,8 @@ generate begin
     // Data inputs: Data Ports
     .A(s_tdata[0][47:18]),                   // 30-bit input: A data
     .B(s_tdata[0][17:0]),                   // 18-bit input: B data
-    //.C(s_tdata[0][(i%8)*64+:48]),                   // 48-bit input: C data
-    .C(data_in[i][47:0]),                   // 48-bit input: C data
+    .C(s_tdata[0][(i%8)*64+:48]),                   // 48-bit input: C data
+    // .C(data_in[i][47:0]),                   // 48-bit input: C data
     // Control inputs: Control Inputs/Status Bits
     .ALUMODE(4'b0100),       // Set ALUMODE to perform XOR operation
     .OPMODE(9'b000110011),   // Set OPMODE to enable A:B XOR C operation
@@ -226,8 +224,8 @@ generate begin
     .CEA2(m_tready),             // Clock enable for A input register
     .CEB1(1'b0),             // Clock enable for B input register
     .CEB2(m_tready),             // Clock enable for B input register
-    //.CEC(!ctrl_1_done && &s_tvalid && write_index <= i && write_index+8 > i),
-    .CEC(1'b1),             // Clock enable for C input register
+    .CEC(!ctrl_1_done && &s_tvalid && write_index <= i && write_index+8 > i),
+    // .CEC(1'b1),             // Clock enable for C input register
     .CEP(m_tready),             // pipeline stall
     .CEALUMODE(1'b1),         // Clock enable for ALUMODE register
     .CECTRL(1'b1),           // Clock enable for control register 
@@ -246,34 +244,79 @@ end
 end
 endgenerate
 
-always_comb begin
-  num_index = 9'h1ff;  // no match
-  for (int i = 0; i < CAM_SIZE; i++) begin
-    if (acc[i] == 0) begin
-      num_index = i;
-      break;
+// always_comb begin
+//   num_index = 9'h1ff;  // no match
+//   for (int i = 0; i < CAM_SIZE; i++) begin
+//     if (acc[i] == 0) begin
+//       num_index = i;
+//       break;
+//     end
+//   end
+// end
+// always_ff @(posedge aclk) begin
+//   if (areset) begin
+//     num_index_final <= 9'h1ff;
+//   end
+//   else begin
+//     num_index_final <= num_index;
+//   end
+// end
+
+// always_ff @(posedge aclk) begin
+//   if (areset) begin
+//     num_index[0] <= 9'h1ff;
+//     num_index[1] <= 9'h1ff;
+//     num_index_final <= 9'h1ff;
+//   end
+//   else begin
+//     num_index[0] <= 9'h1ff;
+//     for (int i = 0; i < CAM_SIZE/2; i++) begin
+//       if (acc[i] == 0) begin
+//         num_index[0] <= i;
+//         break;
+//       end
+//     end
+//     num_index[1] <= 9'h1ff;
+//     for (int i = CAM_SIZE/2; i < CAM_SIZE; i++) begin
+//       if (acc[i] == 0) begin
+//         num_index[1] <= i;
+//         break;
+//       end
+//     end
+//     if (num_index[0] == 9'h1ff)
+//       num_index_final <= num_index[1];
+//     else
+//       num_index_final <= num_index[0];
+//   end
+// end
+always_ff @(posedge aclk) begin
+  if (areset) begin
+    num_index_final <= 4'b1111;
+  end
+  else begin
+    num_index_final <= 4'b1111;
+    for (int i = 0; i < CAM_SIZE; i++) begin
+      if (acc[i] == 0) begin
+        num_index_final <= i;
+        break;
+      end
     end
   end
 end
-always_ff @(posedge aclk) begin
-  if (areset) begin
-    num_index_final <= 9'h1ff;
-  end
-  else begin
-    num_index_final <= num_index;
-  end
-end
+
 
 // assign m_tvalid = m_tready && ctrl_1_done;
 always_ff @(posedge aclk) begin
   if (areset) begin
     m_tvalid1 <= 0;
     m_tvalid2 <= 0;
+    // m_tvalid3 <= 0;
     m_tvalid <= 0;
   end
   else if (ctrl_1_done && m_tready) begin
     m_tvalid1 <= &s_tvalid /*| read_done*/;
     m_tvalid2 <= m_tvalid1;
+    // m_tvalid3 <= m_tvalid2;
     m_tvalid <= m_tvalid2;
   end
 end
@@ -293,7 +336,7 @@ always_comb begin
   end
   else begin
     // m_tdata = {16'b0,acc[compare_index+7],16'b0,acc[compare_index+6],16'b0,acc[compare_index+5],16'b0,acc[compare_index+4],16'b0,acc[compare_index+3],16'b0,acc[compare_index+2],16'b0,acc[compare_index+1],16'b0,acc[compare_index]};
-    m_tdata = {503'b0, num_index_final[8:0]};
+    m_tdata = {511'b0, num_index_final[INDEX_WIDTH:0]};
     // m_tdata = {464'b0, s_tdata[0][47:0]};
   end
 end
