@@ -46,8 +46,8 @@
 // endmodule
 
 // `default_nettype none
-(* DONT_TOUCH = "FALSE" *)
-module krnl_cam_rtl_adder #(
+(* DONT_TOUCH = "TRUE" *)
+module cam_kernel1 #(
   parameter integer C_DATA_WIDTH   = 512, // Data width of both input and output data
   parameter integer C_NUM_CHANNELS = 2,   // Number of input channels.  Only a value of 2 implemented.
   parameter integer CAM_SIZE = 2048,
@@ -62,17 +62,17 @@ module krnl_cam_rtl_adder #(
 
   input logic  [C_NUM_CHANNELS-1:0]                   s_tvalid,
   input logic  [C_NUM_CHANNELS-1:0][C_DATA_WIDTH-1:0] s_tdata,
-  output logic [C_NUM_CHANNELS-1:0]                   s_tready,
+  // output logic [C_NUM_CHANNELS-1:0]                   s_tready,
 
-  output logic                                       m_tvalid,
-  output logic [C_DATA_WIDTH-1:0]                    m_tdata,
+  // output logic                                       m_tvalid,
+  // output logic [C_DATA_WIDTH-1:0]                    m_tdata,
   input  logic                                       m_tready,
 
   input  logic                                       read_done,
 
   // AXI-Lite Slave Interface
-  input  logic [31:0]                                ctrl_1_done_in,
-  output logic                                       ctrl_edge  //update done signal
+  input  logic [31:0]                                ctrl_1_done_in
+  // output logic                                       ctrl_edge  //update done signal
 
 );
 
@@ -137,11 +137,11 @@ always_ff @(posedge aclk) begin
     end
   end
 end
-assign ctrl_edge = !ctrl1[0] && ctrl_1_done[0];
+// assign ctrl_edge = !ctrl1[0] && ctrl_1_done[0];
 
 generate begin
   genvar i;
-  for (i = 0; i < CAM_SIZE/4; i++) begin
+  for (i = 0; i < CAM_SIZE/8; i++) begin
     always_ff @(posedge aclk) begin
       if (areset) begin
         // for (int i = 0; i < CAM_SIZE; i++) begin
@@ -268,110 +268,93 @@ end
 end
 endgenerate
 
-// always_comb begin
-//   num_index = 9'h1ff;  // no match
-//   for (int i = 0; i < CAM_SIZE; i++) begin
-//     if (acc[i] == 0) begin
-//       num_index = i;
-//       break;
+
+// always_ff @(posedge aclk) begin
+//   if (areset) begin
+//     for (int i = 0; i < DIVITION; i++) begin
+//       num_index[i] <= {NO_INDEX{1'b1}};
+//     end
+//     num_index_final <= {NO_INDEX{1'b1}};
+//   end
+//   else begin
+//     for (int j = 0; j < DIVITION; j++) begin
+//       num_index[j] <= {NO_INDEX{1'b1}};
+//       for (int i = CAM_SIZE*j/DIVITION; i < CAM_SIZE*(j+1)/DIVITION; i++) begin
+//         if (acc[i] == 0) begin
+//           num_index[j] <= i;
+//           break;
+//         end
+//       end
+//     end
+//     for (int i = 0; i < DIVITION; i++) begin
+//       num_index_1[i] <= num_index[i];
+//     end
+//     // num_index[0] <= {NO_INDEX{1'b1}};
+//     // for (int i = 0; i < CAM_SIZE/DIVITION; i++) begin
+//     //   if (acc[i] == 0) begin
+//     //     num_index[0] <= i;
+//     //     break;
+//     //   end
+//     // end
+//     num_index_final <= num_index_1[DIVITION-1];
+//     for (int i = 0; i < DIVITION; i++) begin
+//       if (num_index_1[i] != {NO_INDEX{1'b1}}) begin
+//         num_index_final <= num_index_1[i];
+//         break;
+//       end
 //     end
 //   end
 // end
+
+// // assign m_tvalid = m_tready && ctrl_1_done;
 // always_ff @(posedge aclk) begin
 //   if (areset) begin
-//     num_index_final <= 9'h1ff;
+//     m_tvalid1 <= 0;
+//     m_tvalid2 <= 0;
+//     m_tvalid3 <= 0;
+//     m_tvalid4 <= 0;
+//     m_tvalid <= 0;
+//   end
+//   else if (ctrl_1_done[0] && m_tready) begin
+//     m_tvalid1 <= s_tvalid2[0] /*| read_done*/;
+//     m_tvalid2 <= m_tvalid1;
+//     m_tvalid3 <= m_tvalid2;
+//     m_tvalid4 <= m_tvalid3;
+//     m_tvalid <= m_tvalid4;
+//   end
+// end
+
+// // always_ff @(posedge aclk) begin
+// //   if (areset) begin
+// //     compare_index <= 0;
+// //   end
+// //   else if (ctrl_1_done && s_tvalid2 && m_tready) begin
+// //     compare_index <= compare_index + 8'd8;
+// //   end
+// // end
+
+// always_comb begin
+//   if (!ctrl_1_done[0]) begin
+//     m_tdata = 0;
 //   end
 //   else begin
-//     num_index_final <= num_index;
+//     // m_tdata = {16'b0,acc[compare_index+7],16'b0,acc[compare_index+6],16'b0,acc[compare_index+5],16'b0,acc[compare_index+4],16'b0,acc[compare_index+3],16'b0,acc[compare_index+2],16'b0,acc[compare_index+1],16'b0,acc[compare_index]};
+//     m_tdata = {{OUTPUT_ZERO{1'b0}}, num_index_final[INDEX_WIDTH:0]};
+//     // m_tdata = {464'b0, s_tdata[0][47:0]};
 //   end
 // end
 
-always_ff @(posedge aclk) begin
-  if (areset) begin
-    for (int i = 0; i < DIVITION; i++) begin
-      num_index[i] <= {NO_INDEX{1'b1}};
-    end
-    num_index_final <= {NO_INDEX{1'b1}};
-  end
-  else begin
-    for (int j = 0; j < DIVITION; j++) begin
-      num_index[j] <= {NO_INDEX{1'b1}};
-      for (int i = CAM_SIZE*j/DIVITION; i < CAM_SIZE*(j+1)/DIVITION; i++) begin
-        if (acc[i] == 0) begin
-          num_index[j] <= i;
-          break;
-        end
-      end
-    end
-    for (int i = 0; i < DIVITION; i++) begin
-      num_index_1[i] <= num_index[i];
-    end
-    // num_index[0] <= {NO_INDEX{1'b1}};
-    // for (int i = 0; i < CAM_SIZE/DIVITION; i++) begin
-    //   if (acc[i] == 0) begin
-    //     num_index[0] <= i;
-    //     break;
-    //   end
-    // end
-    num_index_final <= num_index_1[DIVITION-1];
-    for (int i = 0; i < DIVITION; i++) begin
-      if (num_index_1[i] != {NO_INDEX{1'b1}}) begin
-        num_index_final <= num_index_1[i];
-        break;
-      end
-    end
-  end
-end
-
-// assign m_tvalid = m_tready && ctrl_1_done;
-always_ff @(posedge aclk) begin
-  if (areset) begin
-    m_tvalid1 <= 0;
-    m_tvalid2 <= 0;
-    m_tvalid3 <= 0;
-    m_tvalid4 <= 0;
-    m_tvalid <= 0;
-  end
-  else if (ctrl_1_done[0] && m_tready) begin
-    m_tvalid1 <= s_tvalid2[0] /*| read_done*/;
-    m_tvalid2 <= m_tvalid1;
-    m_tvalid3 <= m_tvalid2;
-    m_tvalid4 <= m_tvalid3;
-    m_tvalid <= m_tvalid4;
-  end
-end
-
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     compare_index <= 0;
+// always_comb begin
+//   if (!ctrl_1_done[0]) begin
+//     s_tready = &s_tvalid /*&& write_index != 8'd248*/ ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
 //   end
-//   else if (ctrl_1_done && s_tvalid2 && m_tready) begin
-//     compare_index <= compare_index + 8'd8;
+//   else begin
+//     // s_tready = (ctrl_edge || (compare_index == (CAM_SIZE - 8'd16) && &s_tvalid && m_tready)) ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+//     s_tready = &s_tvalid && m_tready ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
 //   end
 // end
 
-always_comb begin
-  if (!ctrl_1_done[0]) begin
-    m_tdata = 0;
-  end
-  else begin
-    // m_tdata = {16'b0,acc[compare_index+7],16'b0,acc[compare_index+6],16'b0,acc[compare_index+5],16'b0,acc[compare_index+4],16'b0,acc[compare_index+3],16'b0,acc[compare_index+2],16'b0,acc[compare_index+1],16'b0,acc[compare_index]};
-    m_tdata = {{OUTPUT_ZERO{1'b0}}, num_index_final[INDEX_WIDTH:0]};
-    // m_tdata = {464'b0, s_tdata[0][47:0]};
-  end
-end
 
-always_comb begin
-  if (!ctrl_1_done[0]) begin
-    s_tready = &s_tvalid /*&& write_index != 8'd248*/ ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
-  end
-  else begin
-    // s_tready = (ctrl_edge || (compare_index == (CAM_SIZE - 8'd16) && &s_tvalid && m_tready)) ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
-    s_tready = &s_tvalid && m_tready ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
-  end
-end
-
-
-endmodule : krnl_cam_rtl_adder
+endmodule
 
 // `default_nettype wire

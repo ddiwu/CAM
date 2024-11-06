@@ -28,20 +28,18 @@
 // const unsigned int c_len = DATA_SIZE / BUFFER_SIZE;
 // const unsigned int c_size = BUFFER_SIZE;
 
-extern "C" {
-void krnl_cam(long int* a, long int* b, long int* c, const int n_elements) {
-#pragma HLS INTERFACE m_axi port = a offset = slave bundle = gmem
-#pragma HLS INTERFACE m_axi port = b offset = slave bundle = gmem
-#pragma HLS INTERFACE m_axi port = c offset = slave bundle = gmem
+// extern "C" {
+// void krnl_cam(long int* a, long int* c, const int n_elements) {
+// #pragma HLS INTERFACE m_axi port = a offset = slave bundle = gmem
+// #pragma HLS INTERFACE m_axi port = c offset = slave bundle = gmem
 
-#pragma HLS INTERFACE s_axilite port = a
-#pragma HLS INTERFACE s_axilite port = b
-#pragma HLS INTERFACE s_axilite port = c
-#pragma HLS INTERFACE s_axilite port = n_elements
-#pragma HLS INTERFACE s_axilite port = return
+// #pragma HLS INTERFACE s_axilite port = a
+// #pragma HLS INTERFACE s_axilite port = c
+// #pragma HLS INTERFACE s_axilite port = n_elements
+// #pragma HLS INTERFACE s_axilite port = return
 
-    for (int i = 0; i < n_elements; i++) {
-        c[i] = a[i] + b[i];
-    }
-}
-}
+//     for (int i = 0; i < n_elements; i++) {
+//         c[i] = a[i];
+//     }
+// }
+// }

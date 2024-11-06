@@ -91,7 +91,7 @@ build: check-vitis check-device $(BUILD_DIR)/cam.xclbin
 xclbin: build
 
 # Building kernel
-$(BUILD_DIR)/cam.xclbin: $(TEMP_DIR)/rtl_cam.xo # $(TEMP_DIR)/krnl_cam.xo
+$(BUILD_DIR)/cam.xclbin: $(TEMP_DIR)/rtl_cam.xo $(TEMP_DIR)/krnl_input.xo $(TEMP_DIR)/krnl_output.xo
 	mkdir -p $(BUILD_DIR)
 	v++ -l $(VPP_FLAGS) -t $(TARGET) --platform $(PLATFORM) $(VPP_LDFLAGS) --temp_dir $(TEMP_DIR) $(VPP_FLAGS_krnl_cam_rtl) -o'$(LINK_OUTPUT)' $(+)
 	v++ -p $(LINK_OUTPUT) -t $(TARGET) --platform $(PLATFORM) --package.out_dir $(PACKAGE_OUT) -o $(BUILD_DIR)/cam.xclbin

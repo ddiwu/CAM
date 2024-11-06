@@ -359,6 +359,6 @@ always_comb begin
 end
 
 
-endmodule : krnl_cam_rtl_adder
+endmodule
 
 // `default_nettype wire

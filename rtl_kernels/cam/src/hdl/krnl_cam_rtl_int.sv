@@ -33,7 +33,7 @@ module krnl_cam_rtl_int #(
   parameter integer  C_M_AXI_GMEM_ID_WIDTH = 1,
   parameter integer  C_M_AXI_GMEM_ADDR_WIDTH = 64,
   parameter integer  C_M_AXI_GMEM_DATA_WIDTH = 32,
-  parameter integer  CAM_SIZE = 8
+  parameter integer  CAM_SIZE = 2048
 )
 (
   // System signals
@@ -269,7 +269,7 @@ inst_krnl_cam_control_s_axi (
   .ap_done   ( ap_done                       ) ,
   .ap_idle   ( ap_idle                       ) ,
   .a         ( a[0+:C_M_AXI_GMEM_ADDR_WIDTH] ) ,
-  .b         ( b[0+:C_M_AXI_GMEM_ADDR_WIDTH] ) ,
+  // .b         ( b[0+:C_M_AXI_GMEM_ADDR_WIDTH] ) ,
   .c         ( c[0+:C_M_AXI_GMEM_ADDR_WIDTH] ) ,
   .length_r  ( length_r[0+:LP_LENGTH_WIDTH]  ) ,
   .ctrl_1_done( ctrl_1_done                  ) ,
@@ -378,6 +378,21 @@ inst_adder (
   .read_done( read_done         ) ,
   .ctrl_edge( ctrl_1_done_in    ) , //upedge of ctrl_1_done
   .ctrl_1_done_in( ctrl_1_done  ) //axilite to make ctrl_1_done_in low
+);
+
+cam_kernel1 #(
+  .C_DATA_WIDTH(C_M_AXI_GMEM_DATA_WIDTH),
+  .C_NUM_CHANNELS(LP_NUM_READ_CHANNELS),
+  .CAM_SIZE(CAM_SIZE)
+)
+cam_kernel1(
+  .aclk      (ap_clk),
+  .areset    (areset),
+  .s_tvalid  (~rd_fifo_tvalid_n),
+  .s_tdata   (rd_fifo_tdata),
+  .m_tready  (~adder_tready_n),
+  .read_done (read_done),
+  .ctrl_1_done_in(ctrl_1_done)
 );
 
 // xpm_fifo_sync: Synchronous FIFO

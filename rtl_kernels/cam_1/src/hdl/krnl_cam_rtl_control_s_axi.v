@@ -17,7 +17,7 @@
 `timescale 1ns/1ps
 module krnl_cam_rtl_control_s_axi
 #(parameter
-    C_S_AXI_ADDR_WIDTH = 7,
+    C_S_AXI_ADDR_WIDTH = 6,
     C_S_AXI_DATA_WIDTH = 32
 )(
     // axi4 lite slave signals
@@ -47,9 +47,6 @@ module krnl_cam_rtl_control_s_axi
     input  wire                          ap_done,
     input  wire                          ap_ready,
     input  wire                          ap_idle,
-    output wire [63:0]                   a,
-    // output wire [63:0]                   b,
-    output wire [63:0]                   c,
     output wire [31:0]                   length_r,
     output wire [31:0]                   ctrl_1_done,
     input wire                           ctrl_1_done_in
@@ -141,7 +138,6 @@ localparam
     reg  [1:0]                    int_ier = 2'b0;
     reg  [1:0]                    int_isr = 2'b0;
     reg  [63:0]                   int_a = 64'b0;
-    // reg  [63:0]                   int_b = 64'b0;
     reg  [63:0]                   int_c = 64'b0;
     reg  [31:0]                   int_length_r = 32'b0;
     reg  [31:0]                   int_ctrl_1_done = 32'b0;
@@ -255,24 +251,18 @@ always @(posedge ACLK) begin
                 ADDR_ISR: begin
                     rdata <= int_isr;
                 end
-                ADDR_A_DATA_0: begin
-                    rdata <= int_a[31:0];
-                end
-                ADDR_A_DATA_1: begin
-                    rdata <= int_a[63:32];
-                end
-                // ADDR_B_DATA_0: begin
-                //     rdata <= int_b[31:0];
+                // ADDR_A_DATA_0: begin
+                //     rdata <= int_a[31:0];
                 // end
-                // ADDR_B_DATA_1: begin
-                //     rdata <= int_b[63:32];
+                // ADDR_A_DATA_1: begin
+                //     rdata <= int_a[63:32];
                 // end
-                ADDR_C_DATA_0: begin
-                    rdata <= int_c[31:0];
-                end
-                ADDR_C_DATA_1: begin
-                    rdata <= int_c[63:32];
-                end
+                // ADDR_C_DATA_0: begin
+                //     rdata <= int_c[31:0];
+                // end
+                // ADDR_C_DATA_1: begin
+                //     rdata <= int_c[63:32];
+                // end
                 ADDR_LENGTH_R_DATA_0: begin
                     rdata <= int_length_r[31:0];
                 end
@@ -296,9 +286,8 @@ assign interrupt    = int_gie & (|int_isr);
 assign ap_start     = int_ap_start;
 assign int_ap_idle  = ap_idle;
 assign int_ap_ready = ap_ready;
-assign a            = int_a;
-// assign b            = int_b;
-assign c            = int_c;
+// assign a            = int_a;
+// assign c            = int_c;
 assign length_r     = int_length_r;
 assign ctrl_1_done  = int_ctrl_1_done;
 // int_ap_start
@@ -379,65 +368,45 @@ always @(posedge ACLK) begin
     end
 end
 
-// int_a[31:0]
-always @(posedge ACLK) begin
-    if (ARESET)
-        int_a[31:0] <= 0;
-    else if (ACLK_EN) begin
-        if (w_hs && waddr == ADDR_A_DATA_0)
-            int_a[31:0] <= (WDATA[31:0] & wmask) | (int_a[31:0] & ~wmask);
-    end
-end
-
-// int_a[63:32]
-always @(posedge ACLK) begin
-    if (ARESET)
-        int_a[63:32] <= 0;
-    else if (ACLK_EN) begin
-        if (w_hs && waddr == ADDR_A_DATA_1)
-            int_a[63:32] <= (WDATA[31:0] & wmask) | (int_a[63:32] & ~wmask);
-    end
-end
-
-// // int_b[31:0]
+// // int_a[31:0]
 // always @(posedge ACLK) begin
 //     if (ARESET)
-//         int_b[31:0] <= 0;
+//         int_a[31:0] <= 0;
 //     else if (ACLK_EN) begin
-//         if (w_hs && waddr == ADDR_B_DATA_0)
-//             int_b[31:0] <= (WDATA[31:0] & wmask) | (int_b[31:0] & ~wmask);
+//         if (w_hs && waddr == ADDR_A_DATA_0)
+//             int_a[31:0] <= (WDATA[31:0] & wmask) | (int_a[31:0] & ~wmask);
 //     end
 // end
 
-// // int_b[63:32]
+// // int_a[63:32]
 // always @(posedge ACLK) begin
 //     if (ARESET)
-//         int_b[63:32] <= 0;
+//         int_a[63:32] <= 0;
 //     else if (ACLK_EN) begin
-//         if (w_hs && waddr == ADDR_B_DATA_1)
-//             int_b[63:32] <= (WDATA[31:0] & wmask) | (int_b[63:32] & ~wmask);
+//         if (w_hs && waddr == ADDR_A_DATA_1)
+//             int_a[63:32] <= (WDATA[31:0] & wmask) | (int_a[63:32] & ~wmask);
 //     end
 // end
 
-// int_c[31:0]
-always @(posedge ACLK) begin
-    if (ARESET)
-        int_c[31:0] <= 0;
-    else if (ACLK_EN) begin
-        if (w_hs && waddr == ADDR_C_DATA_0)
-            int_c[31:0] <= (WDATA[31:0] & wmask) | (int_c[31:0] & ~wmask);
-    end
-end
+// // int_c[31:0]
+// always @(posedge ACLK) begin
+//     if (ARESET)
+//         int_c[31:0] <= 0;
+//     else if (ACLK_EN) begin
+//         if (w_hs && waddr == ADDR_C_DATA_0)
+//             int_c[31:0] <= (WDATA[31:0] & wmask) | (int_c[31:0] & ~wmask);
+//     end
+// end
 
-// int_c[63:32]
-always @(posedge ACLK) begin
-    if (ARESET)
-        int_c[63:32] <= 0;
-    else if (ACLK_EN) begin
-        if (w_hs && waddr == ADDR_C_DATA_1)
-            int_c[63:32] <= (WDATA[31:0] & wmask) | (int_c[63:32] & ~wmask);
-    end
-end
+// // int_c[63:32]
+// always @(posedge ACLK) begin
+//     if (ARESET)
+//         int_c[63:32] <= 0;
+//     else if (ACLK_EN) begin
+//         if (w_hs && waddr == ADDR_C_DATA_1)
+//             int_c[63:32] <= (WDATA[31:0] & wmask) | (int_c[63:32] & ~wmask);
+//     end
+// end
 
 // int_length_r[31:0]
 always @(posedge ACLK) begin

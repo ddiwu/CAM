@@ -4,6 +4,7 @@ profile_summary.html
 profile_summary.csv
 _v++_*/
 .Xil/
+*.csv
 *.ll
 *.exe
 emconfig.json
@@ -33,11 +34,11 @@ performance/
 rtl_kernels/rtl*
 rtl_kernels/README.rst
 rtl_kernels/summary*
-rtl_kernels/cam/tmp*
-rtl_kernels/cam/package*
-rtl_kernels/cam/*.csv
-rtl_kernels/cam/.run
-rtl_kernels/cam/.ipcache
+rtl_kernels/cam*/tmp*
+rtl_kernels/cam*/package*
+rtl_kernels/cam*/*.csv
+rtl_kernels/cam*/.run
+rtl_kernels/cam*/.ipcache
 sys_opt/
 host_xrt/asynchronous_xrt/
 host_xrt/copy_buffer_xrt/
@@ -54,9 +55,9 @@ host_xrt/p2p_fpga2fpga_xrt/
 host_xrt/p2p_simple_xrt/
 host_xrt/streaming_free_running_k2k_xrt/
 host_xrt/streaming_k2k_mm_xrt/
-host_xrt/cam/.ipcache/
-host_xrt/cam/.run/
-host_xrt/cam/.Xil/
-host_xrt/cam/package*
+host_xrt/cam*/.ipcache/
+host_xrt/cam*/.run/
+host_xrt/cam*/.Xil/
+host_xrt/cam*/package*
 
 

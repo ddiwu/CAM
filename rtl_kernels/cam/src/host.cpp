@@ -26,7 +26,7 @@
 #include "experimental/xrt_kernel.h"
 #include "cmdlineparser.h"
 
-#define DATA_SIZE 16
+#define DATA_SIZE 4096
 
 // AXI-Lite address 
 #define CTRL_REG_ADDR 0x000
@@ -41,7 +41,7 @@
 #define CTRL_1_DONE_REG_ADDR 0x03C
 #define LATENCY 0x040
 
-long int val[1024];
+long int val[DATA_SIZE/2];
 
 int cam_appro(long int key){
     long int xor_value[DATA_SIZE/2];
@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
 
     auto size = DATA_SIZE;
     // Allocate Memory in Host Memory
-    long int source_sw_results[256 * 32];
+    long int source_sw_results[256];
 
     auto rtl_kernel = xrt::kernel(device, uuid, "krnl_cam_rtl", xrt::kernel::cu_access_mode::exclusive);
     // auto cl_kernel = xrt::kernel(device, uuid, "krnl_cam");
@@ -101,15 +101,15 @@ int main(int argc, char** argv) {
     //     bank_assign[i] = i;
     // }
 
-    xrt::bo buffer_r1 = xrt::bo(device, size * 32 * sizeof(long int), bank_assign[0]);
-    xrt::bo buffer_r2 = xrt::bo(device, size * sizeof(long int), bank_assign[1]);
-    xrt::bo buffer_rw_0 = xrt::bo(device, (size * 16) * sizeof(long int), bank_assign[2]);
+    xrt::bo buffer_r1 = xrt::bo(device, size * sizeof(long int), bank_assign[0]);
+    // xrt::bo buffer_r2 = xrt::bo(device, size * sizeof(long int), bank_assign[1]);
+    xrt::bo buffer_rw_0 = xrt::bo(device, 256 * sizeof(long int), bank_assign[2]);
     // xrt::bo buffer_rw_1 = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(0));
     // xrt::bo buffer_r3 = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(1));
     // xrt::bo buffer_w = xrt::bo(device, size * sizeof(long int), cl_kernel.group_id(2));
 
     auto buffer_r1_map = buffer_r1.map<long int*>();
-    auto buffer_r2_map = buffer_r2.map<long int*>();
+    // auto buffer_r2_map = buffer_r2.map<long int*>();
     auto buffer_rw_0_map = buffer_rw_0.map<long int*>();
     // auto buffer_rw_1_map = buffer_rw_1.map<long int*>();
     // auto buffer_r3_map = buffer_r3.map<long int*>();
@@ -119,11 +119,11 @@ int main(int argc, char** argv) {
     for (int i = 0; i < DATA_SIZE/2; i++) {
         buffer_r1_map[i] = i;
         val[i] = i;
-        buffer_r2_map[i] = 0;
+        // buffer_r2_map[i] = 0;
     }
 
     for (int i = DATA_SIZE/2; i < (DATA_SIZE/2+256); i += 8) {
-        buffer_r1_map[i] = (i)/8;
+        buffer_r1_map[i] = (i)/2;
     }
 
     // for (int i = 0; i < 32; i++) {
@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < 32; i++) {
         // source_sw_results[i] = cam_appro(i);
-        source_sw_results[i] = cam_precise(i+1);
+        source_sw_results[i] = cam_precise(4*(i+256));
     }
 
     for (int i = 0; i < 256; i++) {
@@ -143,12 +143,12 @@ int main(int argc, char** argv) {
 
     std::cout << "Copying input data to device global memory" << std::endl;
     buffer_r1.sync(XCL_BO_SYNC_BO_TO_DEVICE);
-    buffer_r2.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+    // buffer_r2.sync(XCL_BO_SYNC_BO_TO_DEVICE);
     buffer_rw_0.sync(XCL_BO_SYNC_BO_TO_DEVICE);
 
     std::cout << "Launching RTL kernel" << std::endl;
 
-    xrt::run rtl_run = rtl_kernel(buffer_r1, buffer_r2, buffer_rw_0, 1, 1); // can not be 1 without update
+    xrt::run rtl_run = rtl_kernel(buffer_r1, /*buffer_r2,*/ buffer_rw_0, 32, 0); // can not be 1 without update
     uint32_t ctrl_1_done = rtl_kernel.read_register(CTRL_1_DONE_REG_ADDR);
     std::cout << "ctrl_1_done = " << ctrl_1_done << std::endl;
 

@@ -21,10 +21,7 @@ set path_to_tmp_project "./tmp_kernel_pack_${suffix}"
 create_project -force kernel_pack $path_to_tmp_project 
 add_files -norecurse [glob $path_to_hdl/*.v \
                       $path_to_hdl/krnl_cam_rtl_cam_$mode.sv \
-                      $path_to_hdl/krnl_cam_rtl_axi_read_master.sv \
-                      $path_to_hdl/krnl_cam_rtl_axi_write_master.sv \
                       $path_to_hdl/krnl_cam_rtl_counter.sv \
-                      $path_to_hdl/krnl_cam_rtl_cam_pre_kernel1.sv \
                       $path_to_hdl/krnl_cam_rtl_int.sv]
 add_files -fileset constrs_1 -norecurse [glob $path_to_hdl/*.xdc]
 update_compile_order -fileset sources_1
@@ -39,8 +36,9 @@ set_property core_revision 2 $core
 foreach up [ipx::get_user_parameters] {
   ipx::remove_user_parameter [get_property NAME $up] $core
 }
-ipx::associate_bus_interfaces -busif m_axi_gmem -clock ap_clk $core
 ipx::associate_bus_interfaces -busif s_axi_control -clock ap_clk $core
+ipx::associate_bus_interfaces -busif p0 -clock ap_clk $core
+ipx::associate_bus_interfaces -busif p1 -clock ap_clk $core
 
 set mem_map    [::ipx::add_memory_map -quiet "s_axi_control" $core]
 set addr_block [::ipx::add_address_block -quiet "reg0" $mem_map]
@@ -106,24 +104,6 @@ set reg      [::ipx::add_register "IP_ISR" $addr_block]
   set_property description    "IP Interrupt Status Register"    $reg
   set_property address_offset 0x00C $reg
   set_property size           32    $reg
-
-set reg      [::ipx::add_register -quiet "a" $addr_block]
-  set_property address_offset 0x010 $reg
-  set_property size           [expr {8*8}]   $reg
-  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-  set_property value m_axi_gmem $regparam 
-
-# set reg      [::ipx::add_register -quiet "b" $addr_block]
-#   set_property address_offset 0x01C $reg
-#   set_property size           [expr {8*8}]   $reg
-#   set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-#   set_property value m_axi_gmem $regparam 
-
-set reg      [::ipx::add_register -quiet "c" $addr_block]
-  set_property address_offset 0x028 $reg
-  set_property size           [expr {8*8}]   $reg
-  set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-  set_property value m_axi_gmem $regparam 
 
 set reg      [::ipx::add_register -quiet "length_r" $addr_block]
   set_property address_offset 0x034 $reg
