@@ -5,6 +5,7 @@ profile_summary.csv
 _v++_*/
 .Xil/
 *.csv
+*.str
 *.ll
 *.exe
 emconfig.json
