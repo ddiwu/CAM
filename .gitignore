@@ -32,6 +32,7 @@ _x*
 hello_world/
 host_py/
 performance/
+rtl_kernels/backup/*
 rtl_kernels/rtl*
 rtl_kernels/README.rst
 rtl_kernels/summary*

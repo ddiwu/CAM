@@ -65,11 +65,11 @@ module krnl_cam_rtl_adder #(
   output logic [C_DATA_WIDTH-1:0]                    m_tdata,
   input  logic                                       m_tready,
 
-  input  logic                                       read_done,
+  // input  logic                                       read_done,
 
   // AXI-Lite Slave Interface
-  input  logic [31:0]                                ctrl_1_done_in,
-  output logic                                       ctrl_edge  //update done signal
+  // input  logic [31:0]                                ctrl_1_done_in,
+  // output logic                                       ctrl_edge  //update done signal
 
 );
 
@@ -263,47 +263,47 @@ endgenerate
 //   end
 // end
 
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     num_index[0] <= 9'h1ff;
-//     num_index[1] <= 9'h1ff;
-//     num_index_final <= 9'h1ff;
-//   end
-//   else begin
-//     num_index[0] <= 9'h1ff;
-//     for (int i = 0; i < CAM_SIZE/2; i++) begin
-//       if (acc[i] == 0) begin
-//         num_index[0] <= i;
-//         break;
-//       end
-//     end
-//     num_index[1] <= 9'h1ff;
-//     for (int i = CAM_SIZE/2; i < CAM_SIZE; i++) begin
-//       if (acc[i] == 0) begin
-//         num_index[1] <= i;
-//         break;
-//       end
-//     end
-//     if (num_index[0] == 9'h1ff)
-//       num_index_final <= num_index[1];
-//     else
-//       num_index_final <= num_index[0];
-//   end
-// end
 always_ff @(posedge aclk) begin
   if (areset) begin
-    num_index_final <= 4'b1111;
+    num_index[0] <= 9'h1ff;
+    num_index[1] <= 9'h1ff;
+    num_index_final <= 9'h1ff;
   end
   else begin
-    num_index_final <= 4'b1111;
-    for (int i = 0; i < CAM_SIZE; i++) begin
+    num_index[0] <= 9'h1ff;
+    for (int i = 0; i < CAM_SIZE/2; i++) begin
       if (acc[i] == 0) begin
-        num_index_final <= i;
+        num_index[0] <= i;
         break;
       end
     end
+    num_index[1] <= 9'h1ff;
+    for (int i = CAM_SIZE/2; i < CAM_SIZE; i++) begin
+      if (acc[i] == 0) begin
+        num_index[1] <= i;
+        break;
+      end
+    end
+    if (num_index[0] == 9'h1ff)
+      num_index_final <= num_index[1];
+    else
+      num_index_final <= num_index[0];
   end
 end
+// always_ff @(posedge aclk) begin
+//   if (areset) begin
+//     num_index_final <= 4'b1111;
+//   end
+//   else begin
+//     num_index_final <= 4'b1111;
+//     for (int i = 0; i < CAM_SIZE; i++) begin
+//       if (acc[i] == 0) begin
+//         num_index_final <= i;
+//         break;
+//       end
+//     end
+//   end
+// end
 
 
 // assign m_tvalid = m_tready && ctrl_1_done;
@@ -311,13 +311,13 @@ always_ff @(posedge aclk) begin
   if (areset) begin
     m_tvalid1 <= 0;
     m_tvalid2 <= 0;
-    // m_tvalid3 <= 0;
+    m_tvalid3 <= 0;
     m_tvalid <= 0;
   end
   else if (ctrl_1_done && m_tready) begin
     m_tvalid1 <= &s_tvalid /*| read_done*/;
     m_tvalid2 <= m_tvalid1;
-    // m_tvalid3 <= m_tvalid2;
+    m_tvalid3 <= m_tvalid2;
     m_tvalid <= m_tvalid2;
   end
 end

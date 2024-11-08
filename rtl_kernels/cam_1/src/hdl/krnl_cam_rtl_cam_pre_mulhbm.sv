@@ -1,78 +1,36 @@
-/**
-* Copyright (C) 2019-2021 Xilinx, Inc
-*
-* Licensed under the Apache License, Version 2.0 (the "License"). You may
-* not use this file except in compliance with the License. A copy of the
-* License is located at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-* WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-* License for the specific language governing permissions and limitations
-* under the License.
-*/
 
-////////////////////////////////////////////////////////////////////////////////
-// Description: Basic Adder using DSP48E2, no overflow. Unsigned. Combinatorial.
-////////////////////////////////////////////////////////////////////////////////
-// (* DONT_TOUCH = "FALSE" *)
-// (* use_dsp = "logic" *)
-// module dspxor #(
-//   parameter integer DW = 48
-// )
-// (
-//   input  logic          aclk,
-//   input  logic          areset,
-//   input  logic          m_tready,
-//   input  logic [DW-1:0] a,
-//   input  logic [DW-1:0] b,
-//   output logic [DW-1:0] c_out
-// );
-// logic [DW-1:0] a_in;
-// logic [DW-1:0] b_in;
-
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     c_out <= 0;
-//   end
-//   else if (m_tready) begin
-//     a_in <= a;
-//     b_in <= b;
-//     c_out <= a_in ^ b_in;
-//   end
-// end
-// endmodule
+`define IDLE 0
+`define UPDATE_ALL 1
+`define SEARCH 2
+`define UPDATE_ONE 3
 
 // `default_nettype none
 (* DONT_TOUCH = "FALSE" *)
 module krnl_cam_rtl_adder #(
   parameter integer C_DATA_WIDTH   = 512, // Data width of both input and output data
-  parameter integer C_NUM_CHANNELS = 2,   // Number of input channels.  Only a value of 2 implemented.
-  parameter integer CAM_SIZE = 1024,
+  parameter integer C_NUM_CHANNELS = 1,   // Number of input channels.  Only a value of 2 implemented.
+  parameter integer CAM_SIZE = 256,
   parameter integer INDEX_WIDTH = $clog2(CAM_SIZE),
   parameter integer NO_INDEX = INDEX_WIDTH + 1,
   parameter integer OUTPUT_ZERO = 512 - INDEX_WIDTH - 1,
-  parameter integer DIVITION = 4
+  parameter integer DIVITION = 2,
+  parameter integer OP_CODE_WIDTH = 3
 )
 (
   input logic                                        aclk,
   input logic                                        areset,
-
-  input logic  [C_NUM_CHANNELS-1:0]                   s_tvalid,
+  input logic  [OP_CODE_WIDTH-1:0]                   state,       
+  input logic  [C_NUM_CHANNELS-1:0]                  s_tvalid,
   input logic  [C_NUM_CHANNELS-1:0][C_DATA_WIDTH-1:0] s_tdata,
-  output logic [C_NUM_CHANNELS-1:0]                   s_tready,
-
+  // output logic [C_NUM_CHANNELS-1:0]                   s_tready,
+  output logic                                       update_all_end,
   output logic                                       m_tvalid,
-  output logic [C_DATA_WIDTH-1:0]                    m_tdata,
-  input  logic                                       m_tready,
-
-  input  logic                                       read_done,
+  output logic [C_DATA_WIDTH-1:0]                    m_tdata
+  // input  logic                                       m_tready,
 
   // AXI-Lite Slave Interface
-  input  logic [31:0]                                ctrl_1_done_in,
-  output logic                                       ctrl_edge  //update done signal
+  // input  logic [31:0]                                ctrl_1_done_in,
+  // output logic                                       ctrl_edge  //update done signal
 
 );
 
@@ -82,20 +40,23 @@ timeprecision 1ps;
 /////////////////////////////////////////////////////////////////////////////
 // Variables
 /////////////////////////////////////////////////////////////////////////////
+logic [C_NUM_CHANNELS-1:0] s_tready;
 logic [47:0] s_data1;
 logic m_tvalid1, m_tvalid2, m_tvalid3;
 logic [47:0] acc [CAM_SIZE];
+logic ctrl_edge;
+logic [31:0] ctrl_1_done_in;
 // logic [29:0] A_in;
 // logic [17:0] B_in;
 // logic [7:0] num_index_1 [CAM_SIZE], num_index_2 [CAM_SIZE/2], num_index_3 [CAM_SIZE/4], num_index_4 [CAM_SIZE/8], num_index_5 [CAM_SIZE/16], num_index_6 [CAM_SIZE/32], num_index_7 [CAM_SIZE/64], num_index_8 [CAM_SIZE/128], num_index_9;
 // logic [5:0] one_num_1 [CAM_SIZE], one_num_2 [CAM_SIZE/2], one_num_3 [CAM_SIZE/4], one_num_4 [CAM_SIZE/8], one_num_5 [CAM_SIZE/16], one_num_6 [CAM_SIZE/32], one_num_7 [CAM_SIZE/64], one_num_8 [CAM_SIZE/128], one_num_9;
 logic [INDEX_WIDTH:0] num_index [DIVITION], num_index_final;
-logic [INDEX_WIDTH-1:0] write_index [256]; 
-logic [47:0] data_in [CAM_SIZE];
-logic [47:0] data_in1 [CAM_SIZE];
+logic [INDEX_WIDTH-1:0] write_index; 
+// logic [47:0] data_in [CAM_SIZE];
+// logic [47:0] data_in1 [CAM_SIZE];
 logic [7:0] compare_index, compare_index1, compare_index2;
 
-logic ctrl1 [256], ctrl_1_done [256];
+logic ctrl1, ctrl_1_done;
 
 logic s_tvalid1 [16], s_tvalid2 [256];
 logic [C_DATA_WIDTH-1:0] s_tdata1 [16], s_tdata2 [256];
@@ -103,72 +64,69 @@ logic [C_DATA_WIDTH-1:0] s_tdata1 [16], s_tdata2 [256];
 // Logic
 /////////////////////////////////////////////////////////////////////////////
 //fanout 
-always_ff @(posedge aclk) begin
-  if (areset) begin
-    for (int i = 0; i < 16; i++) begin
-      s_tvalid1[i] <= 0;
-      s_tdata1[i] <= 0;
-    end
-    for (int i = 0; i < 256; i++) begin
-      s_tvalid2[i] <= 0;
-      s_tdata2[i] <= 0;
-    end
-  end
-  else begin
-    for (int i = 0; i < 16; i++) begin
-      s_tvalid1[i] <= s_tvalid[0];
-      s_tdata1[i] <= s_tdata[0];
-    end
-    for (int i = 0; i < 256; i++) begin
-      s_tvalid2[i] <= s_tvalid1[i/16];
-      s_tdata2[i] <= s_tdata1[i/16];
-    end
-  end
-end
-always_ff @(posedge aclk) begin
-  if (areset) begin
-    for (int i = 0; i < 256; i++) begin
-      ctrl1[i] <= 0;
-    end
-  end
-  else begin
-    for (int i = 0; i < 256; i++) begin
-      ctrl1[i] <= ctrl_1_done[i];
-    end
-  end
-end
-assign ctrl_edge = !ctrl1[0] && ctrl_1_done[0];
+// always_ff @(posedge aclk) begin
+//   if (areset) begin
+//     for (int i = 0; i < 16; i++) begin
+//       s_tvalid1[i] <= 0;
+//       s_tdata1[i] <= 0;
+//     end
+//     for (int i = 0; i < 256; i++) begin
+//       s_tvalid2[i] <= 0;
+//       s_tdata2[i] <= 0;
+//     end
+//   end
+//   else begin
+//     for (int i = 0; i < 16; i++) begin
+//       s_tvalid1[i] <= s_tvalid[0];
+//       s_tdata1[i] <= s_tdata[0];
+//     end
+//     for (int i = 0; i < 256; i++) begin
+//       s_tvalid2[i] <= s_tvalid1[i/16];
+//       s_tdata2[i] <= s_tdata1[i/16];
+//     end
+//   end
+// end
+// always_ff @(posedge aclk) begin
+//   if (areset) begin
+//     for (int i = 0; i < 256; i++) begin
+//       ctrl1[i] <= 0;
+//     end
+//   end
+//   else begin
+//     for (int i = 0; i < 256; i++) begin
+//       ctrl1[i] <= ctrl_1_done[i];
+//     end
+//   end
+// end
+// assign ctrl_edge = !ctrl1[0] && ctrl_1_done[0];
 
-generate begin
-  genvar i;
-  for (i = 0; i < CAM_SIZE/4; i++) begin
-    always_ff @(posedge aclk) begin
-      if (areset) begin
-        // for (int i = 0; i < CAM_SIZE; i++) begin
-        //   data_in[i] <= 0;
-        // end
-        write_index[i] <= 0;
-        ctrl_1_done[i] <= 0;
-      end
-      else if (!ctrl_1_done[i] && s_tvalid2[i]) begin
-        // for (int i = 0; i < 8; i++) begin
-        //   data_in[write_index + i][47:0] <= s_tdata[0][i*64+:48];
-        // end
-        if (write_index[i] == (CAM_SIZE-8)) begin 
-          write_index[i] <= 0;
-          ctrl_1_done[i] <= 1;
-        end
-        else begin
-          write_index[i] <= write_index[i] + 8;
-        end
-      end
-      else if (ctrl1[i] && !ctrl_1_done_in[0]) begin //if we set ctrl_1_done_in low when starting
-        ctrl_1_done[i] <= 0;
-      end
+always_ff @(posedge aclk) begin
+  if (areset) begin
+    write_index <= 0;
+    // ctrl_1_done <= 0;
+  end
+  else if (state == `UPDATE_ALL && &s_tvalid) begin
+    if (write_index == (CAM_SIZE-8)) begin 
+      write_index <= 0;
+      // ctrl_1_done <= 1;
+    end
+    else begin
+      write_index <= write_index + 8'd8;
     end
   end
 end
-endgenerate
+
+always_ff @(posedge aclk) begin
+  if (areset) begin
+    update_all_end <= 0;
+  end 
+  else if (state == `UPDATE_ALL && &s_tvalid && write_index == (CAM_SIZE-8)) begin
+    update_all_end <= 1;
+  end
+  else begin
+    update_all_end <= 0;
+  end
+end
 
 generate begin
   genvar i;
@@ -234,9 +192,9 @@ generate begin
     // Data outputs: Data Ports
     .P(acc[i][47:0]),                   // 48-bit output: Result of A:B XOR C
     // Data inputs: Data Ports
-    .A(s_tdata2[i/4][47:18]),                   // 30-bit input: A data
-    .B(s_tdata2[i/4][17:0]),                   // 18-bit input: B data
-    .C(s_tdata2[i/4][(i%8)*64+:48]),                   // 48-bit input: C data
+    .A(s_tdata[0][47:18]),                   // 30-bit input: A data
+    .B(s_tdata[0][17:0]),                   // 18-bit input: B data
+    .C(s_tdata[0][(i%8)*64+:48]),                   // 48-bit input: C data
     // .C(data_in[i][47:0]),                   // 48-bit input: C data
     // Control inputs: Control Inputs/Status Bits
     .ALUMODE(4'b0100),       // Set ALUMODE to perform XOR operation
@@ -248,9 +206,9 @@ generate begin
     .CEB1(1'b0),             // Clock enable for B input register
     // .CEB2(m_tready),             // Clock enable for B input register
     .CEB2(1'b1),
-    .CEC(!ctrl_1_done[i/4] && s_tvalid2[i/4] && write_index[i/4] <= i && write_index[i/4]+8 > i),
+    .CEC(state == `UPDATE_ALL && s_tvalid[0] && write_index <= i && write_index+8 > i),
     // .CEC(1'b1),             // Clock enable for C input register
-    .CEP(m_tready),             // pipeline stall
+    .CEP(1'b1),             // pipeline stall
     .CEALUMODE(1'b1),         // Clock enable for ALUMODE register
     .CECTRL(1'b1),           // Clock enable for control register 
     .CED(1'b0),             // Clock enable for D input register (not used)
@@ -267,24 +225,6 @@ generate begin
 end
 end
 endgenerate
-
-// always_comb begin
-//   num_index = 9'h1ff;  // no match
-//   for (int i = 0; i < CAM_SIZE; i++) begin
-//     if (acc[i] == 0) begin
-//       num_index = i;
-//       break;
-//     end
-//   end
-// end
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     num_index_final <= 9'h1ff;
-//   end
-//   else begin
-//     num_index_final <= num_index;
-//   end
-// end
 
 always_ff @(posedge aclk) begin
   if (areset) begin
@@ -318,47 +258,36 @@ always_ff @(posedge aclk) begin
   if (areset) begin
     m_tvalid1 <= 0;
     m_tvalid2 <= 0;
+    m_tvalid3 <= 0;
     m_tvalid <= 0;
   end
-  else if (ctrl_1_done[0] && m_tready) begin
-    m_tvalid1 <= s_tvalid2[0] /*| read_done*/;
+  else if (state == `SEARCH) begin
+    m_tvalid1 <= s_tvalid[0];
     m_tvalid2 <= m_tvalid1;
     m_tvalid3 <= m_tvalid2;
     m_tvalid <= m_tvalid3;
   end
 end
 
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     compare_index <= 0;
-//   end
-//   else if (ctrl_1_done && s_tvalid2 && m_tready) begin
-//     compare_index <= compare_index + 8'd8;
-//   end
-// end
-
 always_comb begin
-  if (!ctrl_1_done[0]) begin
+  if (state == `SEARCH) begin
     m_tdata = 0;
   end
   else begin
     // m_tdata = {16'b0,acc[compare_index+7],16'b0,acc[compare_index+6],16'b0,acc[compare_index+5],16'b0,acc[compare_index+4],16'b0,acc[compare_index+3],16'b0,acc[compare_index+2],16'b0,acc[compare_index+1],16'b0,acc[compare_index]};
     m_tdata = {{OUTPUT_ZERO{1'b0}}, num_index_final[INDEX_WIDTH:0]};
-    // m_tdata = {464'b0, s_tdata[0][47:0]};
   end
 end
 
-always_comb begin
-  if (!ctrl_1_done[0]) begin
-    s_tready = &s_tvalid /*&& write_index != 8'd248*/ ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
-  end
-  else begin
-    // s_tready = (ctrl_edge || (compare_index == (CAM_SIZE - 8'd16) && &s_tvalid && m_tready)) ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
-    s_tready = &s_tvalid && m_tready ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
-  end
-end
+// always_comb begin
+//   if (!ctrl_1_done[0]) begin
+//     s_tready = &s_tvalid /*&& write_index != 8'd248*/ ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+//   end
+//   else begin
+//     // s_tready = (ctrl_edge || (compare_index == (CAM_SIZE - 8'd16) && &s_tvalid && m_tready)) ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+//     s_tready = &s_tvalid /*&& m_tready*/ ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
+//   end
+// end
 
 
-endmodule
-
-// `default_nettype wire
+endmodule : krnl_cam_rtl_adder
