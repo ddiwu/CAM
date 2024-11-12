@@ -1,28 +1,7 @@
-/**
-* Copyright (C) 2019-2021 Xilinx, Inc
-*
-* Licensed under the Apache License, Version 2.0 (the "License"). You may
-* not use this file except in compliance with the License. A copy of the
-* License is located at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-* WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-* License for the specific language governing permissions and limitations
-* under the License.
-*/
-
-///////////////////////////////////////////////////////////////////////////////
-// Description: This is a example of how to create an RTL Kernel.  The function
-// of this module is to add two 32-bit values and produce a result.  The values
-// are read from one AXI4 memory mapped master, processed and then written out.
-//
-// Data flow: axi_read_master->fifo[2]->adder->fifo->axi_write_master
-///////////////////////////////////////////////////////////////////////////////
-
-// default_nettype of none prevents implicit wire declaration.
+`define IDLE 0
+`define UPDATE_ALL 1
+`define SEARCH 2
+`define UPDATE_ONE 3
 `default_nettype none
 `timescale 1 ns / 1 ps 
 (* DONT_TOUCH = "FALSE" *)
@@ -105,7 +84,7 @@ logic [LP_NUM_READ_CHANNELS-1:0] rd_fifo_tvalid_n;
 logic [LP_NUM_READ_CHANNELS-1:0] rd_fifo_tready; 
 logic [LP_NUM_READ_CHANNELS-1:0] [C_M_AXI_GMEM_DATA_WIDTH-1:0] rd_fifo_tdata;
 
-logic                               adder_tvalid;
+logic                               cam_tvalid;
 logic                               adder_tready_n; 
 logic [C_M_AXI_GMEM_DATA_WIDTH-1:0] adder_tdata;
 logic                               wr_fifo_tvalid_n;
@@ -121,6 +100,7 @@ logic [OP_CODE_WIDTH-1:0] state;
 logic [OP_CODE_WIDTH-1:0] state_pulse;
 logic update_all_end;
 logic [31:0] compare_num;
+logic [31:0] count;
 
 ///////////////////////////////////////////////////////////////////////////////
 // RTL Logic 
@@ -132,21 +112,19 @@ always @(posedge ap_clk) begin
   areset <= ~ap_rst_n; 
 end
 
-krnl_cam_rtl_counter #(
-  .C_WIDTH ( LP_LENGTH_WIDTH        ) ,
-  .C_INIT  ( {LP_LENGTH_WIDTH{1'b0}} ) 
-)
-inst_ar_transaction_cntr ( 
-  .clk        ( ap_clk                 ) ,
-  .clken      ( 1'b1                   ) ,
-  .rst        ( areset                 ) ,
-  .load       ( state_pulse != 0       ) , 
-  .incr       ( 1'b0                   ) ,
-  .decr       ( p1_TVALID & p1_TREADY  ) ,
-  .load_value ( 32-1          ) ,
-  .count      (                        ) ,
-  .is_zero    ( final_transfer         ) 
-);
+always_ff @(posedge ap_clk) begin
+  if (areset) begin
+    count <= 0;
+  end
+  else if (state_pulse == `SEARCH) begin
+    count <= compare_num - 1;
+  end
+  else if (p0_TVALID && p0_TREADY && count != 0) begin
+    count <= count - 1;
+  end
+end
+
+assign compare_num = p0_TDATA[61:32];
 
 krnl_cam_rtl_FSM #(
   .C_DATA_WIDTH ( C_DATA_WIDTH ),
@@ -156,50 +134,12 @@ inst_FSM (
   .clk       ( ap_clk            ) ,
   .rst       ( areset            ) ,
   .data_in   ( p0_TDATA          ) ,
-  .state_end ( 0                 ) ,
+  .data_in_valid (p0_TVALID & p0_TREADY) ,
+  .search_end ( count == 0 && p0_TVALID && p0_TREADY) , 
   .state_pulse(state_pulse       ) ,
   .update_all_end( update_all_end) ,
-  .compare_num( compare_num      ) ,
   .state     ( state             ) 
 );
-
-// assign ap_done = p1_TVALID & p1_TREADY & final_transfer;
-
-// AXI4-Lite slave
-// krnl_cam_rtl_control_s_axi #(
-//   .C_S_AXI_ADDR_WIDTH( C_S_AXI_CONTROL_ADDR_WIDTH ),
-//   .C_S_AXI_DATA_WIDTH( C_S_AXI_CONTROL_DATA_WIDTH )
-// ) 
-// inst_krnl_cam_control_s_axi (
-//   .AWVALID   ( s_axi_control_AWVALID         ) ,
-//   .AWREADY   ( s_axi_control_AWREADY         ) ,
-//   .AWADDR    ( s_axi_control_AWADDR          ) ,
-//   .WVALID    ( s_axi_control_WVALID          ) ,
-//   .WREADY    ( s_axi_control_WREADY          ) ,
-//   .WDATA     ( s_axi_control_WDATA           ) ,
-//   .WSTRB     ( s_axi_control_WSTRB           ) ,
-//   .ARVALID   ( s_axi_control_ARVALID         ) ,
-//   .ARREADY   ( s_axi_control_ARREADY         ) ,
-//   .ARADDR    ( s_axi_control_ARADDR          ) ,
-//   .RVALID    ( s_axi_control_RVALID          ) ,
-//   .RREADY    ( s_axi_control_RREADY          ) ,
-//   .RDATA     ( s_axi_control_RDATA           ) ,
-//   .RRESP     ( s_axi_control_RRESP           ) ,
-//   .BVALID    ( s_axi_control_BVALID          ) ,
-//   .BREADY    ( s_axi_control_BREADY          ) ,
-//   .BRESP     ( s_axi_control_BRESP           ) ,
-//   .ACLK      ( ap_clk                        ) ,
-//   .ARESET    ( areset                        ) ,
-//   .ACLK_EN   ( 1'b1                          ) ,
-//   .ap_start  ( ap_start                      ) ,
-//   .interrupt ( interrupt                     ) ,
-//   .ap_ready  ( ap_ready                      ) ,
-//   .ap_done   ( ap_done                       ) ,
-//   .ap_idle   ( ap_idle                       ) ,
-//   .length_r  ( length_r[0+:LP_LENGTH_WIDTH]  ) ,
-//   .ctrl_1_done( ctrl_1_done                  ) ,
-//   .ctrl_1_done_in( ctrl_1_done_in            )
-// );
 
 // Combinatorial Adder
 krnl_cam_rtl_adder #( 
@@ -216,7 +156,7 @@ inst_adder (
   // .s_tready ( rd_fifo_tready    ) ,
   .s_tdata  ( p0_TDATA          ) ,
   .update_all_end( update_all_end ) ,
-  .m_tvalid ( adder_tvalid      ) ,
+  .m_tvalid ( cam_tvalid      ) ,
   // .m_tready ( ~wr_fifo_prog_full) ,
   .m_tdata  ( adder_tdata       )
   // .ctrl_edge( ctrl_1_done_in    ) , //upedge of ctrl_1_done
@@ -245,7 +185,7 @@ xpm_fifo_sync # (
   .sleep         ( 1'b0             ) ,
   .rst           ( areset           ) ,
   .wr_clk        ( ap_clk           ) ,
-  .wr_en         ( adder_tvalid     ) ,
+  .wr_en         ( cam_tvalid     ) ,
   .din           ( adder_tdata      ) ,
   .full          ( adder_tready_n   ) ,
   .prog_full     ( wr_fifo_prog_full) ,

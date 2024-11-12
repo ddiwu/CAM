@@ -20,9 +20,7 @@ set path_to_tmp_project "./tmp_kernel_pack_${suffix}"
 
 create_project -force kernel_pack $path_to_tmp_project 
 add_files -norecurse [glob $path_to_hdl/krnl_cam_rtl.v \
-                      $path_to_hdl/krnl_cam_rtl_control_s_axi.v \
                       $path_to_hdl/krnl_cam_rtl_cam_$mode.sv \
-                      $path_to_hdl/krnl_cam_rtl_counter.sv \
                       $path_to_hdl/krnl_cam_rtl_FSM.sv \
                       $path_to_hdl/krnl_cam_rtl_int.sv]
 add_files -fileset constrs_1 -norecurse [glob $path_to_hdl/*.xdc]

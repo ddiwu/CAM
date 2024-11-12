@@ -41,8 +41,7 @@ timeprecision 1ps;
 // Variables
 /////////////////////////////////////////////////////////////////////////////
 logic [C_NUM_CHANNELS-1:0] s_tready;
-logic [47:0] s_data1;
-logic m_tvalid1, m_tvalid2, m_tvalid3;
+logic m_tvalid1, m_tvalid2, m_tvalid3, m_tvalid4;
 logic [47:0] acc [CAM_SIZE];
 logic ctrl_edge;
 logic [31:0] ctrl_1_done_in;
@@ -106,26 +105,29 @@ always_ff @(posedge aclk) begin
     // ctrl_1_done <= 0;
   end
   else if (state == `UPDATE_ALL && &s_tvalid) begin
-    if (write_index == (CAM_SIZE-8)) begin 
+    if (write_index == (CAM_SIZE-16)) begin 
       write_index <= 0;
       // ctrl_1_done <= 1;
     end
     else begin
-      write_index <= write_index + 8'd8;
+      write_index <= write_index + 16;
     end
   end
 end
 
-always_ff @(posedge aclk) begin
-  if (areset) begin
-    update_all_end <= 0;
-  end 
-  else if (state == `UPDATE_ALL && &s_tvalid && write_index == (CAM_SIZE-8)) begin
-    update_all_end <= 1;
-  end
-  else begin
-    update_all_end <= 0;
-  end
+// always_ff @(posedge aclk) begin
+//   if (areset) begin
+//     update_all_end <= 0;
+//   end 
+//   else if (state == `UPDATE_ALL && &s_tvalid && write_index == (CAM_SIZE-8)) begin
+//     update_all_end <= 1;
+//   end
+//   else begin
+//     update_all_end <= 0;
+//   end
+// end
+always_comb begin
+  update_all_end = (state == `UPDATE_ALL && &s_tvalid && write_index == (CAM_SIZE-16)) ? 1 : 0;
 end
 
 generate begin
@@ -192,9 +194,9 @@ generate begin
     // Data outputs: Data Ports
     .P(acc[i][47:0]),                   // 48-bit output: Result of A:B XOR C
     // Data inputs: Data Ports
-    .A(s_tdata[0][47:18]),                   // 30-bit input: A data
+    .A({16'b0, s_tdata[0][31:18]}),                   // 30-bit input: A data
     .B(s_tdata[0][17:0]),                   // 18-bit input: B data
-    .C(s_tdata[0][(i%8)*64+:48]),                   // 48-bit input: C data
+    .C({16'b0, s_tdata[0][(i%16)*32+:32]}),                   // 48-bit input: C data
     // .C(data_in[i][47:0]),                   // 48-bit input: C data
     // Control inputs: Control Inputs/Status Bits
     .ALUMODE(4'b0100),       // Set ALUMODE to perform XOR operation
@@ -206,7 +208,7 @@ generate begin
     .CEB1(1'b0),             // Clock enable for B input register
     // .CEB2(m_tready),             // Clock enable for B input register
     .CEB2(1'b1),
-    .CEC(state == `UPDATE_ALL && s_tvalid[0] && write_index <= i && write_index+8 > i),
+    .CEC(state == `UPDATE_ALL && s_tvalid[0] && write_index <= i && write_index+16 > i),
     // .CEC(1'b1),             // Clock enable for C input register
     .CEP(1'b1),             // pipeline stall
     .CEALUMODE(1'b1),         // Clock enable for ALUMODE register
@@ -237,7 +239,7 @@ always_ff @(posedge aclk) begin
     for (int j = 0; j < DIVITION; j++) begin
       num_index[j] <= {NO_INDEX{1'b1}};
       for (int i = CAM_SIZE*j/DIVITION; i < CAM_SIZE*(j+1)/DIVITION; i++) begin
-        if (acc[i] == 0) begin
+        if (acc[i][31:0] == 0) begin
           num_index[j] <= i;
           break;
         end
@@ -253,29 +255,58 @@ always_ff @(posedge aclk) begin
   end
 end
 
-// assign m_tvalid = m_tready && ctrl_1_done;
 always_ff @(posedge aclk) begin
   if (areset) begin
     m_tvalid1 <= 0;
     m_tvalid2 <= 0;
     m_tvalid3 <= 0;
-    m_tvalid <= 0;
+    m_tvalid4 <= 0;
   end
-  else if (state == `SEARCH) begin
-    m_tvalid1 <= s_tvalid[0];
+  else begin
+    m_tvalid1 <= (state == `SEARCH) ? &s_tvalid : 0;
     m_tvalid2 <= m_tvalid1;
     m_tvalid3 <= m_tvalid2;
-    m_tvalid <= m_tvalid3;
+    m_tvalid4 <= m_tvalid3;
   end
 end
 
 always_comb begin
-  if (state == `SEARCH) begin
-    m_tdata = 0;
+  if (update_all_end) begin
+    m_tvalid = 1;
+  end
+  else if (state == `SEARCH) begin
+    m_tvalid = m_tvalid4;
   end
   else begin
-    // m_tdata = {16'b0,acc[compare_index+7],16'b0,acc[compare_index+6],16'b0,acc[compare_index+5],16'b0,acc[compare_index+4],16'b0,acc[compare_index+3],16'b0,acc[compare_index+2],16'b0,acc[compare_index+1],16'b0,acc[compare_index]};
+    m_tvalid = 0;
+  end
+end
+
+// logic [31:0] x;
+// logic [31:0] x1;
+// logic [31:0] x2;
+// logic [31:0] x3;
+
+// always_ff @(posedge aclk) begin
+//   if (state == `SEARCH) begin
+//     x <= s_tdata[0][31:0];
+//     x1 <= x;
+//     x2 <= x1;
+//     x3 <= x2;
+//   end
+// end
+
+always_comb begin
+  if (update_all_end) begin
+    // m_tdata = `UPDATE_ALL;
+    m_tdata = 100;
+  end
+  else if (state == `SEARCH) begin
+    // m_tdata = {480'b0, x3};
     m_tdata = {{OUTPUT_ZERO{1'b0}}, num_index_final[INDEX_WIDTH:0]};
+  end
+  else begin
+    m_tdata = 0;
   end
 end
 

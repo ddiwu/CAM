@@ -14,49 +14,54 @@ module krnl_cam_rtl_FSM  #(
   input  logic                    clk,
   input  logic                    rst,
   input  logic [C_DATA_WIDTH-1:0] data_in,
-  input  logic                    state_end,
+  input  logic                    search_end,
   input  logic                    update_all_end,
+  input  logic                    data_in_valid,
   output logic [OP_CODE_WIDTH-1:0] state_pulse,
-  output logic [31:0]              compare_num,
   output logic [OP_CODE_WIDTH-1:0] state
 );
 
-  always_ff @(posedge clk) begin
-    if (rst) begin
-      state_pulse <= 0;
-    end 
-    else if (state_pulse != 0) begin
-      state_pulse <= 0;
+  // always_ff @(posedge clk) begin
+  //   if (rst) begin
+  //     state_pulse <= 0;
+  //   end 
+  //   else if (state_pulse != 0) begin
+  //     state_pulse <= 0;
+  //   end
+  //   else begin
+  //     if (state == `IDLE && data_in[2] && data_in_valid) begin
+  //       state_pulse <= `SEARCH;
+  //     end
+  //     else if (state == `IDLE && data_in[3] && data_in_valid) begin
+  //       state_pulse <= `UPDATE_ONE;
+  //     end
+  //   end
+  // end
+  always_comb begin 
+    if (state == `IDLE && data_in[31:0]==`SEARCH && data_in_valid) begin
+      state_pulse = `SEARCH;
+    end
+    else if (state == `IDLE && data_in[31:0]==`UPDATE_ONE && data_in_valid) begin
+      state_pulse = `UPDATE_ONE;
     end
     else begin
-      // if (state == `IDLE && data_in[1]) begin
-      //   state_pulse <= `UPDATE_ALL;
-      // end
-      // else 
-      if (state == `IDLE && data_in[2]) begin
-        state_pulse <= `SEARCH;
-      end
-      else if (state == `IDLE && data_in[3]) begin
-        state_pulse <= `UPDATE_ONE;
-      end
+      state_pulse = 0;
     end
   end
 
   always_ff @(posedge clk) begin
     if (rst) begin
       state <= `IDLE;
-      compare_num <= 0;
     end
     else begin
       case (state)
         `IDLE: begin
-          if (data_in[1])
+          if (data_in[31:0]==`UPDATE_ALL && data_in_valid)
             state <= `UPDATE_ALL;
-          else if (data_in[2]) begin
+          else if (data_in[31:0] ==`SEARCH && data_in_valid) begin
             state <= `SEARCH;
-            compare_num <= data_in[63:32];
           end
-          else if (data_in[3])
+          else if (data_in[31:0]==`UPDATE_ONE && data_in_valid)
             state <= `UPDATE_ONE;
           else
             state <= `IDLE;
@@ -66,11 +71,11 @@ module krnl_cam_rtl_FSM  #(
             state <= `IDLE;
         end
         `SEARCH: begin
-          if (state_end)
+          if (search_end )
             state <= `IDLE;
         end
         `UPDATE_ONE: begin
-          if (state_end)
+          if (search_end)
             state <= `IDLE;
         end
         default: begin

@@ -42,11 +42,16 @@
 #define LATENCY 0x040
 
 #define NK 1
+#define search_num 32
+#define IDLE 0
+#define UPDATE_ALL 1
+#define SEARCH 2
+#define UPDATE_ONE 3
 
-long int val[NK][DATA_SIZE/2];
+int val[NK][DATA_SIZE/2];
 
-int cam_appro(long int key){
-    long int xor_value[DATA_SIZE/2];
+int cam_appro(int key){
+    int xor_value[DATA_SIZE/2];
     int num_1[DATA_SIZE/2];
     for (int i = 0; i < DATA_SIZE/2; i++) {
         xor_value[i] = val[0][i] ^ key;
@@ -64,7 +69,7 @@ int cam_appro(long int key){
     return index;
 }
 
-int cam_precise(long int key, int num){
+int cam_precise(int key, int num){
     for (int i = 0; i < DATA_SIZE/2; i++){
         if (val[num][i] == key){
             return i;
@@ -91,13 +96,12 @@ int main(int argc, char** argv) {
     std::cout << "Load the xclbin " << binaryFile << std::endl;
     auto uuid = device.load_xclbin(binaryFile); 
 
-    auto size = DATA_SIZE;
     // Allocate Memory in Host Memory
-    long int source_sw_results[NK][2560];
+    int source_sw_results[NK][2560];
 
     xrt::kernel krnl_input[NK];
     xrt::kernel krnl_output[NK];
-    xrt::kernel rtl_kernel[NK];
+    // xrt::kernel rtl_kernel[NK];
     for (int i = 0; i < NK; i++) {
         krnl_input[i] = xrt::kernel(device, uuid, "krnl_input");
         krnl_output[i] = xrt::kernel(device, uuid, "krnl_output");
@@ -115,41 +119,53 @@ int main(int argc, char** argv) {
 
     xrt::bo buffer_in[NK];
     xrt::bo buffer_out[NK];
-    long int* buffer_in_map[NK];
-    long int* buffer_out_map[NK];
+    int* buffer_in_map[NK];
+    int* buffer_out_map[NK];
     for (int i = 0; i < NK; i++) {
-        buffer_in[i] = xrt::bo(device, 2048 * sizeof(long int), bank_assign[i]);
-        buffer_out[i] = xrt::bo(device, 1024 * sizeof(long int), bank_assign[i]);
+        buffer_in[i] = xrt::bo(device, 4096 * sizeof(int), bank_assign[i]);
+        buffer_out[i] = xrt::bo(device, 2048 * sizeof(int), bank_assign[i]);
     }
     for (int i = 0; i < NK; i++) {
-        buffer_in_map[i] = buffer_in[i].map<long int*>();
-        buffer_out_map[i] = buffer_out[i].map<long int*>();
+        buffer_in_map[i] = buffer_in[i].map<int*>();
+        buffer_out_map[i] = buffer_out[i].map<int*>();
     }
 
-
-    // Create the test data and Software Result
-    buffer_in_map[0][0] = 2;
-    for (int i = 8; i < 8+DATA_SIZE/2; i++) {
-        buffer_in_map[0][i] = i-8;
+    buffer_in_map[0][0] = UPDATE_ALL; //start update all
+    for (int i = 16; i < 16+DATA_SIZE/2; i++) {
+        buffer_in_map[0][i] = i-16;
         // buffer_in_map[1][i] = i*i;
-        val[0][i-8] = i-8;
+        val[0][i-16] = i-16;
         // val[1][i] = i*i;
     }
-    buffer_in_map[0][264] = 4;
+    buffer_in_map[0][272] = SEARCH; //start search
+    buffer_in_map[0][273] = search_num; //search_num
 
-    for (int i = 16+DATA_SIZE/2; i < 16+DATA_SIZE/2+256; i += 8) {
-        buffer_in_map[0][i] = (i-16)/8;
-        // buffer_in_map[1][i] = (i)/8;
+    for (int i = 32+DATA_SIZE/2; i < 32+DATA_SIZE/2+512; i += 16) {
+        buffer_in_map[0][i] = (i-32)/4;
     }
+    for (int i = 800; i <800+16*5; i++) {
+        buffer_in_map[0][i] = 0;
+    }
+    buffer_in_map[0][880] = UPDATE_ALL;
+    for (int i = 896; i < 896+256; i++) {
+        buffer_in_map[0][i] = 0;
+    }
+    // buffer_in_map[0][1136] = SEARCH;
+    // buffer_in_map[0][1137] = search_num;
+    // buffer_in_map[0][1152] = 0;
+    // for (int i = 32+1136; i < 16+1136+512; i += 16) {
+    //     buffer_in_map[0][i] = 0;
+    // }
 
     for (int i = 0; i < 32; i++) {
         // source_sw_results[i] = cam_appro(i);
-        source_sw_results[0][i] = cam_precise(i+32, 0);
+        source_sw_results[0][i+1] = cam_precise((i+16)*4, 0);
         // source_sw_results[1][i] = cam_precise(i+128, 1);
     }
+    source_sw_results[0][0] = UPDATE_ALL;// update end
 
     for (int i = 0; i < NK; i++){
-        for (int j = 0; j < 512; j++) {
+        for (int j = 0; j < 2048; j++) {
             buffer_out_map[i][j] = 0;
         }
     }
@@ -162,25 +178,19 @@ int main(int argc, char** argv) {
     }
     // for (int k = 0; k < 5; k++){
     xrt::run read_stage[NK];
-    // xrt::run rtl_run[NK];
     xrt::run write_stage[NK];
     for (int i = 0; i < NK; i++) {
         write_stage[i] = xrt::run(krnl_output[i]);
         read_stage[i] = xrt::run(krnl_input[i]);
-        // rtl_run[i] = xrt::run(rtl_kernel[i]);
     }
     for (int i = 0; i < NK; i++) {
         write_stage[i].set_arg(0, buffer_out[i]);
-        write_stage[i].set_arg(1, 32);
+        write_stage[i].set_arg(1, 1+32+1);
         write_stage[i].start();
 
         read_stage[i].set_arg(0, buffer_in[i]);
-        read_stage[i].set_arg(1, 17+32);
+        read_stage[i].set_arg(1, 17+33+5+17);
         read_stage[i].start();
-        
-        // rtl_run[i].set_arg(0, 64);
-        // rtl_run[i].set_arg(1, 0);
-        // rtl_run[i].start();
     }
 
     std::cout << "Launching RTL kernel" << std::endl;
@@ -189,26 +199,10 @@ int main(int argc, char** argv) {
     // ctrl_1_done = rtl_kernel[1].read_register(CTRL_1_DONE_REG_ADDR);
     // std::cout << "kernel1: ctrl_1_done = " << ctrl_1_done << std::endl;
 
-    // std::cout << "Reading LENGTH_R_REG_ADDR" << std::endl;
-    // uint32_t si;
-    // si = rtl_kernel.read_register(LENGTH_R_REG_ADDR);
-    // std::cout << "si = " << si << std::endl;
-
-    // while (!ctrl_1_done) {
-    //     std::cout << "suspend 1 s" << std::endl;
-    //     std::this_thread::sleep_for(std::chrono::seconds(1));
-    //     ctrl_1_done = rtl_kernel[0].read_register(CTRL_1_DONE_REG_ADDR);
-    // }
-    // std::cout << "1 stage done" << std::endl;
-    // uint32_t latency_cycle = rtl_kernel[0].read_register(A_REG_ADDR_CTRL);
-    // std::cout << "kernel0: latency_cycle = " << latency_cycle << std::endl;
-    // latency_cycle = rtl_kernel[1].read_register(A_REG_ADDR_CTRL);
-    // std::cout << "kernel1: latency_cycle = " << latency_cycle << std::endl;
-    sleep(5);
+    // sleep(20);
     for (int i = 0; i < NK; i++) {
-        // write_stage[i].wait();
+        write_stage[i].wait();
         read_stage[i].wait();
-        // rtl_run[i].wait();
     }
     // }
 
@@ -221,18 +215,18 @@ int main(int argc, char** argv) {
 
     std::cout << "Comparing results" << std::endl;
     int match = 0;
-    for (int i = 0; i < 32; i++) {
-        if (buffer_out_map[0][8*i] != source_sw_results[0][i]) {
+    for (int i = 0; i < 66; i++) {
+        if (buffer_out_map[0][16*i] != source_sw_results[0][i]) {
             std::cout << "Error: Result mismatch" << std::endl;
             std::cout << "i = " << i << " Software result = " << source_sw_results[0][i]
-                      << " Device result = " << buffer_out_map[0][8*i] << std::endl;
+                      << " Device result = " << buffer_out_map[0][16*i] << std::endl;
             // std::cout << "1 num = " << buffer_out_map[8*i+1] << std::endl;
             match = 1;
         }
         else 
         {
             std::cout << "i = " << i << " Software result = " << source_sw_results[0][i]
-                      << " Device result = " << buffer_out_map[0][8*i] << std::endl;
+                      << " Device result = " << buffer_out_map[0][16*i] << std::endl;
         // std::cout << "1 num = " << buffer_out_map[8*i+1] << std::endl;}
         }
     }
