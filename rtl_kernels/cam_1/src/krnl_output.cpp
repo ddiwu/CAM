@@ -18,12 +18,48 @@
 #include <hls_stream.h>
 
 extern "C" {
-void krnl_output(ap_uint<512>* out, int size, hls::stream<ap_uint<512>>& outStream) {
-// Auto-pipeline is going to apply pipeline to this loop
-mem_wr:
-    for (int i = 0; i < size; i++) {
-// #pragma HLS LOOP_TRIPCOUNT min = c_size max = c_size
-        out[i] = outStream.read();
-    }
+// void krnl_output(ap_uint<512>* out, int size, hls::stream<ap_uint<512>>& outStream) {
+// // Auto-pipeline is going to apply pipeline to this loop
+// mem_wr:
+//     for (int i = 0; i < size; i++) {
+// // #pragma HLS LOOP_TRIPCOUNT min = c_size max = c_size
+//         out[i] = outStream.read();
+//     }
+// }
+
+//test
+void krnl_output(ap_uint<512>* out, int size, hls::stream<ap_uint<512>>& outStream1, 
+                                                hls::stream<ap_uint<512>>& outStream2, 
+                                                hls::stream<ap_uint<512>>& outStream3, 
+                                                hls::stream<ap_uint<512>>& outStream4, 
+                                                hls::stream<ap_uint<512>>& outStream5, 
+                                                hls::stream<ap_uint<512>>& outStream6, 
+                                                hls::stream<ap_uint<512>>& outStream7, 
+                                                hls::stream<ap_uint<512>>& outStream8,
+                                                hls::stream<ap_uint<512>>& outStream9,
+                                                hls::stream<ap_uint<512>>& outStream10,
+                                                hls::stream<ap_uint<512>>& outStream11) {
+    ap_uint<512> result[11];
+    mem_wr:
+        for (int i = 0; i < size; i++)
+        {
+            result[0] = outStream1.read();
+            result[1] = outStream2.read();
+            result[2] = outStream3.read();
+            result[3] = outStream4.read();
+            result[4] = outStream5.read();
+            result[5] = outStream6.read();
+            result[6] = outStream7.read();
+            result[7] = outStream8.read();
+            result[8] = outStream9.read();
+            result[9] = outStream10.read();
+            result[10] = outStream11.read();
+            bool valid = (result[0] != 511) || (result[1] != 511) || 
+                            (result[2] != 511) || (result[3] != 511) || (result[4] != 511) || (result[5] != 511) || 
+                            (result[6] != 511) || (result[7] != 511) || (result[8] != 511) || (result[9] != 511) || (result[10] != 511);
+            if (valid) {
+                out[i] = 100;
+            }
+        }
 }
 }
