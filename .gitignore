@@ -42,24 +42,6 @@ rtl_kernels/cam*/*.csv
 rtl_kernels/cam*/.run
 rtl_kernels/cam*/.ipcache
 sys_opt/
-host_xrt/asynchronous_xrt/
-host_xrt/copy_buffer_xrt/
-host_xrt/data_transfer_xrt/
-host_xrt/hbm_simple_xrt/
-host_xrt/host_memory_copy_buffer_xrt/
-host_xrt/host_memory_copy_kernel_xrt/
-host_xrt/host_memory_simple_xrt/
-host_xrt/kernel_chain/
-host_xrt/mailbox_auto_restart_xrt/
-host_xrt/mult_compute_units_xrt/
-host_xrt/multiple_cus_asymmetrical_xrt/
-host_xrt/p2p_fpga2fpga_xrt/
-host_xrt/p2p_simple_xrt/
-host_xrt/streaming_free_running_k2k_xrt/
-host_xrt/streaming_k2k_mm_xrt/
-host_xrt/cam*/.ipcache/
-host_xrt/cam*/.run/
-host_xrt/cam*/.Xil/
-host_xrt/cam*/package*
+host_xrt/*
 
 
