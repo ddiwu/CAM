@@ -1,18 +1,3 @@
-/**
-* Copyright (C) 2019-2021 Xilinx, Inc
-*
-* Licensed under the Apache License, Version 2.0 (the "License"). You may
-* not use this file except in compliance with the License. A copy of the
-* License is located at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-* WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-* License for the specific language governing permissions and limitations
-* under the License.
-*/
 #include <ap_axi_sdata.h>
 #include <ap_int.h>
 #include <hls_stream.h>
@@ -39,9 +24,10 @@
 
 #define get_data_search_one(x) (x.range(31, 0))
 #define get_table_id_search_one(x) (x.range(95, 64))
+#define set_size_search_one(x, size) (x.range(479, 448) = size)
 
 extern "C" {
-void increment(hls::stream<ap_axiu<512, 0, 0, 0>>& input,
+void router(hls::stream<ap_axiu<512, 0, 0, 0>>& input,
                   hls::stream<ap_axiu<512, 0, 0, CUSTOMIZED_BLOCK_NUM>>& output) {
 #pragma HLS interface ap_ctrl_none port = return
 #pragma HLS interface axis port = input
@@ -111,7 +97,7 @@ void increment(hls::stream<ap_axiu<512, 0, 0, 0>>& input,
                         return idx; 
                     }();
                     index += offset_update_one / CUSTOMIZED_BLOCK_SIZE;
-                    out_packet.data = UPDATE_ONE;
+                    out_packet.data = ((ap_int<512>)UPDATE_ONE) << 480;
                     bit_dest_temp = (ap_uint<CUSTOMIZED_BLOCK_NUM>)(1 << index);
                     out_packet.dest |= bit_dest_temp;
                     output << (out_packet);
@@ -120,14 +106,15 @@ void increment(hls::stream<ap_axiu<512, 0, 0, 0>>& input,
                 } else if (state == UPDATE_ALL) {
                     index = 0; // update all is always starts from block 0
                     counter_update_all = 0;
-                    out_packet.data = UPDATE_ALL;
+                    out_packet.data = ((ap_int<512>)UPDATE_ALL) << 480; // set to top 32 bits
                     out_packet.dest = (1 << (CUSTOMIZED_BLOCK_NUM + 1)) - 1; // set all bits to 1
                     output << (out_packet);
                     state = GET_ROUTING_TABLE;
                     std::cout << "[OUTPUT] status: " << state << " data: " << std::hex << out_packet.data << " dest: " << out_packet.dest << std::endl;
 
                 } else if (state == SEARCH_ONE) {
-                    out_packet.data = SEARCH_ONE;
+                    out_packet.data = ((ap_int<512>)SEARCH_ONE) << 480; // set to top 32 bits
+                    set_size_search_one(out_packet.data, 1); // size = 1.
                     table_id = get_table_id_search_one(in_packet.data);
                     data_search_one = get_data_search_one(in_packet.data);
                     bit_dest_temp = 0;
@@ -143,7 +130,7 @@ void increment(hls::stream<ap_axiu<512, 0, 0, 0>>& input,
                     std::cout << "[OUTPUT] status: " << state << " data: " << std::hex << out_packet.data << " dest: " << out_packet.dest << std::endl;
 
                 } else if (state == SEARCH_MQ) { // no need size
-                    out_packet.data = SEARCH_MQ;
+                    out_packet.data = ((ap_int<512>)SEARCH_MQ) << 480; // set to top 32 bits
                     out_packet.dest = (1 << (CUSTOMIZED_BLOCK_NUM + 1)) - 1; // set all bits to 1
                     output << (out_packet);
                     counter_search_mq = (CUSTOMIZED_BLOCK_NUM - 1) / 16 + 1;
@@ -229,6 +216,5 @@ void increment(hls::stream<ap_axiu<512, 0, 0, 0>>& input,
     out_packet.dest = (1 << (CUSTOMIZED_BLOCK_NUM + 1)) - 1; // set all bits to 1
     output << (out_packet);
     std::cout << "[OUTPUT] status: " << state << " data: " << std::hex << out_packet.data << " dest: " << out_packet.dest << std::endl;
-    std::cout << "Increment finished" << std::endl;
 }
 }

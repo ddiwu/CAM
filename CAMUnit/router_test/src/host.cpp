@@ -16,34 +16,7 @@
 
 /*******************************************************************************
 Description:
-    Kernel to kernel streaming example consisting of three compute
-    units in a linear hardware pipeline.
-
-    1) Memory read
-        This Kernel reads the input vector from Global Memory and streams its
-output.
-
-    2) Increment
-        This Kernel reads stream input, increments the value and streams to
-output.
-
-    3) Memory write
-        This Kernel reads from its input stream and writes into Global Memory.
-
-                     _____________
-                    |             |<----- Global Memory
-                    |  mem_read   |
-                    |_____________|------+
-                     _____________       | AXI4 Stream
-                    |             |<-----+
-                    |  increment  |
-                    |_____________|----->+
-                     ______________      | AXI4 Stream
-                    |              |<----+
-                    |  mem_write   |
-                    |______________|-----> Global Memory
-
-
+    Kernel test for router module in CAM unit.
 *******************************************************************************/
 
 #include "cmdlineparser.h"
@@ -235,7 +208,7 @@ int main(int argc, char** argv) {
         std::cout << "source_hw_results[" << i << "] = " << std::endl;
         for (int j = 0; j < data_size; j++) {
             if (source_hw_results[i][j] == (~ap_int<512>(0))) break;
-            std::cout << std::hex << std::setfill('0') << std::setw(128) << source_hw_results[i][j] << " ";
+            std::cout << std::hex << std::setfill('0') << std::setw(128) << (ap_uint<512>)source_hw_results[i][j] << std::endl;
         }
         std::cout << std::endl;
     }

@@ -7,7 +7,7 @@
 #define CUSTOMIZED_BLOCK_NUM 16 
 
 extern "C" {
-void pre_write(hls::stream<ap_axiu<512, 0, 0, CUSTOMIZED_BLOCK_NUM>>& in, 
+void post_router(hls::stream<ap_axiu<512, 0, 0, CUSTOMIZED_BLOCK_NUM>>& in, 
                hls::stream<ap_axiu<512, 0, 0, 0>>& out_1,
                hls::stream<ap_axiu<512, 0, 0, 0>>& out_2,
                hls::stream<ap_axiu<512, 0, 0, 0>>& out_3,
@@ -48,16 +48,18 @@ void pre_write(hls::stream<ap_axiu<512, 0, 0, CUSTOMIZED_BLOCK_NUM>>& in,
 #pragma HLS pipeline II=1
         ap_axiu<512, 0, 0, CUSTOMIZED_BLOCK_NUM> v = in.read();
         out_packet.data = v.data;
+
         if (v.last) {
             break;
         }
+
         ap_int<CUSTOMIZED_BLOCK_NUM> dest = v.dest;
 
-        // Check each bit of v.dest and write to corresponding output stream
+        // Check each bit of v.dest using range(i, i) and write to corresponding output stream
         for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
 #pragma HLS unroll
-            if (dest.range(i,i)) {
-                if (i == 0) out_1.write(out_packet);
+            if (dest.range(i, i)) {
+                                if (i == 0) out_1.write(out_packet);
                 if (i == 1) out_2.write(out_packet);
                 if (i == 2) out_3.write(out_packet);
                 if (i == 3) out_4.write(out_packet);
@@ -76,6 +78,8 @@ void pre_write(hls::stream<ap_axiu<512, 0, 0, CUSTOMIZED_BLOCK_NUM>>& in,
             }
         }
     }
+
+    // Send end-of-stream packet to all output streams
     out_packet.data = 0;
     out_packet.last = 1;
     out_1.write(out_packet);

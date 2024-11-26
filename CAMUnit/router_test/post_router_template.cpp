@@ -7,7 +7,7 @@
 #define CUSTOMIZED_BLOCK_NUM 16 
 
 extern "C" {
-void pre_write(hls::stream<ap_axiu<512, 0, 0, CUSTOMIZED_BLOCK_NUM>>& in, 
+void post_router(hls::stream<ap_axiu<512, 0, 0, CUSTOMIZED_BLOCK_NUM>>& in, 
                {{OUTPUT_STREAM_DECLARATIONS}}) {
 #pragma HLS interface axis port=in
 {{PRAGMA_DECLARATIONS}}

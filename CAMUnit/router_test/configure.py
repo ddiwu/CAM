@@ -11,9 +11,9 @@ def modify_config_file(template_file, output_file, customized_block_num):
     with open(template_file, "r") as f:
         template = f.read()
 
-    # Generate dynamic stream_connect lines for pre_write outputs
+    # Generate dynamic stream_connect lines for post_router outputs
     stream_connect_outputs = "\n".join(
-        [f"stream_connect=pre_write_1.out_{i + 1}:mem_write_{i + 1}.stream" for i in range(customized_block_num)]
+        [f"stream_connect=post_router_1.out_{i + 1}:mem_write_{i + 1}.stream" for i in range(customized_block_num)]
     )
 
     # Replace placeholders in the template
@@ -103,11 +103,11 @@ def generate_kernel_from_template(template_file, output_file, customized_block_n
 
 if __name__ == "__main__":
     # Configuration for the script
-    input_cfg = "krnl_incr.cfg"  # Input configuration file
-    output_cfg = "krnl_backup.cfg"  # Output modified configuration file
+    input_cfg = "krnl_template.cfg"  # Input configuration file
+    output_cfg = "router.cfg"  # Output modified configuration file
     folder_path = "./src"  # Path to the source folder containing .cpp and .h files
-    template_file = "./pre_write_template.cpp"  # Template file for the kernel
-    output_kernel_file = "./src/pre_write_backup.cpp"  # Generated kernel file
+    template_file = "./post_router_template.cpp"  # Template file for the kernel
+    output_kernel_file = "./src/post_router.cpp"  # Generated kernel file
     customized_block_num = 16  # New value for CUSTOMIZED_BLOCK_NUM
     customized_block_size = 128  # New value for CUSTOMIZED_BLOCK_SIZE
 

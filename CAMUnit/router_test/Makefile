@@ -45,7 +45,7 @@ help::
 ############################## Setting up Project Variables ##############################
 # Points to top directory of Git repository
 # MK_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-# COMMON_REPO ?= $(shell bash -c 'export MK_PATH=$(MK_PATH); echo $${MK_PATH%host_xrt/streaming_free_running_k2k_xrt/*}')
+# COMMON_REPO ?= $(shell bash -c 'export MK_PATH=$(MK_PATH); echo $${MK_PATH%host_xrt/router_host/*}')
 # PWD = $(shell readlink -f .)
 # XF_PROJ_ROOT = $(shell readlink -f $(COMMON_REPO))
 
@@ -71,7 +71,7 @@ RESULT_STRING = TEST PASSED
 
 VPP := v++
 VPP_PFLAGS := 
-CMD_ARGS = -x $(BUILD_DIR)/krnl_incr.xclbin
+CMD_ARGS = -x $(BUILD_DIR)/router.xclbin
 
 include ../../common/includes/opencl/opencl.mk
 CXXFLAGS += $(opencl_CXXFLAGS) -Wall -O0 -g -std=c++17
@@ -100,17 +100,17 @@ endif
 
 
 # Kernel linker flags
-VPP_LDFLAGS_krnl_incr += --config ./krnl.cfg
+VPP_LDFLAGS_krnl_incr += --config ./router.cfg
 
-EXECUTABLE = ./streaming_free_running_k2k_xrt
+EXECUTABLE = ./router_host
 EMCONFIG_DIR = $(TEMP_DIR)
 
 ############################## Declaring Binary Containers ##############################
-BINARY_CONTAINERS += $(BUILD_DIR)/krnl_incr.xclbin
+BINARY_CONTAINERS += $(BUILD_DIR)/router.xclbin
 BINARY_CONTAINER_krnl_incr_OBJS += $(TEMP_DIR)/mem_read.xo
-BINARY_CONTAINER_krnl_incr_OBJS += $(TEMP_DIR)/increment.xo
+BINARY_CONTAINER_krnl_incr_OBJS += $(TEMP_DIR)/router.xo
 BINARY_CONTAINER_krnl_incr_OBJS += $(TEMP_DIR)/mem_write.xo
-BINARY_CONTAINER_krnl_incr_OBJS += $(TEMP_DIR)/pre_write.xo
+BINARY_CONTAINER_krnl_incr_OBJS += $(TEMP_DIR)/post_router.xo
 
 ############################## Setting Targets ##############################
 CP = cp -rf
@@ -128,22 +128,22 @@ build: check-vitis check-device $(BINARY_CONTAINERS)
 xclbin: build
 
 ############################## Setting Rules for Binary Containers (Building Kernels) ##############################
-$(TEMP_DIR)/pre_write.xo: src/pre_write.cpp
+$(TEMP_DIR)/post_router.xo: src/post_router.cpp
 	mkdir -p $(TEMP_DIR)
-	$(VPP) $(VPP_FLAGS) -c -k pre_write --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
+	$(VPP) $(VPP_FLAGS) -c -k post_router --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
 $(TEMP_DIR)/mem_read.xo: src/mem_read.cpp
 	mkdir -p $(TEMP_DIR)
 	$(VPP) $(VPP_FLAGS) -c -k mem_read --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
-$(TEMP_DIR)/increment.xo: src/increment.cpp
+$(TEMP_DIR)/router.xo: src/router.cpp
 	mkdir -p $(TEMP_DIR)
-	$(VPP) $(VPP_FLAGS) -c -k increment --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
+	$(VPP) $(VPP_FLAGS) -c -k router --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
 $(TEMP_DIR)/mem_write.xo: src/mem_write.cpp
 	mkdir -p $(TEMP_DIR)
 	$(VPP) $(VPP_FLAGS) -c -k mem_write --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
-$(BUILD_DIR)/krnl_incr.xclbin: $(BINARY_CONTAINER_krnl_incr_OBJS)
+$(BUILD_DIR)/router.xclbin: $(BINARY_CONTAINER_krnl_incr_OBJS)
 	mkdir -p $(BUILD_DIR)
-	$(VPP) $(VPP_FLAGS) -l $(VPP_LDFLAGS) --temp_dir $(TEMP_DIR) $(VPP_LDFLAGS_krnl_incr) -o'$(BUILD_DIR)/krnl_incr.link.xclbin' $(+)
-	$(VPP) -p $(BUILD_DIR)/krnl_incr.link.xclbin -t $(TARGET) --platform $(PLATFORM) --package.out_dir $(PACKAGE_OUT) -o $(BUILD_DIR)/krnl_incr.xclbin
+	$(VPP) $(VPP_FLAGS) -l $(VPP_LDFLAGS) --temp_dir $(TEMP_DIR) $(VPP_LDFLAGS_krnl_incr) -o'$(BUILD_DIR)/router.link.xclbin' $(+)
+	$(VPP) -p $(BUILD_DIR)/router.link.xclbin -t $(TARGET) --platform $(PLATFORM) --package.out_dir $(PACKAGE_OUT) -o $(BUILD_DIR)/router.xclbin
 
 ############################## Setting Rules for Host (Building Host Executable) ##############################
 $(EXECUTABLE): $(HOST_SRCS) | check-xrt
