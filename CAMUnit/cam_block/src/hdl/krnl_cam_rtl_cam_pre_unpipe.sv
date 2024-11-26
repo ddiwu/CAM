@@ -1,7 +1,8 @@
-`define IDLE 32'hffffff00
-`define UPDATE_ALL 32'hffffff01
-`define SEARCH 32'hffffff03
-`define UPDATE_ONE 32'hffffff02
+
+`define IDLE 0
+`define UPDATE_ALL 1
+`define SEARCH 2
+`define UPDATE_ONE 3
 `define BINARY
 
 // `default_nettype none

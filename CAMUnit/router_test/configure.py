@@ -1,3 +1,4 @@
+import argparse
 import os
 import re
 
@@ -102,21 +103,18 @@ def generate_kernel_from_template(template_file, output_file, customized_block_n
 
 
 if __name__ == "__main__":
-    # Configuration for the script
-    input_cfg = "krnl_template.cfg"  # Input configuration file
-    output_cfg = "router.cfg"  # Output modified configuration file
-    folder_path = "./src"  # Path to the source folder containing .cpp and .h files
-    template_file = "./post_router_template.cpp"  # Template file for the kernel
-    output_kernel_file = "./src/post_router.cpp"  # Generated kernel file
-    customized_block_num = 16  # New value for CUSTOMIZED_BLOCK_NUM
-    customized_block_size = 128  # New value for CUSTOMIZED_BLOCK_SIZE
+    parser = argparse.ArgumentParser(description="Configure router module with custom parameters.")
+    parser.add_argument("--block_num", type=int, required=True, help="Number of customized blocks")
+    parser.add_argument("--block_size", type=int, required=True, help="Size of each customized block")
+    args = parser.parse_args()
 
-    # Step 1: Modify the config file
-    modify_config_file(input_cfg, output_cfg, customized_block_num)
+    input_cfg = "krnl_template.cfg"
+    output_cfg = "router.cfg"
+    folder_path = "./src"
+    template_file = "./post_router_template.cpp"
+    output_kernel_file = "./src/post_router.cpp"
 
-    # Step 2: Generate the kernel code from the template
-    generate_kernel_from_template(template_file, output_kernel_file, customized_block_num)
-
-    # Step 3: Update macro values in source files
-    replace_macro_values(folder_path, customized_block_num, customized_block_size)
+    modify_config_file(input_cfg, output_cfg, args.block_num)
+    generate_kernel_from_template(template_file, output_kernel_file, args.block_num)
+    replace_macro_values(folder_path, args.block_num, args.block_size)
 

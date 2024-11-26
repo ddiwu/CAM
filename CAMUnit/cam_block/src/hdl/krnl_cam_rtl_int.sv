@@ -1,7 +1,7 @@
-`define IDLE 32'hffffff00
-`define UPDATE_ALL 32'hffffff01
-`define SEARCH 32'hffffff03
-`define UPDATE_ONE 32'hffffff02
+`define IDLE 0
+`define UPDATE_ALL 1
+`define SEARCH 2
+`define UPDATE_ONE 3
 `default_nettype none
 `timescale 1 ns / 1 ps 
 (* DONT_TOUCH = "FALSE" *)
@@ -124,7 +124,7 @@ always_ff @(posedge ap_clk) begin
   end
 end
 
-assign compare_num = p0_TDATA[479:448];
+assign compare_num = p0_TDATA[61:32];
 
 krnl_cam_rtl_FSM #(
   .C_DATA_WIDTH ( C_DATA_WIDTH ),

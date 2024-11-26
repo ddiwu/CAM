@@ -1,4 +1,5 @@
 import os
+import argparse
 
 
 def replace_macros_in_file(input_file_path, output_dir, replacements):
@@ -43,19 +44,22 @@ def replace_macros_in_file(input_file_path, output_dir, replacements):
 
 
 if __name__ == "__main__":
-    # Macro replacement values
-    customized_bus_width = "512"
-    customized_cam_size = "256"
-    customized_storage_type = "BINARY"
-    customized_mask = "48'h0"
+    # Command-line arguments
+    parser = argparse.ArgumentParser(description="Replace macros in CAM block template files with custom values.")
+    parser.add_argument("--bus_width", type=str, required=True, help="Customized bus width.")
+    parser.add_argument("--cam_size", type=str, required=True, help="Customized CAM size.")
+    parser.add_argument("--storage_type", type=str, required=True, help="Customized storage type.")
+    parser.add_argument("--mask", type=str, required=True, help="Customized mask.")
+
+    args = parser.parse_args()
 
     # Define replacements for each file
     source_files = {
-        "./template/krnl_cam_rtl.v": {"CUSTORMIZED_BUS_WIDTH": customized_bus_width},
-        "./template/krnl_cam_rtl_int.sv": {"CUSTORMIZED_CAM_SIZE": customized_cam_size},
+        "./template/krnl_cam_rtl.v": {"CUSTORMIZED_BUS_WIDTH": args.bus_width},
+        "./template/krnl_cam_rtl_int.sv": {"CUSTORMIZED_CAM_SIZE": args.cam_size},
         "./template/krnl_cam_rtl_cam_pre_unpipe.sv": {
-            "CUSTORMIZED_STORAGE_TYPE": customized_storage_type,
-            "CUSTORMIZED_MASK": customized_mask
+            "CUSTORMIZED_STORAGE_TYPE": args.storage_type,
+            "CUSTORMIZED_MASK": args.mask
         }
     }
 
