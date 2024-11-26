@@ -28,31 +28,11 @@ extern "C" {
 // }
 
 //test
-void krnl_input(ap_uint<512>* in, int size, hls::stream<ap_uint<512>>& inStream1, 
-                                            hls::stream<ap_uint<512>>& inStream2, 
-                                            hls::stream<ap_uint<512>>& inStream3, 
-                                            hls::stream<ap_uint<512>>& inStream4, 
-                                            hls::stream<ap_uint<512>>& inStream5, 
-                                            hls::stream<ap_uint<512>>& inStream6, 
-                                            hls::stream<ap_uint<512>>& inStream7, 
-                                            hls::stream<ap_uint<512>>& inStream8,
-                                            hls::stream<ap_uint<512>>& inStream9,
-                                            hls::stream<ap_uint<512>>& inStream10,
-                                            hls::stream<ap_uint<512>>& inStream11) {
+void krnl_input(ap_uint<512>* in, int size, hls::stream<ap_uint<512>>& inStream1) {
     mem_rd:
         for (int i = 0; i < size; i++)
         {
             inStream1 << in[i];
-            inStream2 << in[i];
-            inStream3 << in[i];
-            inStream4 << in[i];
-            inStream5 << in[i];
-            inStream6 << in[i];
-            inStream7 << in[i];
-            inStream8 << in[i];
-            inStream9 << in[i];
-            inStream10 << in[i];
-            inStream11 << in[i];
         }
 }
 }

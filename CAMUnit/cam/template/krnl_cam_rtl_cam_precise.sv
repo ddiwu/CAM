@@ -1,8 +1,8 @@
-`define IDLE 32'hffffff00
-`define UPDATE_ALL 32'hffffff01
-`define SEARCH 32'hffffff03
-`define UPDATE_ONE 32'hffffff02
-`define BINARY
+
+`define IDLE 0
+`define UPDATE_ALL 1
+`define SEARCH 2
+`define UPDATE_ONE 3
 
 // `default_nettype none
 (* DONT_TOUCH = "FALSE" *)
@@ -49,8 +49,8 @@ logic [31:0] ctrl_1_done_in;
 // logic [17:0] B_in;
 // logic [7:0] num_index_1 [CAM_SIZE], num_index_2 [CAM_SIZE/2], num_index_3 [CAM_SIZE/4], num_index_4 [CAM_SIZE/8], num_index_5 [CAM_SIZE/16], num_index_6 [CAM_SIZE/32], num_index_7 [CAM_SIZE/64], num_index_8 [CAM_SIZE/128], num_index_9;
 // logic [5:0] one_num_1 [CAM_SIZE], one_num_2 [CAM_SIZE/2], one_num_3 [CAM_SIZE/4], one_num_4 [CAM_SIZE/8], one_num_5 [CAM_SIZE/16], one_num_6 [CAM_SIZE/32], one_num_7 [CAM_SIZE/64], one_num_8 [CAM_SIZE/128], one_num_9;
-logic [INDEX_WIDTH:0] num_index [DIVITION];
-logic [INDEX_WIDTH:0] num_index_final;
+logic [INDEX_WIDTH:0] num_index [DIVITION], num_index_final;
+logic [INDEX_WIDTH:0] num_index_later;
 logic [INDEX_WIDTH-1:0] write_index; 
 // logic [47:0] data_in [CAM_SIZE];
 // logic [47:0] data_in1 [CAM_SIZE];
@@ -60,45 +60,12 @@ logic ctrl1, ctrl_1_done;
 
 logic s_tvalid1 [16], s_tvalid2 [256];
 logic [C_DATA_WIDTH-1:0] s_tdata1 [16], s_tdata2 [256];
+
+logic [29:0] A_cas [128];
+logic [17:0] B_cas [128];
 /////////////////////////////////////////////////////////////////////////////
 // Logic
 /////////////////////////////////////////////////////////////////////////////
-//fanout 
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     for (int i = 0; i < 16; i++) begin
-//       s_tvalid1[i] <= 0;
-//       s_tdata1[i] <= 0;
-//     end
-//     for (int i = 0; i < 256; i++) begin
-//       s_tvalid2[i] <= 0;
-//       s_tdata2[i] <= 0;
-//     end
-//   end
-//   else begin
-//     for (int i = 0; i < 16; i++) begin
-//       s_tvalid1[i] <= s_tvalid[0];
-//       s_tdata1[i] <= s_tdata[0];
-//     end
-//     for (int i = 0; i < 256; i++) begin
-//       s_tvalid2[i] <= s_tvalid1[i/16];
-//       s_tdata2[i] <= s_tdata1[i/16];
-//     end
-//   end
-// end
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     for (int i = 0; i < 256; i++) begin
-//       ctrl1[i] <= 0;
-//     end
-//   end
-//   else begin
-//     for (int i = 0; i < 256; i++) begin
-//       ctrl1[i] <= ctrl_1_done[i];
-//     end
-//   end
-// end
-// assign ctrl_edge = !ctrl1[0] && ctrl_1_done[0];
 
 always_ff @(posedge aclk) begin
   if (areset) begin
@@ -116,25 +83,13 @@ always_ff @(posedge aclk) begin
   end
 end
 
-// always_ff @(posedge aclk) begin
-//   if (areset) begin
-//     update_all_end <= 0;
-//   end 
-//   else if (state == `UPDATE_ALL && &s_tvalid && write_index == (CAM_SIZE-8)) begin
-//     update_all_end <= 1;
-//   end
-//   else begin
-//     update_all_end <= 0;
-//   end
-// end
 always_comb begin
   update_all_end = (state == `UPDATE_ALL && &s_tvalid && write_index == (CAM_SIZE-16)) ? 1 : 0;
 end
 
-`ifndef TERNARY
 generate begin
   genvar i;
-  for (i = 0; i < CAM_SIZE; i++) begin
+  for (i = 0; i < CAM_SIZE/2; i++) begin
   DSP48E2 #(
     // Feature Control Attributes: Data Path Selection
     .AMULTSEL("A"),                    // Selects A input to multiplier (A, AD)
@@ -150,11 +105,11 @@ generate begin
     // Pattern Detector Attributes: Pattern Detection Configuration
     .AUTORESET_PATDET("NO_RESET"),     // No reset for pattern detection
     .AUTORESET_PRIORITY("RESET"),      // Priority of AUTORESET vs. CEP (CEP, RESET)
-    .MASK(48'h0),           // 48-bit mask value for pattern detect (1=ignore)
+    .MASK(48'h3fffffffffff),           // 48-bit mask value for pattern detect (1=ignore)
     .PATTERN(48'h000000000000),        // 48-bit pattern match for pattern detect
     .SEL_MASK("MASK"),                 // Select MASK value for pattern detection
     .SEL_PATTERN("PATTERN"),           // Select pattern value for pattern detection
-    .USE_PATTERN_DETECT("PATDET"),  // Disable pattern detection
+    .USE_PATTERN_DETECT("NO_PATDET"),  // Disable pattern detection
     // Programmable Inversion Attributes: Specifies built-in programmable inversion on specific pins
     .IS_ALUMODE_INVERTED(4'b0000),     // No inversion for ALUMODE
     .IS_CARRYIN_INVERTED(1'b0),        // No inversion for CARRYIN
@@ -196,6 +151,8 @@ generate begin
     // Data outputs: Data Ports
     .P(acc[i][47:0]),                   // 48-bit output: Result of A:B XOR C
     // Data inputs: Data Ports
+    .ACOUT(A_cas[i]),                   // 48-bit input: Cascade data output
+    .BCOUT(B_cas[i]),                   // 48-bit input: Cascade data output
     .A({16'b0, s_tdata[0][31:18]}),                   // 30-bit input: A data
     .B(s_tdata[0][17:0]),                   // 18-bit input: B data
     .C({16'b0, s_tdata[0][(i%16)*32+:32]}),                   // 48-bit input: C data
@@ -229,16 +186,16 @@ generate begin
 end
 end
 endgenerate
-`else
+
 generate begin
   genvar i;
-  for (i = 0; i < CAM_SIZE; i++) begin
+  for (i = CAM_SIZE/2; i < CAM_SIZE; i++) begin
   DSP48E2 #(
     // Feature Control Attributes: Data Path Selection
     .AMULTSEL("A"),                    // Selects A input to multiplier (A, AD)
-    .A_INPUT("DIRECT"),                // Selects A input source, "DIRECT" (A port) or "CASCADE" (ACIN port)
+    .A_INPUT("CASCADE"),                // Selects A input source, "DIRECT" (A port) or "CASCADE" (ACIN port)
     .BMULTSEL("B"),                    // Selects B input to multiplier (AD, B)
-    .B_INPUT("DIRECT"),                // Selects B input source, "DIRECT" (B port) or "CASCADE" (BCIN port)
+    .B_INPUT("CASCADE"),                // Selects B input source, "DIRECT" (B port) or "CASCADE" (BCIN port)
     .PREADDINSEL("A"),                 // Selects input to pre-adder (A, B)
     .RND(48'h000000000000),            // Rounding Constant
     .USE_MULT("NONE"),                 // Disable the multiplier, as multiplication is not needed
@@ -248,11 +205,11 @@ generate begin
     // Pattern Detector Attributes: Pattern Detection Configuration
     .AUTORESET_PATDET("NO_RESET"),     // No reset for pattern detection
     .AUTORESET_PRIORITY("RESET"),      // Priority of AUTORESET vs. CEP (CEP, RESET)
-    .MASK(48'h0),           // 48-bit mask value for pattern detect (1=ignore)
+    .MASK(48'h3fffffffffff),           // 48-bit mask value for pattern detect (1=ignore)
     .PATTERN(48'h000000000000),        // 48-bit pattern match for pattern detect
     .SEL_MASK("MASK"),                 // Select MASK value for pattern detection
     .SEL_PATTERN("PATTERN"),           // Select pattern value for pattern detection
-    .USE_PATTERN_DETECT("PATDET"),  // Disable pattern detection
+    .USE_PATTERN_DETECT("NO_PATDET"),  // Disable pattern detection
     // Programmable Inversion Attributes: Specifies built-in programmable inversion on specific pins
     .IS_ALUMODE_INVERTED(4'b0000),     // No inversion for ALUMODE
     .IS_CARRYIN_INVERTED(1'b0),        // No inversion for CARRYIN
@@ -294,8 +251,8 @@ generate begin
     // Data outputs: Data Ports
     .P(acc[i][47:0]),                   // 48-bit output: Result of A:B XOR C
     // Data inputs: Data Ports
-    .A({16'b0, s_tdata[0][31:18]}),                   // 30-bit input: A data
-    .B(s_tdata[0][17:0]),                   // 18-bit input: B data
+    .ACIN(A_cas[i-128]),                   // 30-bit input: A data
+    .BCIN(B_cas[i-128]),                   // 18-bit input: B data
     .C({16'b0, s_tdata[0][(i%16)*32+:32]}),                   // 48-bit input: C data
     // .C(data_in[i][47:0]),                   // 48-bit input: C data
     // Control inputs: Control Inputs/Status Bits
@@ -327,16 +284,18 @@ generate begin
 end
 end
 endgenerate
-`endif
 
 always_ff @(posedge aclk) begin
   if (areset) begin
     for (int i = 0; i < DIVITION; i++) begin
       num_index[i] <= {NO_INDEX{1'b1}};
     end
-    num_index_final <= {NO_INDEX{1'b1}};
+    // num_index_final <= {NO_INDEX{1'b1}};
+    num_index_later <= {NO_INDEX{1'b1}};
   end
   else begin
+    num_index_later <= num_index[0];
+
     for (int j = 0; j < DIVITION; j++) begin
       num_index[j] <= {NO_INDEX{1'b1}};
       for (int i = CAM_SIZE*j/DIVITION; i < CAM_SIZE*(j+1)/DIVITION; i++) begin
@@ -346,13 +305,22 @@ always_ff @(posedge aclk) begin
         end
       end
     end
-    num_index_final <= num_index[DIVITION-1];
-    for (int i = 0; i < DIVITION; i++) begin
-      if (num_index[i] != {NO_INDEX{1'b1}}) begin
-        num_index_final <= num_index[i];
-        break;
-      end
-    end
+    // num_index_final <= num_index[DIVITION-1];
+    // for (int i = 0; i < DIVITION; i++) begin
+    //   if (num_index[i] != {NO_INDEX{1'b1}}) begin
+    //     num_index_final <= num_index[i];
+    //     break;
+    //   end
+    // end
+  end
+end
+
+always_comb begin
+  if (num_index_later != {NO_INDEX{1'b1}}) begin
+    num_index_final = num_index_later;
+  end
+  else begin
+    num_index_final = num_index[1];
   end
 end
 
@@ -375,51 +343,20 @@ always_comb begin
   if (update_all_end) begin
     m_tvalid = 1;
   end
-  else if (state == `SEARCH) begin
+  else begin
     m_tvalid = m_tvalid4;
   end
-  else begin
-    m_tvalid = 0;
-  end
 end
-
-// logic [31:0] x;
-// logic [31:0] x1;
-// logic [31:0] x2;
-// logic [31:0] x3;
-
-// always_ff @(posedge aclk) begin
-//   if (state == `SEARCH) begin
-//     x <= s_tdata[0][31:0];
-//     x1 <= x;
-//     x2 <= x1;
-//     x3 <= x2;
-//   end
-// end
 
 always_comb begin
   if (update_all_end) begin
     // m_tdata = `UPDATE_ALL;
     m_tdata = 100;
   end
-  else if (state == `SEARCH) begin
+  else begin
     // m_tdata = {480'b0, x3};
     m_tdata = {{OUTPUT_ZERO{1'b0}}, num_index_final[INDEX_WIDTH:0]};
   end
-  else begin
-    m_tdata = 0;
-  end
 end
-
-// always_comb begin
-//   if (!ctrl_1_done[0]) begin
-//     s_tready = &s_tvalid /*&& write_index != 8'd248*/ ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
-//   end
-//   else begin
-//     // s_tready = (ctrl_edge || (compare_index == (CAM_SIZE - 8'd16) && &s_tvalid && m_tready)) ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
-//     s_tready = &s_tvalid /*&& m_tready*/ ? {C_NUM_CHANNELS{1'b1}} : {C_NUM_CHANNELS{1'b0}};
-//   end
-// end
-
 
 endmodule : krnl_cam_rtl_adder

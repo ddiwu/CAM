@@ -43,10 +43,10 @@
 
 #define NK 1
 #define search_num 32
-#define IDLE 0
-#define UPDATE_ALL 1
-#define SEARCH 2
-#define UPDATE_ONE 3
+#define IDLE 0xffffff00
+#define UPDATE_ALL 0xffffff01
+#define UPDATE_ONE 0xffffff02
+#define SEARCH 0xffffff03
 
 int val[NK][DATA_SIZE/2];
 

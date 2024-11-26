@@ -1,8 +1,9 @@
-`define IDLE 32'hffffff00
-`define UPDATE_ALL 32'hffffff01
-`define SEARCH 32'hffffff03
-`define UPDATE_ONE 32'hffffff02
-`define BINARY
+
+`define IDLE 0
+`define UPDATE_ALL 1
+`define SEARCH 2
+`define UPDATE_ONE 3
+`define CUSTORMIZED_STORAGE_TYPE
 
 // `default_nettype none
 (* DONT_TOUCH = "FALSE" *)
@@ -248,7 +249,7 @@ generate begin
     // Pattern Detector Attributes: Pattern Detection Configuration
     .AUTORESET_PATDET("NO_RESET"),     // No reset for pattern detection
     .AUTORESET_PRIORITY("RESET"),      // Priority of AUTORESET vs. CEP (CEP, RESET)
-    .MASK(48'h0),           // 48-bit mask value for pattern detect (1=ignore)
+    .MASK(CUSTORMIZED_MASK),           // 48-bit mask value for pattern detect (1=ignore)
     .PATTERN(48'h000000000000),        // 48-bit pattern match for pattern detect
     .SEL_MASK("MASK"),                 // Select MASK value for pattern detection
     .SEL_PATTERN("PATTERN"),           // Select pattern value for pattern detection

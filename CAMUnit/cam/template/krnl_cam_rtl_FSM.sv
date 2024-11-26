@@ -1,14 +1,14 @@
 `timescale 1ps/1ps
-`define IDLE 32'hffffff00
-`define UPDATE_ALL 32'hffffff01
-`define SEARCH 32'hffffff03
-`define UPDATE_ONE 32'hffffff02
+`define IDLE 0
+`define UPDATE_ALL 1
+`define SEARCH 2
+`define UPDATE_ONE 3
 
 // 1 is symble for transfering state
 
 module krnl_cam_rtl_FSM  #(
   parameter integer C_DATA_WIDTH  = 512,
-  parameter integer OP_CODE_WIDTH = 32
+  parameter integer OP_CODE_WIDTH = 3
 )
 ( 
   input  logic                    clk,
@@ -38,10 +38,10 @@ module krnl_cam_rtl_FSM  #(
   //   end
   // end
   always_comb begin 
-    if (state == `IDLE && data_in[511:480]==`SEARCH && data_in_valid) begin
+    if (state == `IDLE && data_in[31:0]==`SEARCH && data_in_valid) begin
       state_pulse = `SEARCH;
     end
-    else if (state == `IDLE && data_in[511:480]==`UPDATE_ONE && data_in_valid) begin
+    else if (state == `IDLE && data_in[31:0]==`UPDATE_ONE && data_in_valid) begin
       state_pulse = `UPDATE_ONE;
     end
     else begin
@@ -56,12 +56,12 @@ module krnl_cam_rtl_FSM  #(
     else begin
       case (state)
         `IDLE: begin
-          if (data_in[511:480]==`UPDATE_ALL && data_in_valid)
+          if (data_in[31:0]==`UPDATE_ALL && data_in_valid)
             state <= `UPDATE_ALL;
-          else if (data_in[511:480] ==`SEARCH && data_in_valid) begin
+          else if (data_in[31:0] ==`SEARCH && data_in_valid) begin
             state <= `SEARCH;
           end
-          else if (data_in[511:480]==`UPDATE_ONE && data_in_valid)
+          else if (data_in[31:0]==`UPDATE_ONE && data_in_valid)
             state <= `UPDATE_ONE;
           else
             state <= `IDLE;
