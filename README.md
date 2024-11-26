@@ -2,16 +2,16 @@
 
 ## Overview
 
-This project implements a **Configurable DSP-Based CAM Architecture** for FPGA platforms, [Paper](./paper/DSPCam.pdf). The architecture is designed for **scalability**, **efficiency**, and **multi-query support**, targeting applications like **graph analytics** and **databases**. 
+This project implements a **Configurable DSP-Based CAM Architecture** for FPGA platforms. The architecture is designed for **scalability**, **efficiency**, and **multi-query support**, targeting applications like **graph analytics** and **databases**.
 
 ## Features
 - **Hierarchical Design**:
-  - **CAM Cell**: Utilizes FPGA DSP slices for efficient storage and search.
+  - **CAM Cell**: Utilizes FPGA DSP slices for efficient storage and comparison operations.
   - **CAM Block**: Supports search and update operations.
   - **CAM Unit**: Manages multiple CAM blocks with routing for large-scale applications.
-- **Scalability**: Parameterized to adapt to diverse FPGA resources and requirements.
-- **Efficiency**: Optimized for performance using DSP slices and efficient routing.
-- **Multi-query Support**: Handles concurrent operations for high throughput.
+- **Scalability**: Parameterized to adapt as many DSPs as possible.
+- **Efficiency**: Optimized for both search efficiency and update efficiency.
+- **Multi-query Support**: Handles concurrent searches for high throughput and high memory resource utilization.
 - **Real-world Applications**: Suitable for graph-based problems like triangle counting.
 
 ---
@@ -20,18 +20,18 @@ This project implements a **Configurable DSP-Based CAM Architecture** for FPGA p
 
 ### Project Structure
 
-Each folder in this projectincludes:
+Each folder in this project includes:
 - **`param.cfg`**: Configuration parameters for the module.
 - **`configure.sh`**: A script to generate source files based on parameters.
-- **Core Sources**: Template files for kernel and configuration generation.
+- **Core Sources**: Template files for modules and configuration generation.
 
 ### Detailed Design
-![CAM unit architecture design](./paper/CAM_Unit.png "CAM unit architecture design")
+![CAM unit architecture design](./figure/CAM_Unit.png "CAM unit architecture design")
 
-## How to Use This Project
+## How to Use The CAM
 
 ### Step 1: Customizing Parameters
-Update the `param.cfg` file to set the desired values for the CAM architecture. This file allows you to define key parameters such as the number of blocks, block size, and other configuration options.
+Update the `param.cfg` file to set the desired values for the CAM architecture. This file allows you to define key parameters such as the block size, the numbe of blocks, and other configuration options.
 
 **Example `param.cfg`:**
 ```cfg
@@ -46,7 +46,7 @@ After updating the parameters, run the configuration script:
 ```
 
 ### Step 2: Compilation
-Compile the project for the target platform (e.g., software emulation, hardware emulation, or hardware). Replace TARGET with the desired target and specify your platform. We strongly recommend using the Vitis tool (2021.2 or later) to run the application.
+Compile the project for the target platform (e.g., software emulation, hardware emulation, or hardware). Replace TARGET with the desired target and specify your platform. We strongly recommend using the Vitis tool (2021.2 or later) to run the application on AMD U280 platform.
 ```bash
 make TARGET=<sw_emu/hw_emu/hw> PLATFORM=<FPGA platform>
 ``` 
