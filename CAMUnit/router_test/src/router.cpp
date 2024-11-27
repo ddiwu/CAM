@@ -14,6 +14,7 @@
 #define SEARCH_ONE 0xffffff03
 #define SEARCH_MQ 0xffffff04 // Multi-Query
 #define GET_ROUTING_TABLE 0xffffff05
+#define UPDATE_GROUP 0xffffff06
 
 #define get_state(x) (x.range(511, 480))
 
@@ -47,6 +48,7 @@ void router(hls::stream<ap_axiu<512, 0, 0, 0>>& input,
     int offset_update_one = -1; // offset for update one
     int table_id = -1; // table id for update one
     int counter_update_all = -1; // counter for update all
+    int counter_update_group = -1; // counter for update group
 
     int data_search_one = -1; // data for search one
     int counter_search_mq = -1; // counter for search multi-query
@@ -103,6 +105,26 @@ void router(hls::stream<ap_axiu<512, 0, 0, 0>>& input,
                     output << (out_packet);
                     std::cout << "[OUTPUT] status: " << state << " data: " << std::hex << out_packet.data << " dest: " << out_packet.dest << std::endl;
 
+                } else if (state == UPDATE_GROUP) {
+                    // TODO: update group
+                    table_id = get_table_id_update(in_packet.data);
+                    index = [&]() { 
+                        int idx = -1; 
+                        find_index: for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) { 
+                        #pragma HLS unroll
+                            if (routing_table[i] == table_id && idx == -1) idx = i; 
+                        } 
+                        return idx; 
+                    }();
+                    counter_update_group = [&]() {
+                        int s = 0;
+                        for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
+                        #pragma HLS unroll
+                            if (routing_table[i] == table_id) s++;
+                        }
+                        return s * (CUSTOMIZED_BLOCK_SIZE / 16);
+                    }();
+
                 } else if (state == UPDATE_ALL) {
                     index = 0; // update all is always starts from block 0
                     counter_update_all = 0;
@@ -145,6 +167,18 @@ void router(hls::stream<ap_axiu<512, 0, 0, 0>>& input,
                 output << (out_packet);
                 std::cout << "[OUTPUT] status: " << state << " data: " << std::hex << out_packet.data << " dest: " << out_packet.dest << std::endl;
                 state = IDLE;
+                break;
+            case UPDATE_GROUP:
+                in_packet = input.read();
+                counter_update_group--;
+                if (counter_update_group % (CUSTOMIZED_BLOCK_SIZE / 16) == 0) {index++;}
+                if (counter_update_group == 0) {
+                    state = IDLE;
+                }
+                out_packet.dest = 1 << index;
+                out_packet.data = in_packet.data;
+                output << (out_packet);
+                std::cout << "[OUTPUT] status: " << state << " data: " << std::hex << out_packet.data << " dest: " << out_packet.dest << std::endl;
                 break;
             case UPDATE_ALL:
                 in_packet = input.read();
