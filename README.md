@@ -31,7 +31,7 @@ Each folder in this project includes:
 ![CAM unit architecture design](./figure/CAM_Unit.png "CAM unit architecture design")
 
 ### Implementation layout on FPGA board
-<img src="./figure/resource_layout.png" alt="Implementation layout on FPGA board" title="Implementation layout on FPGA board" width="800"/>
+![Implementation layout on FPGA board](./figure/resource_layout.png "Implementation layout on FPGA board")
 
 ## How to Use The CAM
 
