@@ -70,6 +70,7 @@ LAUNCH_EMULATOR = $(PACKAGE_OUT)/launch_$(TARGET).sh
 RESULT_STRING = TEST PASSED
 
 VPP := v++
+VIVADO := $(XILINX_VIVADO)/bin/vivado
 VPP_PFLAGS := 
 CMD_ARGS = -x $(BUILD_DIR)/triangle_count.xclbin
 
@@ -107,6 +108,7 @@ EMCONFIG_DIR = $(TEMP_DIR)
 
 ############################## Declaring Binary Containers ##############################
 BINARY_CONTAINERS += $(BUILD_DIR)/triangle_count.xclbin
+BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/rtl_cam.xo
 BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/triangle_count.xo
 BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/router_tc.xo
 BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/mem_write.xo
@@ -127,6 +129,9 @@ build: check-vitis check-device $(BINARY_CONTAINERS)
 xclbin: build
 
 ############################## Setting Rules for Binary Containers (Building Kernels) ##############################
+$(TEMP_DIR)/rtl_cam.xo: scripts/package_kernel.tcl scripts/gen_rtl_cam_xo.tcl src/hdl/*.sv src/hdl/*.v $(TRIGGER_FILE)
+	mkdir -p $(TEMP_DIR)
+	$(VIVADO) -mode batch -source scripts/gen_rtl_cam_xo.tcl -tclargs $(TEMP_DIR)/rtl_cam.xo cam $(TARGET) $(PLATFORM) $(XSA)
 $(TEMP_DIR)/triangle_count.xo: src/triangle_count.cpp
 	mkdir -p $(TEMP_DIR)
 	$(VPP) $(VPP_FLAGS) -c -k triangle_count --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
