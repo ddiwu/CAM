@@ -144,8 +144,8 @@ Follow the same steps as above but replace sw_emu with hw_emu during the compila
 
 
 ---
-## Triangle Counting on FPGAs
-This example demonstrates triangle counting on FPGAs using a CAM (Content Addressable Memory) implementation. The example utilizes an edge-centric triangle counting algorithm, where the adjacency lists of the source and destination vertices are analyzed to compute the number of triangles in the graph.
+## Triangle Counting on FPGA
+This example demonstrates triangle counting on FPGA using CAM (Content Addressable Memory). The example utilizes an edge-centric triangle counting algorithm, where the adjacency lists of the source and destination vertices are analyzed to compute the number of triangles in the graph.
 
 ### **Functionality**
 
@@ -169,8 +169,8 @@ This CAM-based implementation provides high performance by leveraging the parall
 
   ## copy  your graph datasets to the ./TriangleCount/dataset/ directory
   cd ./TriangleCount/dataset/  
-  ## make sure the graph datasets have three files: edge_list.txt, csr_col.txt, csr_row.txt. Note that csr_row.txt contains the doubled vertex list based on the original csr_row format in CSR representation.
-  ## (please refer to our test graph datasets for detailed format)
+  ## make sure the graph datasets have three files: edge_list.txt, csr_col.txt, csr_row_2.txt.
+  ## (please refer to our test graph dataset in ./TriangleCount/dataset/ for detailed format)
   ```
 1. **Navigate to the Example Directory**:
   ```bash
