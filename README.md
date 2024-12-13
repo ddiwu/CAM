@@ -1,4 +1,4 @@
-# Configurable DSP-Based CAM Architecture Project
+# Configurable DSP-Based CAM on FPGAs
 
 ## Overview
 
@@ -9,9 +9,9 @@ This project implements a **Configurable DSP-Based CAM Architecture** for FPGA p
 ## Features
 - **Hierarchical Design**:
   - **CAM Cell**: Utilizes FPGA DSP slices for efficient storage and comparison operations.
-  - **CAM Block**: Supports search and update operations.
-  - **CAM Unit**: Manages multiple CAM blocks with routing for large-scale applications.
-- **Scalability**: Parameterized to adapt as many DSPs as possible.
+  - **CAM Block**: Supports search and update operations across a number of CAM cells.
+  - **CAM Unit**: Manages multiple CAM blocks with routing for larger space and concurrent search.
+- **Scalability**: Parameterized to adapt as many DSPs as possible, scale across chip scale.
 - **Efficiency**: Optimized for both search efficiency and update efficiency.
 - **Multi-query Support**: Handles concurrent searches for high throughput and high memory resource utilization.
 - **Real-world Applications**: Suitable for graph-based problems like triangle counting.
@@ -23,7 +23,7 @@ This project implements a **Configurable DSP-Based CAM Architecture** for FPGA p
 ### Project Structure
 
 Each folder in this project includes:
-- **`param.cfg`**: Configuration parameters for the module.
+- **`param.cfg`**: Contains the configurable parameters for the microarchitectures.
 - **`configure.sh`**: A script to generate source files based on parameters.
 - **Core Sources**: Template files for modules and configuration generation.
 
