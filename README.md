@@ -158,8 +158,49 @@ This example demonstrates triangle counting on FPGAs using a CAM (Content Addres
   - A multi-query search is performed on the CAM using items from the adjacency list of the destination vertex as search keys.
   - The results of the multi-query search provide the intersection of the two adjacency lists.
 
-This CAM-based implementation provides high performance by leveraging the parallel processing capabilities of FPGAs. The details of this implementation can be found in the `./TriangleCount` folder.
+This CAM-based implementation provides high performance by leveraging the parallel processing capabilities of CAM. The source files of this implementation can be found in the `./TriangleCount` folder.
 
+### **How to Run the Example**
+
+0. **Set up the environment && graph datasets**:
+  ```bash
+  source /opt/xilinx/xrt/setup.sh
+  source /YOUR_PATH/Vitis/2022.2/settings64.sh ## please change the path to your Vitis installation path
+
+  ## copy  your graph datasets to the ./TriangleCount/dataset/ directory
+  cd ./TriangleCount/dataset/  
+  ## make sure the graph datasets have three files: edge_list.txt, csr_col.txt, csr_row.txt. Note that csr_row.txt contains the doubled vertex list based on the original csr_row format in CSR representation.
+  ## (please refer to our test graph datasets for detailed format)
+  ```
+1. **Navigate to the Example Directory**:
+  ```bash
+   cd ./TriangleCount && make all TARGET=hw_emu PLATFORM=/opt/xilinx/platforms/xilinx_u55c_gen3x16_xdma_3_202210_1/xilinx_u55c_gen3x16_xdma_3_202210_1.xpfm 
+  ```
+
+2. **Run the Example in Hardware Emulation Mode:**:
+  ```bash
+  XCL_EMULATION_MODE=hw_emu ./triangle_count -x ./triangle_count.xclbin
+  ```
+
+### **Observe the Output**: 
+If the execution is successful, you will see results which demonstarates that the triangle counting is correctly performed. Like the following (taking the test graph dataset as an example):
+```bash
+col_idx length: 82
+row_ptr length: 42
+edge_list length: 82 edges (164 elements)
+Copying data to device...
+Launching kernels...
+Waiting for completion...
+TC kernel completed!
+Mem write kernels completed!
+Copying results from device...
+Execution completed successfully!
+Triangle count: 155
+```
+
+### **Run in Hardware Mode (Optional):**
+You can also run the example in hw mode to observe the waveform.
+Follow the same steps as above but replace hw_emu with hw during the compilation and execution.
 
 ---
 ## Contribution Guide
