@@ -125,7 +125,7 @@ void loadAdjList(hls::stream<bool>& loctrl,
             length_item = LenStrmB.read();
 
             int start_idx = (offset_item) / 16;
-            int end_idx = (offset_item + length_item) / 16;
+            int end_idx = (offset_item + length_item - 1) / 16;
 
             Load_adj_list_B: for (int i = start_idx; i <= end_idx; i++) {
                 ap_uint<512> search_key_item = column_list_B[i];
@@ -133,13 +133,14 @@ void loadAdjList(hls::stream<bool>& loctrl,
                 #pragma HLS UNROLL
                     global_index = i * 16 + j;
                     if (!((global_index >= offset_item) && (global_index < (offset_item + length_item)))) {
-                        search_key_item.range(32 * j + 31, 32 * j) = DUMMY_DATA;
+                        search_key_item.range(32 * j + 31, 32 * j) = DUMMY_DATA_MQ;
                     }
                 }
                 // PrintHex("search_key_item", search_key_item);
                 int send_key_loop = 16 / parallelism;
                 Load_adj_list_B_send_key: for (int k = 0; k < send_key_loop; k++) {
                 #pragma HLS pipeline II = 1
+                    tc_item.data.range(519, 519) = 0; // reserved
                     tc_item.data.range(518, 515) = SEARCH_MQ;
                     tc_item.data.range(514, 512) = encode_parallelism; // seems not used, reserved in this case.
                     for (int t = 0; t < 16; t++) {
@@ -147,7 +148,7 @@ void loadAdjList(hls::stream<bool>& loctrl,
                         if (t < parallelism) { // Set the parallelism data into the lower location
                             tc_item.data.range(32 * t + 31, 32 * t) = search_key_item.range(32 * (k * parallelism + t) + 31, 32 * (k * parallelism + t));
                         } else {
-                            tc_item.data.range(32 * t + 31, 32 * t) = DUMMY_DATA;
+                            tc_item.data.range(32 * t + 31, 32 * t) = DUMMY_DATA_MQ;
                         }
                     }
                     tc_item.last = 0;
@@ -167,8 +168,15 @@ void loadAdjList(hls::stream<bool>& loctrl,
                 IdA_last = offset_item;
                 // Update the routing table first.
                 parallelism = ReturnParallelism(length_item);
+                tc_item.data.range(519, 519) = 0; // reserved
+                tc_item.data.range(514, 512) = 0; // parallelism, reserved in this case.
                 tc_item.data.range(511, 0) = ReturnRoutingTable(parallelism);
                 tc_item.data.range(518, 515) = SET_ROUTING_TABLE; // set the routing table.
+                tc_item.last = 0;
+                tc_stream << tc_item;
+
+                // need to add a reset flag to reset the CAM content.
+                tc_item.data.range(518, 515) = RESET_CAM;
                 tc_item.last = 0;
                 tc_stream << tc_item;
 
@@ -179,7 +187,7 @@ void loadAdjList(hls::stream<bool>& loctrl,
                 tc_item.data.range(514, 512) = encode_parallelism;
                 // update the CAM content. Step 2: update the adjlist.
                 start_idx = (offset_item) / 16; // need to mask DUMMY data in CAM.
-                end_idx = (offset_item + length_item) / 16; // since 512 bits = 16 int_32 data;
+                end_idx = (offset_item + length_item - 1) / 16; // corner case, offset = 0, length = 16. 
                 Load_adj_list_A: for (int i = start_idx; i <= end_idx; i++) {
                 #pragma HLS pipeline II = 1
                     ap_uint<512> column_list_item = column_list_A[i];
@@ -189,7 +197,7 @@ void loadAdjList(hls::stream<bool>& loctrl,
                         if ((global_index >= offset_item) && (global_index < (offset_item + length_item))) {
                             tc_item.data(32 * j + 31, 32 * j) = column_list_item.range(32 * j + 31, 32 * j);
                         } else {
-                            tc_item.data(32 * j + 31, 32 * j) = DUMMY_DATA;
+                            tc_item.data(32 * j + 31, 32 * j) = DUMMY_DATA_UD;
                         }
                     }
                     tc_item.last = 0;

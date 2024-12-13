@@ -1,19 +1,3 @@
-/**
-* Copyright (C) 2019-2021 Xilinx, Inc
-*
-* Licensed under the Apache License, Version 2.0 (the "License"). You may
-* not use this file except in compliance with the License. A copy of the
-* License is located at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-* WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-* License for the specific language governing permissions and limitations
-* under the License.
-*/
-
 ///////////////////////////////////////////////////////////////////////////////
 // Description: This is a wrapper of module "krnl_cam_rtl_int"
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,11 +7,6 @@
 `timescale 1 ns / 1 ps 
 
 module krnl_cam_rtl #( 
-  parameter integer  C_S_AXI_CONTROL_DATA_WIDTH = 32,
-  parameter integer  C_S_AXI_CONTROL_ADDR_WIDTH = 6,
-  parameter integer  C_M_AXI_GMEM_ID_WIDTH = 1,
-  parameter integer  C_M_AXI_GMEM_ADDR_WIDTH = 64,
-  parameter integer  C_M_AXI_GMEM_DATA_WIDTH = 512,
   parameter integer  C_DATA_WIDTH = 520
 )
 (
@@ -35,40 +14,15 @@ module krnl_cam_rtl #(
   input  wire  ap_clk,
   input  wire  ap_rst_n,
   // AXI4 master interface 
-  input  wire [C_DATA_WIDTH-1:0] p0_TDATA,
+  input  wire [C_DATA_WIDTH-1:0] p0_TDATA, // input data 
   input  wire        p0_TVALID,
   output wire        p0_TREADY,
-  output wire [C_DATA_WIDTH-1:0] p1_TDATA,
+  output wire [C_DATA_WIDTH-1:0] p1_TDATA, // output data
   output wire        p1_TVALID,
   input  wire        p1_TREADY
-
-  // AXI4-Lite slave interface
-  // input  wire                                    s_axi_control_AWVALID,
-  // output wire                                    s_axi_control_AWREADY,
-  // input  wire [C_S_AXI_CONTROL_ADDR_WIDTH-1:0]   s_axi_control_AWADDR,
-  // input  wire                                    s_axi_control_WVALID,
-  // output wire                                    s_axi_control_WREADY,
-  // input  wire [C_S_AXI_CONTROL_DATA_WIDTH-1:0]   s_axi_control_WDATA,
-  // input  wire [C_S_AXI_CONTROL_DATA_WIDTH/8-1:0] s_axi_control_WSTRB,
-  // input  wire                                    s_axi_control_ARVALID,
-  // output wire                                    s_axi_control_ARREADY,
-  // input  wire [C_S_AXI_CONTROL_ADDR_WIDTH-1:0]   s_axi_control_ARADDR,
-  // output wire                                    s_axi_control_RVALID,
-  // input  wire                                    s_axi_control_RREADY,
-  // output wire [C_S_AXI_CONTROL_DATA_WIDTH-1:0]   s_axi_control_RDATA,
-  // output wire [1:0]                              s_axi_control_RRESP,
-  // output wire                                    s_axi_control_BVALID,
-  // input  wire                                    s_axi_control_BREADY,
-  // output wire [1:0]                              s_axi_control_BRESP,
-  // output wire                                    interrupt 
 );
 
 krnl_cam_rtl_int #(
-  .C_S_AXI_CONTROL_DATA_WIDTH  ( C_S_AXI_CONTROL_DATA_WIDTH ),
-  .C_S_AXI_CONTROL_ADDR_WIDTH  ( C_S_AXI_CONTROL_ADDR_WIDTH ),
-  .C_M_AXI_GMEM_ID_WIDTH       ( C_M_AXI_GMEM_ID_WIDTH ),
-  .C_M_AXI_GMEM_ADDR_WIDTH     ( C_M_AXI_GMEM_ADDR_WIDTH ),
-  .C_M_AXI_GMEM_DATA_WIDTH     ( C_M_AXI_GMEM_DATA_WIDTH ),
   .C_DATA_WIDTH                ( C_DATA_WIDTH )
 )
 inst_krnl_cam_rtl_int (
@@ -80,24 +34,6 @@ inst_krnl_cam_rtl_int (
   .p1_TDATA               ( p1_TDATA ),
   .p1_TVALID              ( p1_TVALID ),
   .p1_TREADY              ( p1_TREADY )
-  // .s_axi_control_AWVALID  ( s_axi_control_AWVALID ),
-  // .s_axi_control_AWREADY  ( s_axi_control_AWREADY ),
-  // .s_axi_control_AWADDR   ( s_axi_control_AWADDR ),
-  // .s_axi_control_WVALID   ( s_axi_control_WVALID ),
-  // .s_axi_control_WREADY   ( s_axi_control_WREADY ),
-  // .s_axi_control_WDATA    ( s_axi_control_WDATA ),
-  // .s_axi_control_WSTRB    ( s_axi_control_WSTRB ),
-  // .s_axi_control_ARVALID  ( s_axi_control_ARVALID ),
-  // .s_axi_control_ARREADY  ( s_axi_control_ARREADY ),
-  // .s_axi_control_ARADDR   ( s_axi_control_ARADDR ),
-  // .s_axi_control_RVALID   ( s_axi_control_RVALID ),
-  // .s_axi_control_RREADY   ( s_axi_control_RREADY ),
-  // .s_axi_control_RDATA    ( s_axi_control_RDATA ),
-  // .s_axi_control_RRESP    ( s_axi_control_RRESP ),
-  // .s_axi_control_BVALID   ( s_axi_control_BVALID ),
-  // .s_axi_control_BREADY   ( s_axi_control_BREADY ),
-  // .s_axi_control_BRESP    ( s_axi_control_BRESP ),
-  // .interrupt              ( interrupt )
 );
 endmodule : krnl_cam_rtl
 

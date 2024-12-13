@@ -25,12 +25,14 @@
 #define SEARCH_ONE          0x4
 #define SEARCH_MQ           0x5
 #define SET_ROUTING_TABLE   0x6
-#define RESET_ALL           0x7
+#define RESET_CAM           0x7
 #define UPDATE_DUPLICATE    0x8
 
-///// DATA /////
-#define DUMMY_DATA          0x80000000
+#define END_OF_STREAM       0xf  // end of stream
 
+///// DATA /////
+#define DUMMY_DATA_UD          0x80000000  // dummay data for update_duplicate
+#define DUMMY_DATA_MQ          0x80000001  // dummay data for search_mq
 // Define DEBUG_MODE to enable debug outputs; comment it to disable.
 // #define DEBUG_MODE
 

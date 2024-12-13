@@ -91,35 +91,51 @@ int main(int argc, char** argv) {
 
     // Load kernels
     xrt::kernel tc_kernel = xrt::kernel(device, uuid, "triangle_count");
-    xrt::kernel mem_write_kernel = xrt::kernel(device, uuid, "mem_write");
+    std::vector<xrt::kernel> mem_write_kernels;
+    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
+        mem_write_kernels.push_back(xrt::kernel(device, uuid, "mem_write:{mem_write_" + std::to_string(i+1) + "}"));
+    }
     
     // Allocate XRT buffers
     auto bo_col = xrt::bo(device, col_idx.size() * sizeof(int), tc_kernel.group_id(2));
     auto bo_row = xrt::bo(device, row_ptr.size() * sizeof(int), tc_kernel.group_id(1));
     auto bo_edge = xrt::bo(device, edge_list.size() * sizeof(int), tc_kernel.group_id(0));
-    auto cmd_out = xrt::bo(device, edge_list.size() * sizeof(int) * 2, mem_write_kernel.group_id(0)); // give a larger space
+    std::vector<xrt::bo> cmd_out_bo;
+    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
+        cmd_out_bo.push_back(xrt::bo(device, sizeof(int), mem_write_kernels[i].group_id(0))); // 1 int data for tc_count
+    }
 
     auto col_idx_ptr = bo_col.map<int*>();
     auto row_ptr_ptr = bo_row.map<int*>();
     auto edge_list_ptr = bo_edge.map<int*>();
-    auto cmd_out_ptr = cmd_out.map<ap_uint<512>*>();
+    std::vector<ap_uint<32>*> cmd_out_ptr (CUSTOMIZED_BLOCK_NUM, nullptr);
+    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
+        cmd_out_ptr[i] = cmd_out_bo[i].map<ap_uint<32>*>();
+    }
 
     // Copy data to device
     std::cout << "Copying data to device..." << std::endl;
     std::memcpy(col_idx_ptr, col_idx.data(), col_idx.size() * sizeof(int));
     std::memcpy(row_ptr_ptr, row_ptr.data(), row_ptr.size() * sizeof(int));
     std::memcpy(edge_list_ptr, edge_list.data(), edge_list.size() * sizeof(int));
-    std::memset(cmd_out_ptr, 0, edge_list.size() * sizeof(int) * 2);
+    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
+        std::memset(cmd_out_ptr[i], 0, sizeof(int));
+    }
 
     bo_col.sync(XCL_BO_SYNC_BO_TO_DEVICE);
     bo_row.sync(XCL_BO_SYNC_BO_TO_DEVICE);
     bo_edge.sync(XCL_BO_SYNC_BO_TO_DEVICE);
-    cmd_out.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
+        cmd_out_bo[i].sync(XCL_BO_SYNC_BO_TO_DEVICE);
+    }
 
     std::cout << "Launching kernels..." << std::endl;
-    xrt::run write_run = xrt::run(mem_write_kernel);
-    write_run.set_arg(0, cmd_out);
-    write_run.start();
+    std::vector<xrt::run> write_runs;
+    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
+        write_runs.push_back(xrt::run(mem_write_kernels[i]));
+        write_runs[i].set_arg(0, cmd_out_bo[i]);
+        write_runs[i].start();
+    }
 
     xrt::run tc_run = xrt::run(tc_kernel);
     tc_run.set_arg(0, bo_edge);
@@ -131,13 +147,26 @@ int main(int argc, char** argv) {
     // Wait for completion
     std::cout << "Waiting for completion..." << std::endl;
     tc_run.wait();
-    write_run.wait();
+    std::cout << "TC kernel completed!" << std::endl;
+    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
+        write_runs[i].wait();
+    }
+    std::cout << "Mem write kernels completed!" << std::endl;
 
     // Copy results from device
     std::cout << "Copying results from device..." << std::endl;
-    cmd_out.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
+    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
+        cmd_out_bo[i].sync(XCL_BO_SYNC_BO_FROM_DEVICE);
+    }
+
+    // Print results
+    uint32_t tc_count = 0;
+    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
+        tc_count += cmd_out_ptr[i][0];
+    }
 
     std::cout << "Execution completed successfully!" << std::endl;
+    std::cout << "Triangle count: " << tc_count << std::endl;
 
     return EXIT_SUCCESS;
 }

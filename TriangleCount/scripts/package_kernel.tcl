@@ -20,10 +20,9 @@ set path_to_tmp_project "./tmp_kernel_pack_${suffix}"
 
 create_project -force kernel_pack $path_to_tmp_project 
 add_files -norecurse [glob $path_to_hdl/krnl_cam_rtl.v \
-                      $path_to_hdl/krnl_cam_rtl_cam_pre_unpipe.sv \
-                      $path_to_hdl/krnl_cam_rtl_FSM.sv \
+                      $path_to_hdl/krnl_cam_rtl_cam.sv \
                       $path_to_hdl/krnl_cam_rtl_int.sv]
-add_files -fileset constrs_1 -norecurse [glob $path_to_hdl/*.xdc]
+## add_files -fileset constrs_1 -norecurse [glob $path_to_hdl/*.xdc]
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
 ipx::package_project -root_dir $path_to_packaged -vendor xilinx.com -library RTLKernel -taxonomy /KernelIP -import_files -set_current false

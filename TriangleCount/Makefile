@@ -112,6 +112,7 @@ BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/rtl_cam.xo
 BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/triangle_count.xo
 BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/router_tc.xo
 BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/mem_write.xo
+BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/post_router.xo
 
 ############################## Setting Targets ##############################
 CP = cp -rf
@@ -129,9 +130,12 @@ build: check-vitis check-device $(BINARY_CONTAINERS)
 xclbin: build
 
 ############################## Setting Rules for Binary Containers (Building Kernels) ##############################
-$(TEMP_DIR)/rtl_cam.xo: scripts/package_kernel.tcl scripts/gen_rtl_cam_xo.tcl src/hdl/*.sv src/hdl/*.v $(TRIGGER_FILE)
+$(TEMP_DIR)/rtl_cam.xo: scripts/package_kernel.tcl scripts/gen_rtl_cam_xo.tcl src/hdl/*.sv src/hdl/*.v
 	mkdir -p $(TEMP_DIR)
 	$(VIVADO) -mode batch -source scripts/gen_rtl_cam_xo.tcl -tclargs $(TEMP_DIR)/rtl_cam.xo cam $(TARGET) $(PLATFORM) $(XSA)
+$(TEMP_DIR)/post_router.xo: src/post_router.cpp
+	mkdir -p $(TEMP_DIR)
+	$(VPP) $(VPP_FLAGS) -c -k post_router --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
 $(TEMP_DIR)/triangle_count.xo: src/triangle_count.cpp
 	mkdir -p $(TEMP_DIR)
 	$(VPP) $(VPP_FLAGS) -c -k triangle_count --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'

@@ -40,7 +40,7 @@ void router_tc(hls::stream<ap_axiu<STREAM_LENGTH, 0, 0, 0>>& tc_stream_in,
 
     int index = 0; // accumulate the number of packets.
 
-    while (true) {
+    router_tc_loop: while (true) {
         #pragma HLS PIPELINE II = 1
         in_packet = tc_stream_in.read();
         if (in_packet.last) break;
@@ -71,8 +71,16 @@ void router_tc(hls::stream<ap_axiu<STREAM_LENGTH, 0, 0, 0>>& tc_stream_in,
                 out_packet.data.range(32 * (i + 1) - 1, 32 * i) = in_packet.data.range(32 * (index + 1) - 1, 32 * index);
             }
             out_packet.last = 0;
+            out_packet.data.range(519,512) = in_packet.data.range(519,512); // update the instruction.
             router_out << out_packet;
             // PrintHexOutput("SEARCH_MQ", out_packet.dest, out_packet.data);
+        } else if (decode_instruction(in_packet.data) == RESET_CAM) {
+            // Perform RESET_CAM
+            out_packet.dest = (1 << (CUSTOMIZED_BLOCK_NUM + 1)) - 1; // set all bits to 1
+            out_packet.last = 0;
+            out_packet.data = in_packet.data;
+            router_out << out_packet;
+            // PrintHexOutput("RESET_CAM", out_packet.dest, out_packet.data);
         }
 
         if (decode_instruction(in_packet.data) == UPDATE_DUPLICATE) {

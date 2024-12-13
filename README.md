@@ -142,6 +142,25 @@ Search Keys in Each Block:
 You can also run the example in hw_emu mode to observe the waveform.
 Follow the same steps as above but replace sw_emu with hw_emu during the compilation and execution.
 
+
+---
+## Triangle Counting on FPGAs
+This example demonstrates triangle counting on FPGAs using a CAM (Content Addressable Memory) implementation. The example utilizes an edge-centric triangle counting algorithm, where the adjacency lists of the source and destination vertices are analyzed to compute the number of triangles in the graph.
+
+### **Functionality**
+
+- **Adjacency List Extraction**: For each edge in the graph, retrieve the adjacency lists of the source and destination vertices.
+
+- **Intersection Computation**: Calculate the intersection of these two adjacency lists to identify common neighbors, which form the third vertex of a triangle.
+
+- **CAM-Based Acceleration**:
+  - The adjacency list of the source vertex is stored in the CAM.
+  - A multi-query search is performed on the CAM using items from the adjacency list of the destination vertex as search keys.
+  - The results of the multi-query search provide the intersection of the two adjacency lists.
+
+This CAM-based implementation provides high performance by leveraging the parallel processing capabilities of FPGAs. The details of this implementation can be found in the `./TriangleCount` folder.
+
+
 ---
 ## Contribution Guide
 
