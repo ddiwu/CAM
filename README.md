@@ -199,7 +199,7 @@ Triangle count: 155
 ```
 
 ### **Run in Hardware Mode (Optional):**
-You can also run the example in hw mode to observe the waveform.
+You can also run the example in hw mode.
 Follow the same steps as above but replace hw_emu with hw during the compilation and execution.
 
 ---
