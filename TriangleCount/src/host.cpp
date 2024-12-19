@@ -11,7 +11,7 @@ Description:
 #include <cstring>
 #include <ap_int.h>
 #include <iomanip>
-
+#include <chrono>
 // XRT includes
 #include "experimental/xrt_bo.h"
 #include "experimental/xrt_device.h"
@@ -91,79 +91,63 @@ int main(int argc, char** argv) {
 
     // Load kernels
     xrt::kernel tc_kernel = xrt::kernel(device, uuid, "triangle_count");
-    std::vector<xrt::kernel> mem_write_kernels;
-    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
-        mem_write_kernels.push_back(xrt::kernel(device, uuid, "mem_write:{mem_write_" + std::to_string(i+1) + "}"));
-    }
+    xrt::kernel count_kernel = xrt::kernel(device, uuid, "sum_count");
     
     // Allocate XRT buffers
-    auto bo_col = xrt::bo(device, col_idx.size() * sizeof(int), tc_kernel.group_id(2));
+    auto bo_col = xrt::bo(device, col_idx.size() * sizeof(int), tc_kernel.group_id(3));
     auto bo_row = xrt::bo(device, row_ptr.size() * sizeof(int), tc_kernel.group_id(1));
     auto bo_edge = xrt::bo(device, edge_list.size() * sizeof(int), tc_kernel.group_id(0));
-    std::vector<xrt::bo> cmd_out_bo;
-    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
-        cmd_out_bo.push_back(xrt::bo(device, sizeof(int), mem_write_kernels[i].group_id(0))); // 1 int data for tc_count
-    }
+    auto bo_count = xrt::bo(device, sizeof(int), count_kernel.group_id(0));
 
     auto col_idx_ptr = bo_col.map<int*>();
     auto row_ptr_ptr = bo_row.map<int*>();
     auto edge_list_ptr = bo_edge.map<int*>();
-    std::vector<ap_uint<32>*> cmd_out_ptr (CUSTOMIZED_BLOCK_NUM, nullptr);
-    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
-        cmd_out_ptr[i] = cmd_out_bo[i].map<ap_uint<32>*>();
-    }
+    auto count_ptr = bo_count.map<int*>();
 
     // Copy data to device
     std::cout << "Copying data to device..." << std::endl;
     std::memcpy(col_idx_ptr, col_idx.data(), col_idx.size() * sizeof(int));
     std::memcpy(row_ptr_ptr, row_ptr.data(), row_ptr.size() * sizeof(int));
     std::memcpy(edge_list_ptr, edge_list.data(), edge_list.size() * sizeof(int));
-    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
-        std::memset(cmd_out_ptr[i], 0, sizeof(int));
-    }
+    std::memset(count_ptr, 0, sizeof(int));
 
     bo_col.sync(XCL_BO_SYNC_BO_TO_DEVICE);
     bo_row.sync(XCL_BO_SYNC_BO_TO_DEVICE);
     bo_edge.sync(XCL_BO_SYNC_BO_TO_DEVICE);
-    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
-        cmd_out_bo[i].sync(XCL_BO_SYNC_BO_TO_DEVICE);
-    }
+    bo_count.sync(XCL_BO_SYNC_BO_TO_DEVICE);
 
     std::cout << "Launching kernels..." << std::endl;
-    std::vector<xrt::run> write_runs;
-    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
-        write_runs.push_back(xrt::run(mem_write_kernels[i]));
-        write_runs[i].set_arg(0, cmd_out_bo[i]);
-        write_runs[i].start();
-    }
+    xrt::run count_run = xrt::run(count_kernel);
+    count_run.set_arg(0, bo_count);
 
     xrt::run tc_run = xrt::run(tc_kernel);
     tc_run.set_arg(0, bo_edge);
     tc_run.set_arg(1, bo_row);
-    tc_run.set_arg(2, bo_col);
-    tc_run.set_arg(3, (edge_list.size() / 2));
+    tc_run.set_arg(2, bo_row);
+    tc_run.set_arg(3, bo_col);
+    tc_run.set_arg(4, bo_col);
+    tc_run.set_arg(5, (edge_list.size() / 2));
+
+
+    // add time counter
+    auto start_time = std::chrono::high_resolution_clock::now();
+    count_run.start();
     tc_run.start();
 
     // Wait for completion
-    std::cout << "Waiting for completion..." << std::endl;
     tc_run.wait();
-    std::cout << "TC kernel completed!" << std::endl;
-    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
-        write_runs[i].wait();
-    }
-    std::cout << "Mem write kernels completed!" << std::endl;
+    count_run.wait();
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+    std::cout << "TriangleCount completed, execution time: " << duration << " us" << std::endl;
 
     // Copy results from device
     std::cout << "Copying results from device..." << std::endl;
-    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
-        cmd_out_bo[i].sync(XCL_BO_SYNC_BO_FROM_DEVICE);
-    }
+    bo_count.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
 
     // Print results
     uint32_t tc_count = 0;
-    for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
-        tc_count += cmd_out_ptr[i][0];
-    }
+    tc_count = count_ptr[0];
 
     std::cout << "Execution completed successfully!" << std::endl;
     std::cout << "Triangle count: " << tc_count << std::endl;

@@ -111,9 +111,8 @@ BINARY_CONTAINERS += $(BUILD_DIR)/triangle_count.xclbin
 BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/rtl_cam.xo
 BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/triangle_count.xo
 BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/router_tc.xo
-BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/mem_write.xo
 BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/post_router.xo
-
+BINARY_CONTAINER_triangle_count_OBJS += $(TEMP_DIR)/sum_count.xo
 ############################## Setting Targets ##############################
 CP = cp -rf
 
@@ -142,9 +141,9 @@ $(TEMP_DIR)/triangle_count.xo: src/triangle_count.cpp
 $(TEMP_DIR)/router_tc.xo: src/router_tc.cpp
 	mkdir -p $(TEMP_DIR)
 	$(VPP) $(VPP_FLAGS) -c -k router_tc --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
-$(TEMP_DIR)/mem_write.xo: src/mem_write.cpp
+$(TEMP_DIR)/sum_count.xo: src/sum_count.cpp
 	mkdir -p $(TEMP_DIR)
-	$(VPP) $(VPP_FLAGS) -c -k mem_write --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
+	$(VPP) $(VPP_FLAGS) -c -k sum_count --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
 $(BUILD_DIR)/triangle_count.xclbin: $(BINARY_CONTAINER_triangle_count_OBJS)
 	mkdir -p $(BUILD_DIR)
 	$(VPP) $(VPP_FLAGS) -l $(VPP_LDFLAGS) --temp_dir $(TEMP_DIR) $(VPP_LDFLAGS_triangle_count) -o'$(BUILD_DIR)/triangle_count.link.xclbin' $(+)

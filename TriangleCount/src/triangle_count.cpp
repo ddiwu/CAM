@@ -213,15 +213,22 @@ void loadAdjList(hls::stream<bool>& loctrl,
 }
 
 extern "C" {
-void triangle_count(ap_uint<64>* edge_list, ap_uint<64>* offset, ap_uint<512>* column_list, 
-                    int edge_num, hls::stream<ap_axiu<STREAM_LENGTH, 0, 0, 0>>& tc_stream) {
+void triangle_count(ap_uint<64>* edge_list, 
+                    ap_uint<64>* offset_1, ap_uint<64>* offset_2, 
+                    ap_uint<512>* column_list_1, ap_uint<512>* column_list_2, 
+                    int edge_num, 
+                    hls::stream<ap_axiu<STREAM_LENGTH, 0, 0, 0>>& tc_stream) {
 #pragma HLS INTERFACE m_axi offset = slave latency = 16 num_read_outstanding = 32 max_read_burst_length = 32 bundle = gmem0 port = edge_list
-#pragma HLS INTERFACE m_axi offset = slave latency = 16 num_read_outstanding = 32 max_read_burst_length = 2 bundle = gmem1 port = offset
-#pragma HLS INTERFACE m_axi offset = slave latency = 16 num_read_outstanding = 16 max_read_burst_length = 2 bundle = gmem2 port = column_list
+#pragma HLS INTERFACE m_axi offset = slave latency = 16 num_read_outstanding = 32 max_read_burst_length = 2 bundle = gmem1 port = offset_1
+#pragma HLS INTERFACE m_axi offset = slave latency = 16 num_read_outstanding = 32 max_read_burst_length = 2 bundle = gmem2 port = offset_2
+#pragma HLS INTERFACE m_axi offset = slave latency = 16 num_read_outstanding = 16 max_read_burst_length = 2 bundle = gmem3 port = column_list_1
+#pragma HLS INTERFACE m_axi offset = slave latency = 16 num_read_outstanding = 16 max_read_burst_length = 2 bundle = gmem4 port = column_list_2
 
 #pragma HLS INTERFACE s_axilite port = edge_list bundle = control
-#pragma HLS INTERFACE s_axilite port = offset bundle = control
-#pragma HLS INTERFACE s_axilite port = column_list bundle = control
+#pragma HLS INTERFACE s_axilite port = offset_1 bundle = control
+#pragma HLS INTERFACE s_axilite port = offset_2 bundle = control
+#pragma HLS INTERFACE s_axilite port = column_list_1 bundle = control
+#pragma HLS INTERFACE s_axilite port = column_list_2 bundle = control
 #pragma HLS INTERFACE s_axilite port = edge_num bundle = control
 #pragma HLS INTERFACE s_axilite port = return bundle = control
 
@@ -243,8 +250,8 @@ void triangle_count(ap_uint<64>* edge_list, ap_uint<64>* offset, ap_uint<512>* c
 #pragma HLS STREAM variable = loctrl depth=16
 
     loadEdgeList(edge_num, edge_list, edgeStrm, lelctrl); // each edge has two vertices, 64 bits
-    loadOffset (edgeStrm, lelctrl, offset, offset, OffStrmA, OffStrmB, LenStrmA, LenStrmB, loctrl);
-    loadAdjList(loctrl, OffStrmA, OffStrmB, LenStrmA, LenStrmB, column_list, column_list, tc_stream);
+    loadOffset (edgeStrm, lelctrl, offset_1, offset_2, OffStrmA, OffStrmB, LenStrmA, LenStrmB, loctrl);
+    loadAdjList(loctrl, OffStrmA, OffStrmB, LenStrmA, LenStrmB, column_list_1, column_list_2, tc_stream);
 
 }
 }
