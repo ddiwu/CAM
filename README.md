@@ -211,7 +211,7 @@ make TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u250_gen3x16_xdma_3_1_20202
 ```
 
 ### **Observe the Output**: 
-If the execution is successful, you will see results which demonstarates that the triangle counting is correctly performed. Like the following (taking the test graph dataset as an example):
+If the execution is successful, you will see results which demonstarates that the triangle counting is correctly performed. Like the following (taking the as20000102 graph dataset as an example):
 ```bash
 Open the device0
 Load the xclbin ./build_dir.hw.xilinx_u250_gen3x16_xdma_3_1_202020_1/triangle_count.xclbin
