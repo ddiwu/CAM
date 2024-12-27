@@ -165,16 +165,16 @@ This CAM-based implementation provides high performance by leveraging the parall
 0. **Set up the environment && graph datasets**:
   ```bash
   source /opt/xilinx/xrt/setup.sh
-  source /YOUR_PATH/Vitis/2022.2/settings64.sh ## please change the path to your Vitis installation path
+  source /YOUR_PATH/Vitis/2021.2/settings64.sh ## please change the path to your Vitis installation path
 
   ## copy  your graph datasets to the ./TriangleCount/dataset/ directory
   cd ./TriangleCount/dataset/  
   ## make sure the graph datasets have three files: edge_list.txt, csr_col.txt, csr_row_2.txt.
-  ## (please refer to our test graph dataset in ./TriangleCount/dataset/ for detailed format)
+  ## (please refer to the './dataset/partition_tc.py' for the generation of the graph datasets)
   ```
 1. **Navigate to the Example Directory**:
   ```bash
-   cd ./TriangleCount && make all TARGET=hw_emu PLATFORM=/opt/xilinx/platforms/xilinx_u55c_gen3x16_xdma_3_202210_1/xilinx_u55c_gen3x16_xdma_3_202210_1.xpfm 
+   cd ./TriangleCount && make all TARGET=hw_emu PLATFORM=/opt/xilinx/platforms/xilinx_u250_gen3x16_xdma_3_1_202020_1/xilinx_u250_gen3x16_xdma_3_1_202020_1.xpfm 
   ```
 
 2. **Run the Example in Hardware Emulation Mode:**:
@@ -198,9 +198,35 @@ Execution completed successfully!
 Triangle count: 155
 ```
 
-### **Run in Hardware Mode (Optional):**
-You can also run the example in hw mode.
+### **Run in Hardware Mode:**
+You can also run the example in hw mode on Xilinx U250 board.
 Follow the same steps as above but replace hw_emu with hw during the compilation and execution.
+
+```bash
+# for compiling the xclbin file
+make TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u250_gen3x16_xdma_3_1_202020_1/xilinx_u250_gen3x16_xdma_3_1_202020_1.xpfm 
+
+# for running the xclbin file
+./triangle_count -x ./build_dir.hw.xilinx_u250_gen3x16_xdma_3_1_202020_1/triangle_count.xclbin -s ./dataset/as20000102
+```
+
+### **Observe the Output**: 
+If the execution is successful, you will see results which demonstarates that the triangle counting is correctly performed. Like the following (taking the test graph dataset as an example):
+```bash
+Open the device0
+Load the xclbin ./build_dir.hw.xilinx_u250_gen3x16_xdma_3_1_202020_1/triangle_count.xclbin
+Kernel UUID: 1
+col_idx length: 12536
+row_ptr length: 12948
+edge_list length: 12536 edges (25072 elements)
+Copying data to device...
+Launching kernels...
+TriangleCount completed, execution time: 2094 us
+Copying results from device...
+Execution completed successfully!
+Triangle count: 6584
+```
+Note that we are actively working on the optimization of the triangle counting kernel, so the performance can be better than the data reported in the paper.
 
 ---
 ## Contribution Guide
