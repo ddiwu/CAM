@@ -51,7 +51,7 @@ After updating the parameters, run the configuration script:
 ```
 
 ### Step 2: Compilation
-Compile the project for the target platform (e.g., software emulation, hardware emulation, or hardware). Replace TARGET with the desired target and specify your platform. We strongly recommend using the Vitis tool (2021.2 or later) to run the application on AMD U280 platform.
+Compile the project for the target platform (e.g., software emulation, hardware emulation, or hardware). Replace TARGET with the desired target and specify your platform. We strongly recommend using the Vitis tool (2021.2 or later) to implement the application on AMD U280 platform.
 ```bash
 make TARGET=<sw_emu/hw_emu/hw> PLATFORM=<FPGA platform>
 ``` 
@@ -170,7 +170,7 @@ This CAM-based implementation provides high performance by leveraging the parall
   ## copy  your graph datasets to the ./TriangleCount/dataset/ directory
   cd ./TriangleCount/dataset/  
   ## make sure the graph datasets have three files: edge_list.txt, csr_col.txt, csr_row_2.txt.
-  ## (please refer to the './dataset/partition_tc.py' for the generation of the graph datasets)
+  ## (The dataset is generated from the original edgelist file, please refer to the './dataset/partition_tc.py' for the generation of the graph datasets. Make sure you execute the partitioning if the dataset does not include the three files.)
   ```
 1. **Navigate to the Example Directory**:
   ```bash
