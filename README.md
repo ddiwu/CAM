@@ -226,7 +226,15 @@ Copying results from device...
 Execution completed successfully!
 Triangle count: 6584
 ```
-Note that we are actively working on the optimization of the triangle counting kernel, so the performance can be better than the data reported in the paper.
+Note that we are actively working on the optimization of the triangle counting kernel, so the performance can be better than the data reported in the paper. Here is the performance table of the triangle counting kernel on U250 board:
+
+| Dataset            | CAM_Execution_time (ms) | Baseline | Ave_degree |
+|--------------------|-------------------------|----------|-----------|
+| facebook_combined  | 12.59                  | 18.7     | 21.85     |
+| amazon0601         | 159.506                | 230.3    | 6.08      |
+| as20000102         | 0.857                  | 7.4      | 1.95      |
+| soc-Slashdot0811   | 92.761                 | 259.7    | 6.09      |
+
 
 ---
 ## Contribution Guide
