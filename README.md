@@ -221,7 +221,7 @@ row_ptr length: 12948
 edge_list length: 12536 edges (25072 elements)
 Copying data to device...
 Launching kernels...
-TriangleCount completed, execution time: 2094 us
+TriangleCount completed, execution time: 1025 us
 Copying results from device...
 Execution completed successfully!
 Triangle count: 6584
@@ -230,10 +230,11 @@ Note that we are actively working on the optimization of the triangle counting k
 
 | Dataset            | CAM_Execution_time (ms) | Baseline | Ave_degree |
 |--------------------|-------------------------|----------|-----------|
-| facebook_combined  | 12.59                  | 18.7     | 21.85     |
-| amazon0601         | 159.506                | 230.3    | 6.08      |
-| as20000102         | 0.857                  | 7.4      | 1.95      |
-| soc-Slashdot0811   | 92.761                 | 259.7    | 6.09      |
+| facebook_combined  | 6.983                   | 18.7     | 21.85     |
+| amazon0601         | 106.771                 | 230.3    | 6.08      |
+| as20000102         | 1.025                   | 7.4      | 1.95      |
+| ca-cit-HepPh       | 2694.017                | 5361.1   | 117       |
+| soc-Slashdot0811   | 45.967                  | 259.7    | 6.09      |
 
 
 ---
