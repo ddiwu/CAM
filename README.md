@@ -228,7 +228,7 @@ Triangle count: 6584
 ```
 Note that we are actively working on the optimization of the triangle counting kernel, so the performance can be better than the data reported in the paper. Here is the performance table of the triangle counting kernel on U250 board:
 
-| Dataset            | CAM_Execution_time (ms) | Baseline | Ave_degree |
+| Dataset            | CAM_Execution_time (ms) | Baseline* | Ave_degree |
 |--------------------|-------------------------|----------|-----------|
 | facebook_combined  | 6.983                   | 18.7     | 21.85     |
 | amazon0601         | 106.771                 | 230.3    | 6.08      |
@@ -236,7 +236,7 @@ Note that we are actively working on the optimization of the triangle counting k
 | ca-cit-HepPh       | 2694.017                | 5361.1   | 117       |
 | soc-Slashdot0811   | 45.967                  | 259.7    | 6.09      |
 
-
+* The baselines are obtained through re-implementing the official triangle counting accelerator design provided in the AMD Vitis library at [Triangle_counting](https://xilinx.github.io/Vitis_Libraries/graph/2021.1/guide_L2/kernels/TriangleCount.html) on our experimental platform.
 ---
 ## Contribution Guide
 
