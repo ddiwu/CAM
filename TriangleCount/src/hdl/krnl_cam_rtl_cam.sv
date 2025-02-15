@@ -50,7 +50,7 @@ always_ff @(posedge aclk) begin
   if (state == `RESET_ALL) begin
     write_index <= 0;
   end
-  else if (state == `UPDATE_DUPLICATE) begin
+  else if ((state == `UPDATE_DUPLICATE) && (s_tvalid)) begin
     write_index <= write_index + 16;
   end
 end
@@ -135,7 +135,7 @@ generate begin
     // Data inputs: Data Ports
     .A({16'b0, s_tdata[31:18]}),                   // 30-bit input: A data
     .B(s_tdata[17:0]),                   // 18-bit input: B data
-    .C({16'b0, s_tdata[(i%16)*32+:32]}),                   // 48-bit input: C data
+    .C((state == `RESET_ALL) ? 48'b0 : {16'b0, s_tdata[(i%16)*32+:32]}),                   // 48-bit input: C data
     // .C(data_in[i][47:0]),                   // 48-bit input: C data
     // Control inputs: Control Inputs/Status Bits
     .ALUMODE(4'b0100),       // Set ALUMODE to perform XOR operation, 4'b0100
@@ -147,7 +147,7 @@ generate begin
     .CEB1(1'b0),             // Clock enable for B input register
     // .CEB2(m_tready),             // Clock enable for B input register
     .CEB2(1'b1),
-    .CEC((state == `UPDATE_DUPLICATE) && (s_tvalid) && (write_index <= i) && (write_index+16 > i)),
+    .CEC(((state == `UPDATE_DUPLICATE) && (s_tvalid) && (write_index <= i) && (write_index+16 > i)) || (state == `RESET_ALL)),
     // .CEC(1'b1),             // Clock enable for C input register
     .CEP(1'b1),             // pipeline stall
     .CEALUMODE(1'b1),         // Clock enable for ALUMODE register
@@ -156,7 +156,8 @@ generate begin
     .CEAD(1'b0),            // Clock enable for AD input register (not used)
     .RSTA(1'b0),             // Reset for A input register
     .RSTB(1'b0),             // Reset for B input register
-    .RSTC(state == `RESET_ALL),             // Reset for C input register
+    // .RSTC(state == `RESET_ALL),             // Reset for C input register
+    .RSTC(1'b0),             // Reset for C input register
     .RSTD(1'b0),             // Reset for D input register (not used)
     .RSTALLCARRYIN(1'b0),    // Reset for carry-in register (not used)
     .RSTALUMODE(1'b0),       // Reset for ALUMODE register

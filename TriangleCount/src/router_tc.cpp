@@ -14,14 +14,14 @@ void PrintHexOutput(const std::string& label, const ap_uint<16>& dest, const ap_
 
 ap_uint<16> block_lookup_table(ap_uint<3> encoded_parallelism, ap_uint<32> index) {
     #pragma HLS INLINE
-    const ap_uint<16> dest_lut[5][8] = {
-        {0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080}, // Parallelism = 1
-        {0x0101, 0x0202, 0x0404, 0x0808, 0x1010, 0x2020, 0x4040, 0x8080}, // Parallelism = 2
-        {0x1111, 0x2222, 0x4444, 0x8888, 0x0000, 0x0000, 0x0000, 0x0000}, // Parallelism = 4
-        {0x5555, 0xAAAA, 0x5555, 0xAAAA, 0x5555, 0xAAAA, 0x5555, 0xAAAA}, // Parallelism = 8
-        {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF}  // Parallelism = 16
+    const ap_uint<16> dest_lut[5][16] = {
+        {0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080, 0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000, 0x8000}, // Parallelism = 1
+        {0x0101, 0x0202, 0x0404, 0x0808, 0x1010, 0x2020, 0x4040, 0x8080, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}, // Parallelism = 2
+        {0x1111, 0x2222, 0x4444, 0x8888, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}, // Parallelism = 4
+        {0x5555, 0xAAAA, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}, // Parallelism = 8
+        {0xFFFF, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}  // Parallelism = 16
     };
-    ap_uint<3> group_id = (index / 8) % 8; // Wrap around within 8 groups
+    ap_uint<4> group_id = (index / 8) % 16; // 8 means 8 512bits for 128 int data;
     return dest_lut[encoded_parallelism - 1][group_id]; 
     // -1 because the encoded_parallelism is 1-5, but the index is 0-4.
 }
@@ -48,11 +48,7 @@ void router_tc(hls::stream<ap_axiu<STREAM_LENGTH, 0, 0, 0>>& tc_stream_in,
         if (decode_instruction(in_packet.data) == SET_ROUTING_TABLE) {
             for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
             #pragma HLS unroll  
-                if (i < CUSTOMIZED_BLOCK_NUM) {
-                    routing_table[i] = in_packet.data.range(32 * i + 31, 32 * i);
-                } else {
-                    routing_table[i] = -1; // set useless data to -1
-                }
+                routing_table[i] = in_packet.data.range(32 * i + 31, 32 * i);
             }
         } else if (decode_instruction(in_packet.data) == UPDATE_DUPLICATE) {
             out_packet.dest = block_lookup_table(get_parallelism(in_packet.data), index);
@@ -60,6 +56,7 @@ void router_tc(hls::stream<ap_axiu<STREAM_LENGTH, 0, 0, 0>>& tc_stream_in,
             out_packet.last = 0;
             out_packet.data = in_packet.data;
             router_out << out_packet;
+            index++;
             // PrintHexOutput("UPDATE_DUPLICATE", out_packet.dest, out_packet.data);
 
         } else if (decode_instruction(in_packet.data) == SEARCH_MQ) {
@@ -67,8 +64,8 @@ void router_tc(hls::stream<ap_axiu<STREAM_LENGTH, 0, 0, 0>>& tc_stream_in,
             out_packet.dest = (1 << (CUSTOMIZED_BLOCK_NUM + 1)) - 1; // set all bits to 1
             for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
             #pragma HLS unroll
-                int index = routing_table[i];
-                out_packet.data.range(32 * (i + 1) - 1, 32 * i) = in_packet.data.range(32 * (index + 1) - 1, 32 * index);
+                int idx = routing_table[i];
+                out_packet.data.range(32 * (i + 1) - 1, 32 * i) = in_packet.data.range(32 * (idx + 1) - 1, 32 * idx);
             }
             out_packet.last = 0;
             out_packet.data.range(519,512) = in_packet.data.range(519,512); // update the instruction.
@@ -83,9 +80,7 @@ void router_tc(hls::stream<ap_axiu<STREAM_LENGTH, 0, 0, 0>>& tc_stream_in,
             // PrintHexOutput("RESET_CAM", out_packet.dest, out_packet.data);
         }
 
-        if (decode_instruction(in_packet.data) == UPDATE_DUPLICATE) {
-            index++;
-        } else {
+        if (!(decode_instruction(in_packet.data) == UPDATE_DUPLICATE)) {
             index = 0;
         }
     }
