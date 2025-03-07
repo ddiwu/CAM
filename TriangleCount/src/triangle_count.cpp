@@ -74,6 +74,28 @@ ap_uint<32> GetMultiQueries (ap_uint<32> parallelism) {
            (parallelism == 16) ? 1 : 0;
 }
 
+ap_uint<32> GetNumberQueries(ap_uint<32> start_idx, ap_uint<32> end_idx, ap_uint<32> length_aligned) {
+    #pragma HLS inline
+    ap_uint<32> temp = end_idx - start_idx + 1;
+    // Simplify shift calculations using direct mapping
+    ap_uint<32> shift_value = 0;
+    if (length_aligned <= 128) {
+        shift_value = 0;
+    } else if (length_aligned <= 256) {
+        shift_value = 1;
+    } else if (length_aligned <= 512) {
+        shift_value = 2;
+    } else if (length_aligned <= 1024) {
+        shift_value = 3;
+    } else if (length_aligned <= 2048) {
+        shift_value = 4;
+    } else {
+        shift_value = 32; // should not exist this case
+    }
+
+    return (temp << shift_value);
+}
+
 void loadEdgeList(int edge_num, ap_uint<64>* EdgeArr, hls::stream<ap_uint<64>>& eStrmOut, hls::stream<bool>& lelctrl) {
     ap_uint<64> edge_item;
     for (int i = 0; i < edge_num; i++) {
@@ -136,15 +158,24 @@ void loadOffset(hls::stream<ap_uint<64>>& eStrmOut, hls::stream<bool>& lelctrl, 
 void duplicateStream (hls::stream<ap_uint<32>>& OffStrmA, hls::stream<ap_uint<32>>& OffStrmB, 
                       hls::stream<ap_uint<32>>& LenStrmA, hls::stream<ap_uint<32>>& LenStrmB, 
                       hls::stream<bool>& loctrl, 
-                      hls::stream<ap_uint<32>>& OffA1, hls::stream<ap_uint<32>>& OffA2, hls::stream<ap_uint<32>>& OffA3, 
-                      hls::stream<ap_uint<32>>& LenA1, hls::stream<ap_uint<32>>& LenA2, hls::stream<ap_uint<32>>& LenA3, 
-                      hls::stream<ap_uint<32>>& OffB1, hls::stream<ap_uint<32>>& OffB2, 
-                      hls::stream<ap_uint<32>>& LenB1, hls::stream<ap_uint<32>>& LenB2, 
+                      hls::stream<ap_uint<32>>& OffA1, hls::stream<ap_uint<32>>& LenA1,
+                      hls::stream<ap_uint<32>>& OffB1, hls::stream<ap_uint<32>>& LenB1, 
+                      hls::stream<ap_uint<32>>& Aligned_length_a_generate_mq,
+                      hls::stream<ap_uint<32>>& Number_a,
+                      hls::stream<ap_uint<32>>& Number_b,
+                      hls::stream<bool>& forward_flag,
                       hls::stream<bool>& Ctl1, hls::stream<bool>& Ctl2, hls::stream<bool>& Ctl3, hls::stream<bool>& Ctl4) {
     ap_uint<32> offset_item_a;
     ap_uint<32> length_item_a;
     ap_uint<32> offset_item_b;
     ap_uint<32> length_item_b;
+
+    ap_uint<32> offset_a_last = 0xffffffff;
+    ap_uint<32> start_idx_a = 0;
+    ap_uint<32> end_idx_a = 0;
+    ap_uint<32> start_idx_b = 0;
+    ap_uint<32> end_idx_b = 0;
+
     duplicate_stream: while (1) {
 #pragma HLS pipeline II = 1
         bool lo_flag = loctrl.read();
@@ -160,22 +191,38 @@ void duplicateStream (hls::stream<ap_uint<32>>& OffStrmA, hls::stream<ap_uint<32
         length_item_a = LenStrmA.read();
         offset_item_b = OffStrmB.read();
         length_item_b = LenStrmB.read();
+
+        if (offset_item_a != offset_a_last) {
+            offset_a_last = offset_item_a;
+            forward_flag << false;
+        } else {
+            forward_flag << true;
+        }
+
+        start_idx_a = (offset_item_a >> 4);
+        end_idx_a = ((offset_item_a + length_item_a - 1) >> 4);
+        start_idx_b = (offset_item_b >> 4);
+        end_idx_b = ((offset_item_b + length_item_b - 1) >> 4);
+
+        Aligned_length_a_generate_mq << ((end_idx_a - start_idx_a + 1) << 4);
+        Number_a << (1 + end_idx_a - start_idx_a + 1);
+        Number_b << (GetNumberQueries(start_idx_b, end_idx_b, ((end_idx_a - start_idx_a + 1) << 4)));
+
         OffA1 << offset_item_a;
-        OffA2 << offset_item_a;
-        OffA3 << offset_item_a;
         LenA1 << length_item_a;
-        LenA2 << length_item_a;
-        LenA3 << length_item_a;
+
         OffB1 << offset_item_b;
-        OffB2 << offset_item_b;
         LenB1 << length_item_b;
-        LenB2 << length_item_b;
+
         Ctl1 << false;
         Ctl2 << false;
         Ctl3 << false;
         Ctl4 << false;
     }
 }
+
+int global_load_adj_a = 0;
+int global_load_adj_b = 0;
 
 void loadSrcAdjList(hls::stream<ap_uint<32>>& OffA1, 
                     hls::stream<ap_uint<32>>& LenA1, 
@@ -201,6 +248,7 @@ void loadSrcAdjList(hls::stream<ap_uint<32>>& OffA1,
             case READ_INPUT: {
                 bool ctl_flag = Ctl1.read();
                 if (ctl_flag) {
+                    std::cout << "global_load_adj_a: " << global_load_adj_a << std::endl;
                     return;
                 } else {
                     offset_item = OffA1.read();
@@ -216,24 +264,16 @@ void loadSrcAdjList(hls::stream<ap_uint<32>>& OffA1,
                         tc_item_inst.range(6, 3) = SET_ROUTING_TABLE; // Set routing table
                         tc_stream_a_merge << tc_item_data;
                         tc_stream_a_merge_inst << tc_item_inst;
-                        state = CAM_RESETTING;
+                        global_load_adj_a++;
+                        // state = CAM_RESETTING;
+                        encode_parallelism = EncodeParallelism(parallelism);
+                        start_idx = (offset_item >> 4);
+                        end_idx = ((offset_item + length_item - 1) >> 4);
+                        state = PROCESS_ADJLIST;
                     } else {
                         state = READ_INPUT;
                     }
                 }
-                break;
-            }
-
-            case CAM_RESETTING: {
-                tc_item_inst.range(6, 3) = RESET_CAM;
-                tc_stream_a_merge_inst << tc_item_inst;
-                tc_item_data.range(511, 0) = 0;
-                tc_stream_a_merge << tc_item_data;
-                state = PROCESS_ADJLIST;
-                // calculate the start_idx and end_idx for the next state.
-                encode_parallelism = EncodeParallelism(parallelism);
-                start_idx = (offset_item >> 4);
-                end_idx = ((offset_item + length_item - 1) >> 4);
                 break;
             }
 
@@ -253,6 +293,7 @@ void loadSrcAdjList(hls::stream<ap_uint<32>>& OffA1,
                     }
                     tc_stream_a_merge << tc_item_data;
                     tc_stream_a_merge_inst << tc_item_inst;
+                    global_load_adj_a++;
                     start_idx++;
                 } else {
                     state = READ_INPUT;
@@ -263,21 +304,20 @@ void loadSrcAdjList(hls::stream<ap_uint<32>>& OffA1,
     }
 }
 
-
-// need to split these function into two parts. One is for ADJ list load, another is generating STREAM_KEYS.
 void loadDstAdjList(hls::stream<ap_uint<32>>& OffB1, hls::stream<ap_uint<32>>& LenB1, 
                     hls::stream<bool>& Ctl2, 
                     ap_uint<512>* column_list_2, 
                     hls::stream<ap_uint<32>>& b_item_num,
                     hls::stream<ap_uint<512>>& tc_stream_data) {
 // State machine states
-    enum State { READ_INPUT, PROCESS_ADJLIST};
+    enum State { READ_INPUT, CACHE_HIT, PROCESS_ADJLIST};
     State state = READ_INPUT;
     // Local variables
     ap_uint<32> offset_b = 0, length_b = 0;
     ap_uint<32> start_idx = 0, end_idx = 0, global_index = 0;
-    ap_uint<512> tc_item_data;
+    ap_uint<512> tc_item_data, last_tc_item_data;
     ap_uint<32> i = 0, j = 0;
+    ap_uint<32> last_offset_id = 0xffffffff;
 
     loadDstAdjList_loop: while (1) {
         #pragma HLS pipeline II=1
@@ -293,25 +333,46 @@ void loadDstAdjList(hls::stream<ap_uint<32>>& OffB1, hls::stream<ap_uint<32>>& L
                     end_idx = ((offset_b + length_b - 1) >> 4);
                     i = start_idx;
                     b_item_num << (end_idx - start_idx + 1);
-                    state = PROCESS_ADJLIST;
+                    if ((start_idx == last_offset_id) && (end_idx == start_idx)) {
+                        last_offset_id = start_idx;
+                        state = CACHE_HIT;
+                    } else {
+                        state = PROCESS_ADJLIST;
+                    }
                 }
                 break;
             }
 
-            case PROCESS_ADJLIST: {
-                if (i <= end_idx) {
-                    tc_item_data = column_list_2[i];
-                    for (j = 0; j < 16; j++) {
-                    #pragma HLS UNROLL
-                        global_index = (i << 4) + j;
-                        if (!((global_index >= offset_b) && (global_index < (offset_b + length_b)))) {
-                            tc_item_data.range((j << 5) + 31, (j << 5)) = DUMMY_DATA_MQ;
-                        }
+            case CACHE_HIT: {
+                tc_item_data = last_tc_item_data; // use cached data.
+                for (j = 0; j < 16; j++) {
+                #pragma HLS UNROLL
+                    global_index = (start_idx << 4) + j;
+                    if (!((global_index >= offset_b) && (global_index < (offset_b + length_b)))) {
+                        tc_item_data.range((j << 5) + 31, (j << 5)) = DUMMY_DATA_MQ;
                     }
-                    tc_stream_data << tc_item_data;
-                    i++;
-                } else {
-                    state = READ_INPUT; // Transition back to IDLE after processing
+                }
+                tc_stream_data << tc_item_data;
+                state = READ_INPUT;
+                break;
+            }
+
+            case PROCESS_ADJLIST: {
+                tc_item_data = column_list_2[i];
+                last_tc_item_data = tc_item_data; // update the cache data.
+                for (j = 0; j < 16; j++) {
+                #pragma HLS UNROLL
+                    global_index = (i << 4) + j;
+                    if (!((global_index >= offset_b) && (global_index < (offset_b + length_b)))) {
+                        tc_item_data.range((j << 5) + 31, (j << 5)) = DUMMY_DATA_MQ;
+                    }
+                }
+                tc_stream_data << tc_item_data;
+                last_offset_id = i;
+                i++;
+
+                if (i > end_idx) {
+                    state = READ_INPUT;
                 }
                 break;
             }
@@ -319,19 +380,16 @@ void loadDstAdjList(hls::stream<ap_uint<32>>& OffB1, hls::stream<ap_uint<32>>& L
     }
 }
 
-void generateMultiQueries(hls::stream<ap_uint<32>>& OffA2, 
-                        hls::stream<ap_uint<32>>& LenA2, 
+void generateMultiQueries(hls::stream<ap_uint<32>>& aligned_length_a_generate_mq, 
                         hls::stream<bool>& Ctl3, 
                         hls::stream<ap_uint<32>>& b_item_num,
                         hls::stream<ap_uint<512>>& tc_stream_b_data, 
                         hls::stream<ap_uint<512>>& tc_stream_b_merge,
                         hls::stream<ap_uint<8>>& tc_stream_b_merge_inst) {
-    enum State { READ_INPUT, GET_B_ITEM, STREAM_KEYS};
+    enum State { READ_INPUT, STREAM_KEYS};
     State state = READ_INPUT;
     // Local variables
-    ap_uint<32> offset_a = 0, length_a = 0;
     ap_uint<32> parallelism = 0, encode_parallelism = 0, multi_queries = 0;
-    ap_uint<32> start_idx = 0, end_idx = 0, global_index = 0;
     ap_uint<512> stream_b_item = 0;
     ap_uint<32> b_counter = 0;
     // ap_uint<STREAM_LENGTH> tc_item;
@@ -345,140 +403,83 @@ void generateMultiQueries(hls::stream<ap_uint<32>>& OffA2,
             case READ_INPUT: {
                 bool ctl_flag = Ctl3.read();
                 if (ctl_flag) {
+                    std::cout << "global_load_adj_b: " << global_load_adj_b << std::endl;
+                    std::cout << "GenerateMultiQueries done" << std::endl;
                     return;
                 } else {
-                    offset_a = OffA2.read();
-                    length_a = LenA2.read();
-                    ap_uint<32> aligned_length = (((offset_a + length_a - 1) >> 4) - (offset_a >> 4) + 1) << 4;
+                    ap_uint<32> aligned_length = aligned_length_a_generate_mq.read();
                     parallelism = ReturnParallelism(aligned_length);
                     encode_parallelism = EncodeParallelism(parallelism);
                     multi_queries = GetMultiQueries(parallelism);
                     b_counter = b_item_num.read();
                     i = 0;
-                    state = GET_B_ITEM;
+                    j = 0;
+                    stream_b_item = tc_stream_b_data.read();
+                    state = STREAM_KEYS;
                 }
-                break;
-            }
-
-            case GET_B_ITEM: {
-                stream_b_item = tc_stream_b_data.read();
-                j = 0;
-                state = STREAM_KEYS;
                 break;
             }
 
             case STREAM_KEYS: {
-                if (j < multi_queries) {
-                    tc_item_inst.range(7, 7) = 0; // Reserved
-                    tc_item_inst.range(6, 3) = SEARCH_MQ;
-                    tc_item_inst.range(2, 0) = encode_parallelism;
-                    for (ap_uint<32> t = 0; t < 16; t++) {
-                    #pragma HLS UNROLL
-                        if (t < parallelism) { // Set the parallelism data into the lower location
-                            tc_item_data.range((t << 5) + 31, (t << 5)) = 
-                                stream_b_item.range((((j << (encode_parallelism - 1)) + t) << 5) + 31, ((j << (encode_parallelism - 1)) + t) << 5);
-                        } else {
-                            tc_item_data.range((t << 5) + 31, (t << 5)) = DUMMY_DATA_MQ;
-                        }
+
+                tc_item_inst.range(7, 7) = 0; // Reserved
+                tc_item_inst.range(6, 3) = SEARCH_MQ;
+                tc_item_inst.range(2, 0) = encode_parallelism;
+                for (ap_uint<32> t = 0; t < 16; t++) {
+                #pragma HLS UNROLL
+                    if (t < parallelism) { // Set the parallelism data into the lower location
+                        tc_item_data.range((t << 5) + 31, (t << 5)) = 
+                            stream_b_item.range((((j << (encode_parallelism - 1)) + t) << 5) + 31, ((j << (encode_parallelism - 1)) + t) << 5);
+                    } else {
+                        tc_item_data.range((t << 5) + 31, (t << 5)) = DUMMY_DATA_MQ;
                     }
-                    tc_stream_b_merge << tc_item_data;
-                    tc_stream_b_merge_inst << tc_item_inst;
-                    j++; // Increment key streaming loop index
-                } else {
+                }
+                tc_stream_b_merge << tc_item_data;
+                tc_stream_b_merge_inst << tc_item_inst;
+                global_load_adj_b++;
+
+                j++; // Increment key streaming loop index
+
+                if (j >= multi_queries) {
                     i++; // Increment outer adjacency list index
                     if (i < b_counter) {
-                        state = GET_B_ITEM;
+                        stream_b_item = tc_stream_b_data.read();
+                        j = 0;
                     } else {
                         state = READ_INPUT;
                     }
                 }
+
                 break;
             }
         }
     }
 }
 
-ap_uint<32> GetNumberQueries(ap_uint<32> start_idx, ap_uint<32> end_idx, ap_uint<32> length_aligned) {
-    #pragma HLS inline
-    ap_uint<32> temp = end_idx - start_idx + 1;
-    // Simplify shift calculations using direct mapping
-    ap_uint<32> shift_value = 0;
-    if (length_aligned <= 128) {
-        shift_value = 0;
-    } else if (length_aligned <= 256) {
-        shift_value = 1;
-    } else if (length_aligned <= 512) {
-        shift_value = 2;
-    } else if (length_aligned <= 1024) {
-        shift_value = 3;
-    } else if (length_aligned <= 2048) {
-        shift_value = 4;
-    } else {
-        shift_value = 32; // should not exist this case
-    }
 
-    return (temp << shift_value);
-}
-
-void mergeTcStream(hls::stream<ap_uint<32>>& OffA3, hls::stream<ap_uint<32>>& LenA3, 
-                   hls::stream<ap_uint<32>>& OffB2, hls::stream<ap_uint<32>>& LenB2, 
-                   hls::stream<bool>& Ctl3, 
+int global_count_a = 0;
+int global_count_b = 0;
+void mergeTcStream(hls::stream<ap_uint<32>>& Number_a, hls::stream<ap_uint<32>>& Number_b,
+                   hls::stream<bool>& forward_flag,
+                   hls::stream<bool>& Ctl4, 
                    hls::stream<ap_uint<512>>& tc_stream_a_merge, 
                    hls::stream<ap_uint<8>>& tc_stream_a_merge_inst, 
                    hls::stream<ap_uint<512>>& tc_stream_b_merge, 
                    hls::stream<ap_uint<8>>& tc_stream_b_merge_inst, 
                    hls::stream<ap_axiu<STREAM_LENGTH, 0, 0, 0>>& tc_stream) {
-enum State { READ_INPUT, FORWARD_STREAM_A, FORWARD_STREAM_B };
-    State state = READ_INPUT;
+    enum State {FORWARD_STREAM_A, FORWARD_STREAM_B };
+    State state = FORWARD_STREAM_B;
 
-    // Local variables
-    ap_uint<32> offset_a = 0, length_a = 0, IdA_last = 0xffffffff;
-    ap_uint<32> offset_b = 0, length_b = 0;
     ap_uint<32> counter_a = 0, counter_b = 0;
     ap_uint<32> number_a = 0, number_b = 0;
-    ap_uint<32> parallelism = 0;
-    ap_uint<32> start_idx_a = 0, end_idx_a = 0;
-    ap_uint<32> start_idx_b = 0, end_idx_b = 0;
-
     ap_axiu<STREAM_LENGTH, 0, 0, 0> item;
+    bool forward = false;
 
     mergeTcStream_loop: while (1) {
         #pragma HLS pipeline II=1
         switch (state) {
-            case READ_INPUT:{
-                bool ctl_flag = Ctl3.read();
-                if (ctl_flag) {
-                    item.data = 0;
-                    item.last = 1;
-                    tc_stream << item;
-                    return;
-                } else {
-                    offset_a = OffA3.read();
-                    length_a = LenA3.read();
-                    offset_b = OffB2.read();
-                    length_b = LenB2.read();
-                     // hardware friendly.
-                    ap_uint<32> length_aligned = (((offset_a + length_a - 1) >> 4) - (offset_a >> 4) + 1) << 4;
-                    start_idx_a = (offset_a) >> 4;
-                    end_idx_a = (offset_a + length_a - 1) >> 4; 
-                    // one rest_CAM, one ROUTING_TABLE + several UPDATE_DUPLICATE.
-                    number_a = 1 + 1 + end_idx_a - start_idx_a + 1;
-                    start_idx_b = (offset_b) >> 4;
-                    end_idx_b = (offset_b + length_b - 1) >> 4;
-                    number_b = GetNumberQueries(start_idx_b, end_idx_b, length_aligned);
-                    counter_a = 0;
-                    counter_b = 0;
-                    if (offset_a != IdA_last) {
-                        IdA_last = offset_a;
-                        state = FORWARD_STREAM_A;
-                    } else {
-                        state = FORWARD_STREAM_B;
-                    }
-                }
-                break;
-            }
-
             case FORWARD_STREAM_A: {
+                global_count_a++;
                 if (counter_a < number_a) {
                     item.data.range(511, 0) = tc_stream_a_merge.read();
                     item.data.range(519, 512) = tc_stream_a_merge_inst.read();
@@ -501,11 +502,30 @@ enum State { READ_INPUT, FORWARD_STREAM_A, FORWARD_STREAM_B };
                     item.last = 0;
                     tc_stream << item;
                     counter_b++;
-                    if (counter_b == number_b) {
-                        state = READ_INPUT;
+                    global_count_b++;
+                }
+                
+                if (counter_b >= number_b) {
+                    counter_a = 0;
+                    counter_b = 0;
+                    bool ctl_flag = Ctl4.read();
+                    if (ctl_flag) {
+                        item.data = 0;
+                        item.last = 1;
+                        tc_stream << item;
+                        std::cout << "global_count_a: " << global_count_a << std::endl;
+                        std::cout << "global_count_b: " << global_count_b << std::endl;
+                        return;
+                    } else {
+                        number_a = Number_a.read();
+                        number_b = Number_b.read();
+                        forward = forward_flag.read();
+                        if (!forward) {
+                            state = FORWARD_STREAM_A;
+                        } else {
+                            state = FORWARD_STREAM_B;
+                        }
                     }
-                } else {
-                    state = READ_INPUT;
                 }
                 break;
             }
@@ -552,33 +572,31 @@ void triangle_count(ap_uint<64>* edge_list,
 #pragma HLS STREAM variable = loctrl depth=16
 
     static hls::stream<ap_uint<32>> OffA1;
-    static hls::stream<ap_uint<32>> OffA2;
-    static hls::stream<ap_uint<32>> OffA3;
     static hls::stream<ap_uint<32>> LenA1;
-    static hls::stream<ap_uint<32>> LenA2;
-    static hls::stream<ap_uint<32>> LenA3;
     static hls::stream<ap_uint<32>> OffB1;
-    static hls::stream<ap_uint<32>> OffB2;
     static hls::stream<ap_uint<32>> LenB1;
-    static hls::stream<ap_uint<32>> LenB2;
+
+    static hls::stream<ap_uint<32>> Aligned_length_a;
+    static hls::stream<ap_uint<32>> Number_a;
+    static hls::stream<ap_uint<32>> Number_b;
+    static hls::stream<bool> Forward_flag;
+
     static hls::stream<bool> Ctl1;
     static hls::stream<bool> Ctl2;
     static hls::stream<bool> Ctl3;
     static hls::stream<bool> Ctl4;
 #pragma HLS STREAM variable = OffA1 depth=512
-#pragma HLS STREAM variable = OffA2 depth=512 
-#pragma HLS STREAM variable = OffA3 depth=512
 #pragma HLS STREAM variable = LenA1 depth=512
-#pragma HLS STREAM variable = LenA2 depth=512
-#pragma HLS STREAM variable = LenA3 depth=512
 #pragma HLS STREAM variable = OffB1 depth=512
-#pragma HLS STREAM variable = OffB2 depth=512
 #pragma HLS STREAM variable = LenB1 depth=512
-#pragma HLS STREAM variable = LenB2 depth=512
 #pragma HLS STREAM variable = Ctl1 depth=512
 #pragma HLS STREAM variable = Ctl2 depth=512
 #pragma HLS STREAM variable = Ctl3 depth=512
 #pragma HLS STREAM variable = Ctl4 depth=512
+#pragma HLS STREAM variable = Aligned_length_a depth=512
+#pragma HLS STREAM variable = Number_a depth=512
+#pragma HLS STREAM variable = Number_b depth=512
+#pragma HLS STREAM variable = Forward_flag depth=512
 
     hls::stream<ap_uint<32>> item_b_stream;
     hls::stream<ap_uint<512>> tc_stream_a_merge;
@@ -596,14 +614,15 @@ void triangle_count(ap_uint<64>* edge_list,
     loadEdgeList(edge_num, edge_list, edgeStrm, lelctrl); // each edge has two vertices, 64 bits
     loadOffset(edgeStrm, lelctrl, offset_1, offset_2, OffStrmA, OffStrmB, LenStrmA, LenStrmB, loctrl);
     duplicateStream(OffStrmA, OffStrmB, LenStrmA, LenStrmB, loctrl, 
-                    OffA1, OffA2, OffA3, LenA1, LenA2, LenA3, 
-                    OffB1, OffB2, LenB1, LenB2, 
+                    OffA1, LenA1, 
+                    OffB1, LenB1, 
+                    Aligned_length_a, Number_a, Number_b, Forward_flag,
                     Ctl1, Ctl2, Ctl3, Ctl4);
     loadSrcAdjList(OffA1, LenA1, Ctl1, column_list_1, tc_stream_a_merge, tc_stream_a_merge_inst);
     loadDstAdjList(OffB1, LenB1, Ctl2, column_list_2, item_b_stream, tc_stream_b_data);
-    generateMultiQueries(OffA2, LenA2, Ctl3, item_b_stream, tc_stream_b_data, 
+    generateMultiQueries(Aligned_length_a, Ctl3, item_b_stream, tc_stream_b_data, 
                         tc_stream_b_merge, tc_stream_b_merge_inst);
-    mergeTcStream(OffA3, LenA3, OffB2, LenB2, Ctl4, 
+    mergeTcStream(Number_a, Number_b, Forward_flag, Ctl4, 
                     tc_stream_a_merge, tc_stream_a_merge_inst, 
                     tc_stream_b_merge, tc_stream_b_merge_inst, 
                     tc_stream);

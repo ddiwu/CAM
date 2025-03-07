@@ -21,7 +21,8 @@ ap_uint<16> block_lookup_table(ap_uint<3> encoded_parallelism, ap_uint<32> index
         {0x5555, 0xAAAA, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}, // Parallelism = 8
         {0xFFFF, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}  // Parallelism = 16
     };
-    ap_uint<4> group_id = (index / 8) % 16; // 8 means 8 512bits for 128 int data;
+    // ap_uint<4> group_id = (index / 8) % 16; // 8 means 8 512bits for 128 int data;
+    ap_uint<4> group_id = (index >> 3) & 0xF; // 8 means 8 512bits for 128 int data;   
     return dest_lut[encoded_parallelism - 1][group_id]; 
     // -1 because the encoded_parallelism is 1-5, but the index is 0-4.
 }
@@ -50,6 +51,11 @@ void router_tc(hls::stream<ap_axiu<STREAM_LENGTH, 0, 0, 0>>& tc_stream_in,
             #pragma HLS unroll  
                 routing_table[i] = in_packet.data.range(32 * i + 31, 32 * i);
             }
+            out_packet.dest = (1 << (CUSTOMIZED_BLOCK_NUM + 1)) - 1; // set all bits to 1
+            out_packet.last = 0;
+            out_packet.data.range(518,515) = RESET_CAM;
+            router_out << out_packet;
+            
         } else if (decode_instruction(in_packet.data) == UPDATE_DUPLICATE) {
             out_packet.dest = block_lookup_table(get_parallelism(in_packet.data), index);
             // Perform UPDATE_DUPLICATE

@@ -174,8 +174,15 @@ def process_graph_with_virtual_nodes(edge_list, max_length):
 
     # Step 6: Sort the edge list
     duplicated_edges = sorted(new_edges, key=lambda edge: (edge[0], edge[1]))
-
-    return duplicated_edges, virtual_node_mapping, virtual_node_counts, node_mapping
+    
+    # Step 7: remove the last edge of each source
+    duplicated_edges_array = np.array(duplicated_edges)
+    unique_sources, counts = np.unique(duplicated_edges_array[:, 0], return_counts=True)
+    remove_indices = np.cumsum(counts) - 1
+    mask = np.ones(len(duplicated_edges_array), dtype=bool)
+    mask[remove_indices] = False
+    
+    return duplicated_edges_array[mask], virtual_node_mapping, virtual_node_counts, node_mapping
 
 
 def edgelist_to_csr(edge_list, num_vertices):
@@ -294,21 +301,18 @@ def process_multiple_datasets(file_list, max_length, input_dir="../datasets", ou
 
 # Example usage
 if __name__ == "__main__":
-    max_length = 2048
+    max_length = (2048 - 16) ## keep 16 to avoid the aligned edge length exceed 2048.
     file_list = [
-        "test.txt",
         "as20000102.txt",
         "amazon0302.mtx",
         "amazon0601.mtx",
-        "bio-DM-LC.edges",
         "cit-Patents.txt",
         "roadNet-PA.txt",
-        "amazon0312.mtx",
         "ca-cit-HepPh.edges",
         "facebook_combined.txt",
         "roadNet-CA.txt",
         "roadNet-TX.txt",
         "soc-Slashdot0811.txt",
     ]
-    process_multiple_datasets(file_list, max_length, "../datasets", "./generated")
+    process_multiple_datasets(file_list, max_length, "../../datasets", "./generated")
 

@@ -52,6 +52,7 @@ help::
 TARGET := hw
 HOST_ARCH := x86
 SYSROOT := 
+FREQ := 280 ## default frequency = 250 MHz
 
 include ./utils.mk
 
@@ -94,7 +95,7 @@ LDFLAGS += -luuid -lxrt_coreutil
 
 ############################## Setting up Kernel Variables ##############################
 # Kernel compiler global settings
-VPP_FLAGS += -t $(TARGET) --platform $(PLATFORM) --save-temps 
+VPP_FLAGS += -t $(TARGET) --platform $(PLATFORM) --save-temps --kernel_frequency $(FREQ)
 ifneq ($(TARGET), hw)
 	VPP_FLAGS += -g
 endif
