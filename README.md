@@ -218,25 +218,34 @@ Load the xclbin ./build_dir.hw.xilinx_u250_gen3x16_xdma_3_1_202020_1/triangle_co
 Kernel UUID: 1
 col_idx length: 12536
 row_ptr length: 12948
-edge_list length: 12536 edges (25072 elements)
+edge_list length: 11066 edges (22132 elements)
 Copying data to device...
 Launching kernels...
-TriangleCount completed, execution time: 1025 us
+TriangleCount completed, execution time: 422 us
 Copying results from device...
 Execution completed successfully!
 Triangle count: 6584
 ```
-Note that we are actively working on the optimization of the triangle counting kernel, so the performance can be better than the data reported in the paper. Here is the performance table of the triangle counting kernel on U250 board:
+Here are the lastest experimental results.
 
-| Dataset            | CAM_Execution_time (ms) | Baseline* | Ave_degree |
-|--------------------|-------------------------|----------|-----------|
-| facebook_combined  | 6.983                   | 18.7     | 21.85     |
-| amazon0601         | 106.771                 | 230.3    | 6.08      |
-| as20000102         | 1.025                   | 7.4      | 1.95      |
-| ca-cit-HepPh       | 2694.017                | 5361.1   | 117       |
-| soc-Slashdot0811   | 45.967                  | 259.7    | 6.09      |
+| Dataset              | Triangles    | Our Solution (CAM) (ms) | Baseline (ms) | Speedup |
+|----------------------|-------------|-------------------------|--------------|---------|
+| facebook_combined   | 1,612,010    | 5.054                   | 18.7         | 3.70x   |
+| amazon0302         | 717,719      | 23.086                  | 89.5         | 3.88x   |
+| amazon0601         | 3,986,507    | 71.210                  | 230.3        | 3.23x   |
+| as20000102        | 6,584        | 0.422                   | 7.4          | 17.54x  |
+| cit-Patents       | 7,515,023    | 415.808                 | 800          | 1.92x   |
+| ca-cit-HepPh      | 195,758,685  | 1,526.05                | 5,361.1      | 3.51x   |
+| roadNet-CA        | 120,676      | 62.058                  | 108.8        | 1.75x   |
+| roadNet-PA        | 67,150       | 34.559                  | 88.7         | 2.57x   |
+| roadNet-TX        | 82,869       | 42.323                  | 96.8         | 2.29x   |
+| soc-Slashdot0811  | 551,724      | 29.402                  | 259.7        | 8.83x   |
 
-* The baselines are obtained through re-implementing the official triangle counting accelerator design provided in the AMD Vitis library at [Triangle_counting](https://xilinx.github.io/Vitis_Libraries/graph/2021.1/guide_L2/kernels/TriangleCount.html) on our experimental platform.
+## Notes:
+- Baselines were obtained by re-implementing the official Triangle Counting accelerator design from AMD Vitis Library on our experimental platform.
+- Speedup values compare our CAM-based solution against the baseline implementation.
+- Detailed resource utilization reports and results comparisons are available in:  
+  `CAM/TriangleCount/results/`
 ---
 ## Contribution Guide
 
