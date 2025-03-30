@@ -62,6 +62,22 @@ Run the application on the specified target to simulate or test the functionalit
 ./executable -x xclbin_file
 ```
 
+you will see the output results like this:
+```bash
+Mapping input buffer
+Mapping output buffer
+Copying input data to device global memory
+Launching RTL kernel
+Copying output data to device global memory
+Comparing results
+i = 0 Software result = 1 Device result = 1
+i = 1 Software result = 1 Device result = 1
+i = 2 Software result = 1 Device result = 1
+i = 3 Software result = 0 Device result = 0
+i = 4 Software result = 0 Device result = 0
+i = 5 Software result = 0 Device result = 0
+TEST PASSED
+```
 
 ---
 ## An Module Test Example for Multi-Query Functionality of CAM Design

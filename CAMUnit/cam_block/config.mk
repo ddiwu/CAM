@@ -1,15 +1,8 @@
 VIVADO := $(XILINX_VIVADO)/bin/vivado
-# mode = appro / precise
-MODE ?= precise
 
-TRIGGER_FILE := mode_trigger.txt
-.PHONY: update_trigger
-update_trigger:
-	@echo "MODE is set to $(MODE)" > $(TRIGGER_FILE)
-
-$(TEMP_DIR)/rtl_cam.xo: scripts/package_kernel.tcl scripts/gen_rtl_cam_xo.tcl src/hdl/*.sv src/hdl/*.v src/hdl/*.xdc $(TRIGGER_FILE)
+$(TEMP_DIR)/rtl_cam.xo: scripts/package_kernel.tcl scripts/gen_rtl_cam_xo.tcl src/hdl/*.sv src/hdl/*.v
 	mkdir -p $(TEMP_DIR)
-	$(VIVADO) -mode batch -source scripts/gen_rtl_cam_xo.tcl -tclargs $(TEMP_DIR)/rtl_cam.xo cam $(TARGET) $(PLATFORM) $(XSA) $(MODE)
+	$(VIVADO) -mode batch -source scripts/gen_rtl_cam_xo.tcl -tclargs $(TEMP_DIR)/rtl_cam.xo cam $(TARGET) $(PLATFORM) $(XSA)
 
 $(TEMP_DIR)/krnl_output.xo: ./src/krnl_output.cpp
 	mkdir -p $(TEMP_DIR)
