@@ -1,15 +1,8 @@
 VIVADO := $(XILINX_VIVADO)/bin/vivado
-# mode = appro / precise
-MODE ?= precise
 
-TRIGGER_FILE := mode_trigger.txt
-.PHONY: update_trigger
-update_trigger:
-	@echo "MODE is set to $(MODE)" > $(TRIGGER_FILE)
-
-$(TEMP_DIR)/rtl_cam.xo: scripts/package_kernel.tcl scripts/gen_rtl_cam_xo.tcl src/hdl/*.sv src/hdl/*.v src/hdl/*.xdc $(TRIGGER_FILE)
+$(TEMP_DIR)/rtl_cam.xo: scripts/package_kernel.tcl scripts/gen_rtl_cam_xo.tcl src/hdl/*.sv src/hdl/*.v
 	mkdir -p $(TEMP_DIR)
-	$(VIVADO) -mode batch -source scripts/gen_rtl_cam_xo.tcl -tclargs $(TEMP_DIR)/rtl_cam.xo cam $(TARGET) $(PLATFORM) $(XSA) $(MODE)
+	$(VIVADO) -mode batch -source scripts/gen_rtl_cam_xo.tcl -tclargs $(TEMP_DIR)/rtl_cam.xo cam $(TARGET) $(PLATFORM) $(XSA)
 
 $(TEMP_DIR)/krnl_output.xo: ./src/krnl_output.cpp
 	mkdir -p $(TEMP_DIR)
@@ -21,16 +14,8 @@ $(TEMP_DIR)/krnl_input.xo: ./src/krnl_input.cpp
 
 $(TEMP_DIR)/post_router.xo: ./src/post_router.cpp
 	mkdir -p $(TEMP_DIR)
-	$(VPP) $(VPP_FLAGS) -c -k post_router --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
+	v++ $(VPP_FLAGS) -t $(TARGET) --platform $(PLATFORM) -c -k post_router -I'$(<D)' -o'$@' '$<' 
 
-$(TEMP_DIR)/mem_read.xo: ./src/mem_read.cpp
+$(TEMP_DIR)/router_tc.xo: ./src/router_tc.cpp
 	mkdir -p $(TEMP_DIR)
-	$(VPP) $(VPP_FLAGS) -c -k mem_read --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
-
-$(TEMP_DIR)/router.xo: ./src/router.cpp
-	mkdir -p $(TEMP_DIR)
-	$(VPP) $(VPP_FLAGS) -c -k router --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
-
-$(TEMP_DIR)/mem_write.xo: ./src/mem_write.cpp
-	mkdir -p $(TEMP_DIR)
-	$(VPP) $(VPP_FLAGS) -c -k mem_write --temp_dir $(TEMP_DIR)  -I'$(<D)' -o'$@' '$<'
+	v++ $(VPP_FLAGS) -t $(TARGET) --platform $(PLATFORM) -c -k router_tc -I'$(<D)' -o'$@' '$<' 

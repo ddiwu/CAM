@@ -79,6 +79,31 @@ i = 5 Software result = 0 Device result = 0
 TEST PASSED
 ```
 
+
+```bash
+Mapping input buffer
+Mapping output buffer
+Copying input data to device global memory
+Launching RTL kernel
+Copying output data to device global memory
+Comparing results
+match results = 48
+TEST PASSED
+
+Result Analysis (48):
+---------------------
+Breakdown:
+- First 3 multi-query operations: 16 results each (16 CAM blocks active)
+- Next 3 operations: 0 results each (CAM was reset)
+- Total = (3 × 16) + (3 × 0) = 48
+
+Key Points:
+1. 16-way parallelism from CAM blocks
+2. First batch shows full capacity output
+3. Second batch shows reset state (0s)
+4. Final sum aggregates all operation outputs
+```
+
 ---
 ## An Module Test Example for Multi-Query Functionality of CAM Design
 

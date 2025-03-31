@@ -63,8 +63,8 @@ LDFLAGS += -L$(XILINX_XRT)/lib -pthread -lOpenCL
 PLATFORM_BLOCKLIST += nodma 
 ############################## Setting up Host Variables ##############################
 #Include Required Host Source Files
-CXXFLAGS += -I$(XF_PROJ_ROOT)/common/includes/xcl2 -I$(XF_PROJ_ROOT)/common/includes/cmdparser -I$(XF_PROJ_ROOT)/common/includes/logger
-HOST_SRCS += $(XF_PROJ_ROOT)/common/includes/cmdparser/cmdlineparser.cpp $(XF_PROJ_ROOT)/common/includes/logger/logger.cpp $(XF_PROJ_ROOT)/common/includes/xcl2/xcl2.cpp src/host.cpp 
+CXXFLAGS += -I../../common/includes/xcl2 -I../../common/includes/cmdparser -I../../common/includes/logger
+HOST_SRCS += ../../common/includes/cmdparser/cmdlineparser.cpp ../../common/includes/logger/logger.cpp ../../common/includes/xcl2/xcl2.cpp src/host.cpp 
 # Host compiler global settings
 CXXFLAGS += -fmessage-length=0
 LDFLAGS += -lrt -lstdc++ 
@@ -74,13 +74,13 @@ LDFLAGS += -luuid -lxrt_coreutil
 # Kernel compiler global settings
 VPP_FLAGS += --save-temps 
 
-VPP_FLAGS_krnl_cam_rtl += --config ./unit.cfg
-EXECUTABLE = ./cam_unit
+VPP_FLAGS_krnl_cam_rtl += --config ./cam_unit.cfg
+EXECUTABLE = ./cam_host
 EMCONFIG_DIR = $(TEMP_DIR)
 
 ############################## Setting Targets ##############################
 .PHONY: all clean cleanall docs emconfig
-all: update_trigger check-platform check-device check-vitis $(EXECUTABLE) $(BUILD_DIR)/cam.xclbin emconfig
+all: check-platform check-device check-vitis $(EXECUTABLE) $(BUILD_DIR)/cam.xclbin emconfig
 
 .PHONY: host
 host: $(EXECUTABLE)
@@ -92,7 +92,7 @@ build: check-vitis check-device $(BUILD_DIR)/cam.xclbin
 xclbin: build
 
 # Building kernel
-$(BUILD_DIR)/cam.xclbin: $(TEMP_DIR)/rtl_cam.xo $(TEMP_DIR)/krnl_input.xo $(TEMP_DIR)/krnl_output.xo $(TEMP_DIR)/post_router.xo $(TEMP_DIR)/mem_read.xo $(TEMP_DIR)/router.xo $(TEMP_DIR)/mem_write.xo
+$(BUILD_DIR)/cam.xclbin: $(TEMP_DIR)/rtl_cam.xo $(TEMP_DIR)/krnl_input.xo $(TEMP_DIR)/krnl_output.xo $(TEMP_DIR)/post_router.xo $(TEMP_DIR)/router_tc.xo
 	mkdir -p $(BUILD_DIR)
 	v++ -l $(VPP_FLAGS) -t $(TARGET) --platform $(PLATFORM) $(VPP_LDFLAGS) --temp_dir $(TEMP_DIR) $(VPP_FLAGS_krnl_cam_rtl) -o'$(LINK_OUTPUT)' $(+)
 	v++ -p $(LINK_OUTPUT) -t $(TARGET) --platform $(PLATFORM) --package.out_dir $(PACKAGE_OUT) -o $(BUILD_DIR)/cam.xclbin

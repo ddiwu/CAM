@@ -1,36 +1,33 @@
 #!/bin/bash
+rm -rf ./src/*
+cp -r ./template/* ./src
 
-# Ensure the generate.sh script exists
-if [ -f "./src/generate.sh" ]; then
-    echo "Running ./src/generate.sh..."
-    
-    # Make sure the script is executable
-    chmod +x ./src/generate.sh
-
-    # Run the script
-    ./src/generate.sh
-
-    # Check the status of the run
-    if [ $? -eq 0 ]; then
-        echo "generate.sh executed successfully."
-    else
-        echo "generate.sh encountered an error."
-        exit 1
-    fi
-else
-    echo "Error: ./src/generate.sh does not exist."
-    exit 1
-fi
-
-# Read parameters from param.cfg
-while IFS='=' read -r key value; do
-    export "$key"="$value"
+# Load the parameters from param.cfg into an associative array.
+declare -A params
+while IFS= read -r line || [ -n "$line" ]; do
+  # Skip empty lines or lines starting with a comment.
+  [[ -z "$line" || "$line" =~ ^# ]] && continue
+  
+  # Extract the key and value from the line.
+  key=$(echo "$line" | cut -d '=' -f1)
+  value=$(echo "$line" | cut -d '=' -f2-)
+  
+  params["$key"]="$value"
 done < param.cfg
 
-# Call the Python script with the parameters
-python3 configure.py --bus_width "$BUS_WIDTH" \
-                     --cam_size "$CAM_SIZE" \
-                     --storage_type "$STORAGE_TYPE" \
-                     --mask "$MASK" \
-                     --block_num "$BLOCK_NUM" \
-                     --block_size "$BLOCK_SIZE"
+# First, print out the parameters that will be replaced.
+echo "Parameters to be replaced:"
+for key in "${!params[@]}"; do
+  echo "$key will be replaced with ${params[$key]}"
+done
+
+echo "------------------------------------"
+
+# Iterate over every file in the ./src directory.
+while IFS= read -r file; do
+  for key in "${!params[@]}"; do
+    # Replace every occurrence of the parameter word with its value.
+    sed -i "s|${key}|${params[$key]}|g" "$file"
+  done
+  echo "Processed file: $file"
+done < <(find ./src -type f)
