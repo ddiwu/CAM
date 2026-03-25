@@ -45,8 +45,6 @@ void post_router(hls::stream<ap_axiu<STREAM_LENGTH, 0, 0, CUSTOMIZED_BLOCK_NUM>>
 #pragma HLS interface ap_ctrl_none port=return
 
     ap_uint<STREAM_LENGTH> out_packet;
-    ap_uint<STREAM_LENGTH> search_packet[CUSTOMIZED_BLOCK_NUM];
-    #pragma HLS array_partition variable=search_packet complete dim=1
 
     ap_axiu<STREAM_LENGTH, 0, 0, CUSTOMIZED_BLOCK_NUM> v;
     ap_uint<CUSTOMIZED_BLOCK_NUM> dest;
@@ -57,32 +55,28 @@ void post_router(hls::stream<ap_axiu<STREAM_LENGTH, 0, 0, CUSTOMIZED_BLOCK_NUM>>
         if (v.last) break;
 
         if (decode_instruction(v.data) == SEARCH_MQ) {
-            for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) {
-                search_packet[i].range(31, 0) = ap_int<32>(v.data.range((i+1) * 32 - 1, i * 32));
-                search_packet[i].range(511, 32) = 0;
-                search_packet[i].range(519, 512) = v.data.range(519, 512);
-            }
-            out_1.write(search_packet[0]);
-            out_2.write(search_packet[1]);
-            out_3.write(search_packet[2]);
-            out_4.write(search_packet[3]);
-            out_5.write(search_packet[4]);
-            out_6.write(search_packet[5]);
-            out_7.write(search_packet[6]);
-            out_8.write(search_packet[7]);
-            out_9.write(search_packet[8]);
-            out_10.write(search_packet[9]);
-            out_11.write(search_packet[10]);
-            out_12.write(search_packet[11]);
-            out_13.write(search_packet[12]);
-            out_14.write(search_packet[13]);
-            out_15.write(search_packet[14]);
-            out_16.write(search_packet[15]);
-            #if DEBUG_POST_ROUTER_ENABLE
-            for (int i = 0; i < CUSTOMIZED_BLOCK_NUM; i++) { // print the keys
-                std::cout << std::hex << "[INFO] SEARCH_MQ, block " << i << " keys: " << search_packet[i].data.range(31, 0) << std::endl;
-            }
-            #endif
+            // Write directly to each stream without intermediate array.
+            // base_packet has instruction in upper bits, zeros elsewhere.
+            ap_uint<STREAM_LENGTH> base_packet = 0;
+            base_packet.range(519, 512) = v.data.range(519, 512);
+            ap_uint<STREAM_LENGTH> p;
+
+            p = base_packet; p.range(31, 0) = v.data.range(31, 0);     out_1.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(63, 32);    out_2.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(95, 64);    out_3.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(127, 96);   out_4.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(159, 128);  out_5.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(191, 160);  out_6.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(223, 192);  out_7.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(255, 224);  out_8.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(287, 256);  out_9.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(319, 288);  out_10.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(351, 320);  out_11.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(383, 352);  out_12.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(415, 384);  out_13.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(447, 416);  out_14.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(479, 448);  out_15.write(p);
+            p = base_packet; p.range(31, 0) = v.data.range(511, 480);  out_16.write(p);
         } else {
             out_packet = v.data;
             dest = v.dest;
